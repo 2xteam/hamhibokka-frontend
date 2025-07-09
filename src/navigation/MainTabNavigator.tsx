@@ -1,66 +1,96 @@
-// src/navigation/MainTabNavigator.tsx
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-import {Colors} from '../theme';
-import {HomeScreen} from '../screens/home/HomeScreen';
-import {GoalStackNavigator} from '../navigation/GoalStackNavigator';
-import {ExploreScreen} from '../screens/explore/ExploreScreen';
-import {ProfileStackNavigator} from '../navigation/ProfileStackNavigator';
+import HomeScreen from '../screens/HomeScreen';
+import GoalScreen from '../screens/GoalScreen';
+import ExploreScreen from '../screens/ExploreScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
-export const MainTabNavigator = () => {
+interface User {
+  id: string;
+  userId: string;
+  email: string;
+  nickname: string;
+  profileImage?: string;
+}
+
+interface MainTabNavigatorProps {
+  user: User | null;
+  onLogout: () => void;
+}
+
+const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({ user, onLogout }) => {
   return (
     <Tab.Navigator
-      screenOptions={({route}) => ({
-        tabBarIcon: ({focused, color, size}) => {
-          let iconName: string;
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName = '';
 
           switch (route.name) {
             case 'Home':
-              iconName = focused ? 'home' : 'home-outline';
+              iconName = 'home';
               break;
             case 'Goals':
-              iconName = focused ? 'trophy' : 'trophy-outline';
+              iconName = 'flag';
               break;
             case 'Explore':
-              iconName = focused ? 'search' : 'search-outline';
+              iconName = 'search';
               break;
             case 'Profile':
-              iconName = focused ? 'person' : 'person-outline';
+              iconName = 'person';
               break;
-            default:
-              iconName = 'home-outline';
           }
 
           return <Icon name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: Colors.primary,
-        tabBarInactiveTintColor: Colors.textSecondary,
-        headerShown: false,
+        tabBarActiveTintColor: '#4A90E2',
+        tabBarInactiveTintColor: '#95A5A6',
         tabBarStyle: {
-          backgroundColor: Colors.background,
-          borderTopColor: Colors.borderLight,
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 1,
+          borderTopColor: '#E0E6ED',
+          paddingBottom: 8,
+          paddingTop: 8,
+          height: 60,
         },
-      })}>
-      <Tab.Screen name="Home" component={HomeScreen} options={{title: '홈'}} />
-      <Tab.Screen
-        name="Goals"
-        component={GoalStackNavigator}
-        options={{title: '목표'}}
-      />
-      <Tab.Screen
-        name="Explore"
-        component={ExploreScreen}
-        options={{title: '탐색'}}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileStackNavigator}
-        options={{title: '프로필'}}
-      />
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+        },
+        headerShown: false,
+      })}
+    >
+      <Tab.Screen 
+        name="Home" 
+        options={{ tabBarLabel: '홈' }}
+      >
+        {() => <HomeScreen user={user} />}
+      </Tab.Screen>
+      
+      <Tab.Screen 
+        name="Goals" 
+        options={{ tabBarLabel: '목표' }}
+      >
+        {() => <GoalScreen user={user} />}
+      </Tab.Screen>
+      
+      <Tab.Screen 
+        name="Explore" 
+        options={{ tabBarLabel: '탐색' }}
+      >
+        {() => <ExploreScreen user={user} />}
+      </Tab.Screen>
+      
+      <Tab.Screen 
+        name="Profile" 
+        options={{ tabBarLabel: '프로필' }}
+      >
+        {() => <ProfileScreen user={user} onLogout={onLogout} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 };
+
+export default MainTabNavigator;
