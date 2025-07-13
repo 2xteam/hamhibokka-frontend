@@ -14,14 +14,15 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "paths": {
-      "@/*": ["src/*"],
-      "@/components/*": ["src/components/*"],
-      "@/screens/*": ["src/screens/*"],
-      "@/types/*": ["src/types/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/hooks/*": ["src/hooks/*"],
-      "@/state/*": ["src/state/*"],
-      "@/services/*": ["src/services/*"]
+      "@/*": ["./src/*"],
+      "@/queries/*": ["./src/queries/*"],
+      // "@/components/*": ["src/components/*"],
+      // "@/screens/*": ["src/screens/*"],
+      // "@/types/*": ["src/types/*"],
+      // "@/utils/*": ["src/utils/*"],
+      // "@/hooks/*": ["src/hooks/*"],
+      // "@/state/*": ["src/state/*"],
+      // "@/services/*": ["src/services/*"]
     }
   }
 }

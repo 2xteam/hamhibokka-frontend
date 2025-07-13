@@ -1,9 +1,9 @@
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
-import HomeScreen from '../screens/HomeScreen';
-import GoalScreen from '../screens/GoalScreen';
 import ExploreScreen from '../screens/ExploreScreen';
+import GoalTabScreen from '../screens/GoalTabScreen';
+import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
@@ -21,11 +21,14 @@ interface MainTabNavigatorProps {
   onLogout: () => void;
 }
 
-const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({ user, onLogout }) => {
+const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({
+  user,
+  onLogout,
+}) => {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
+      screenOptions={({route}) => ({
+        tabBarIcon: ({focused, color, size}) => {
           let iconName = '';
 
           switch (route.name) {
@@ -60,33 +63,22 @@ const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({ user, onLogout }) =
           fontWeight: '500',
         },
         headerShown: false,
-      })}
-    >
-      <Tab.Screen 
-        name="Home" 
-        options={{ tabBarLabel: '홈' }}
-      >
+      })}>
+      <Tab.Screen name="Home" options={{tabBarLabel: '홈'}}>
         {() => <HomeScreen user={user} />}
       </Tab.Screen>
-      
-      <Tab.Screen 
-        name="Goals" 
-        options={{ tabBarLabel: '목표' }}
-      >
-        {() => <GoalScreen user={user} />}
-      </Tab.Screen>
-      
-      <Tab.Screen 
-        name="Explore" 
-        options={{ tabBarLabel: '탐색' }}
-      >
+
+      <Tab.Screen
+        name="Goals"
+        component={GoalTabScreen}
+        options={{tabBarLabel: '목표 관리'}}
+      />
+
+      <Tab.Screen name="Explore" options={{tabBarLabel: '탐색'}}>
         {() => <ExploreScreen user={user} />}
       </Tab.Screen>
-      
-      <Tab.Screen 
-        name="Profile" 
-        options={{ tabBarLabel: '프로필' }}
-      >
+
+      <Tab.Screen name="Profile" options={{tabBarLabel: '프로필'}}>
         {() => <ProfileScreen user={user} onLogout={onLogout} />}
       </Tab.Screen>
     </Tab.Navigator>

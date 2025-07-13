@@ -5,8 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // HTTP 링크 설정 (백엔드 서버 주소)
 const httpLink = createHttpLink({
-  uri: 'http://localhost:3000/graphql', // 개발환경
-  // uri: 'https://your-production-api.com/graphql', // 프로덕션환경
+  uri: 'http://10.0.2.2:3000/graphql', // Android 에뮬레이터용 local
+  // uri: 'http://ec2-13-55-123-201.ap-southeast-2.compute.amazonaws.com:3000/graphql', // 프로덕션환경
 });
 
 // 인증 헤더 설정

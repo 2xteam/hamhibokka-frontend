@@ -1,0 +1,14 @@
+overwrite: true
+schema: "http://localhost:3000/graphql"  # GraphQL 서버 URL
+# schema: "http://ec2-13-55-123-201.ap-southeast-2.compute.amazonaws.com:3000/graphql"  # GraphQL 서버 URL
+documents: "src/**/*.{ts,tsx}"  # GraphQL 쿼리가 있는 파일들
+generates:
+  src/generated/graphql.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
+    config:
+      withHooks: true
+      withComponent: false
+      withHOC: false
