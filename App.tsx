@@ -1,12 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import {ApolloProvider} from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ApolloProvider } from '@apollo/client';
-import apolloClient from './src/services/apollo-client';
-import LoadingScreen from './src/screens/LoadingScreen';
-import AuthScreen from './src/screens/AuthScreen';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
+import React, {useEffect, useState} from 'react';
+import Reactotron from 'reactotron-react-native';
 import MainTabNavigator from './src/navigation/MainTabNavigator';
+import AuthScreen from './src/screens/AuthScreen';
+import CreateGoalScreen from './src/screens/CreateGoalScreen';
+import GoalDetailScreen from './src/screens/GoalDetailScreen';
+import InvitationDetailScreen from './src/screens/InvitationDetailScreen';
+import LoadingScreen from './src/screens/LoadingScreen';
+import apolloClient from './src/services/apollo-client';
+
+if (__DEV__) {
+  import('./ReactotronConfig').then(() =>
+    Reactotron.log('Reactotron Configured'),
+  );
+}
 
 const Stack = createStackNavigator();
 
@@ -37,7 +47,7 @@ const App: React.FC = () => {
         const parsedUser = JSON.parse(userData);
         setUser(parsedUser);
         setIsAuthenticated(true);
-        
+
         // TODO: 토큰 유효성 검증 API 호출
         // const isValidToken = await validateToken(token);
         // if (!isValidToken) {
@@ -81,11 +91,28 @@ const App: React.FC = () => {
   return (
     <ApolloProvider client={apolloClient}>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
           {isAuthenticated ? (
-            <Stack.Screen name="Main">
-              {() => <MainTabNavigator user={user} onLogout={logout} />}
-            </Stack.Screen>
+            <>
+              <Stack.Screen name="Main">
+                {() => <MainTabNavigator user={user} onLogout={logout} />}
+              </Stack.Screen>
+              <Stack.Screen
+                name="CreateGoal"
+                component={CreateGoalScreen}
+                options={{headerShown: true, title: '새 목표 만들기'}}
+              />
+              <Stack.Screen
+                name="GoalDetail"
+                component={GoalDetailScreen}
+                options={{headerShown: true, title: '목표 상세'}}
+              />
+              <Stack.Screen
+                name="InvitationDetail"
+                component={InvitationDetailScreen}
+                options={{headerShown: true, title: '요청/초대 상세'}}
+              />
+            </>
           ) : (
             <Stack.Screen name="Auth">
               {() => <AuthScreen onAuthSuccess={handleAuthSuccess} />}

@@ -12,7 +12,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { useMutation } from '@apollo/client';
-import { LOGIN_MUTATION, REGISTER_MUTATION } from '../services/auth-queries';
+import { LOGIN_USER, REGISTER_USER } from '../queries/user';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -35,8 +36,8 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
   const [nickname, setNickname] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const [login] = useMutation(LOGIN_MUTATION);
-  const [register] = useMutation(REGISTER_MUTATION);
+  const [login] = useMutation(LOGIN_USER);
+  const [register] = useMutation(REGISTER_USER);
 
   const handleAuth = async () => {
     if (!email || !password || (!isLogin && !nickname)) {
@@ -61,6 +62,8 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
           }
         });
         
+        console.log('Login result:', result); // 디버깅용
+        
         if (result.data?.login) {
           const { accessToken, user } = result.data.login;
           onAuthSuccess(accessToken, user);
@@ -68,7 +71,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
       } else {
         result = await register({
           variables: {
-            registerInput: { email, password, nickname }
+            registerInput: { email, password, nickname, userId: '1234567890', profileImage: 'https://via.placeholder.com/150'  }
           }
         });
         
@@ -79,10 +82,25 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
       }
     } catch (error: any) {
       console.error('Auth error:', error);
-      Alert.alert(
-        '오류', 
-        error.message || (isLogin ? '로그인에 실패했습니다.' : '회원가입에 실패했습니다.')
-      );
+      console.error('Error details:', {
+        message: error.message,
+        graphQLErrors: error.graphQLErrors,
+        networkError: error.networkError,
+        clientErrors: error.clientErrors
+      });
+      
+      let errorMessage = isLogin ? '로그인에 실패했습니다.' : '회원가입에 실패했습니다.';
+      
+      // GraphQL 에러 메시지 추출
+      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+        errorMessage = error.graphQLErrors[0].message;
+      } else if (error.networkError) {
+        errorMessage = '네트워크 연결을 확인해주세요.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert('오류', errorMessage);
     } finally {
       setIsLoading(false);
     }

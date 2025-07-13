@@ -6,11 +6,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
-  Dimensions,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-
-const { width } = Dimensions.get('window');
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
+import GoalSummarySection from './components/GoalSummarySection';
+import FollowFeedSection from './components/FollowFeedSection';
+import ChallengeSection from './components/ChallengeSection';
+import FloatingAddGoalButton from './components/FloatingAddGoalButton';
 
 interface User {
   id: string;
@@ -26,6 +28,7 @@ interface HomeScreenProps {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
   const [refreshing, setRefreshing] = useState(false);
+  const navigation = useNavigation<any>();
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -44,7 +47,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
           <Text style={styles.userName}>{user?.nickname}님</Text>
         </View>
         <TouchableOpacity style={styles.notificationButton}>
-          <Icon name="notifications" size={24} color="#2C3E50" />
+          <MaterialIcons name="notifications" size={24} color="#2C3E50" />
           <View style={styles.notificationBadge}>
             <Text style={styles.notificationCount}>3</Text>
           </View>
@@ -58,134 +61,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* 내 목표 요약 */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>내 목표 현황</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>전체보기</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.goalSummaryContainer}>
-            <View style={styles.goalSummaryCard}>
-              <View style={styles.goalSummaryIcon}>
-                <Icon name="flag" size={20} color="#4A90E2" />
-              </View>
-              <Text style={styles.goalSummaryNumber}>3</Text>
-              <Text style={styles.goalSummaryLabel}>진행 중</Text>
-            </View>
-
-            <View style={styles.goalSummaryCard}>
-              <View style={styles.goalSummaryIcon}>
-                <Icon name="check-circle" size={20} color="#27AE60" />
-              </View>
-              <Text style={styles.goalSummaryNumber}>12</Text>
-              <Text style={styles.goalSummaryLabel}>완료됨</Text>
-            </View>
-
-            <View style={styles.goalSummaryCard}>
-              <View style={styles.goalSummaryIcon}>
-                <Icon name="stars" size={20} color="#F39C12" />
-              </View>
-              <Text style={styles.goalSummaryNumber}>127</Text>
-              <Text style={styles.goalSummaryLabel}>스티커</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* 팔로우 피드 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>팔로우 피드</Text>
-          
-          {/* 피드 아이템 예시 */}
-          <View style={styles.feedItem}>
-            <View style={styles.feedHeader}>
-              <View style={styles.feedUserInfo}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>김</Text>
-                </View>
-                <View>
-                  <Text style={styles.feedUserName}>김철수</Text>
-                  <Text style={styles.feedTime}>2시간 전</Text>
-                </View>
-              </View>
-              <TouchableOpacity style={styles.stickerButton}>
-                <Icon name="star" size={16} color="#F39C12" />
-                <Text style={styles.stickerButtonText}>스티커</Text>
-              </TouchableOpacity>
-            </View>
-            
-            <Text style={styles.feedGoalTitle}>매일 영어 단어 20개 외우기</Text>
-            <View style={styles.feedProgress}>
-              <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: '60%' }]} />
-              </View>
-              <Text style={styles.progressText}>12/20 스티커</Text>
-            </View>
-          </View>
-
-          <View style={styles.feedItem}>
-            <View style={styles.feedHeader}>
-              <View style={styles.feedUserInfo}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>이</Text>
-                </View>
-                <View>
-                  <Text style={styles.feedUserName}>이영희</Text>
-                  <Text style={styles.feedTime}>5시간 전</Text>
-                </View>
-              </View>
-              <TouchableOpacity style={styles.stickerButton}>
-                <Icon name="star" size={16} color="#F39C12" />
-                <Text style={styles.stickerButtonText}>스티커</Text>
-              </TouchableOpacity>
-            </View>
-            
-            <Text style={styles.feedGoalTitle}>주 3회 운동하기</Text>
-            <View style={styles.feedProgress}>
-              <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: '80%' }]} />
-              </View>
-              <Text style={styles.progressText}>8/10 스티커</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* 추천 챌린저 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>참여 가능한 챌린저</Text>
-          
-          <TouchableOpacity style={styles.challengeCard}>
-            <View style={styles.challengeHeader}>
-              <Text style={styles.challengeTitle}>새해 독서 챌린지</Text>
-              <View style={styles.challengeParticipants}>
-                <Icon name="group" size={16} color="#7F8C8D" />
-                <Text style={styles.participantCount}>15명 참여</Text>
-              </View>
-            </View>
-            <Text style={styles.challengeDescription}>
-              한 달 동안 책 3권 읽기 도전!
-            </Text>
-            <View style={styles.challengeFooter}>
-              <Text style={styles.challengeDuration}>30일 남음</Text>
-              <TouchableOpacity style={styles.joinButton}>
-                <Text style={styles.joinButtonText}>참여하기</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </View>
+        <GoalSummarySection navigation={navigation} />
+        <FollowFeedSection />
+        <ChallengeSection />
       </ScrollView>
 
       {/* 플로팅 액션 버튼 */}
-      <TouchableOpacity style={styles.fab}>
-        <Icon name="add" size={24} color="#FFFFFF" />
-      </TouchableOpacity>
+      <FloatingAddGoalButton />
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',
@@ -233,6 +120,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
+    marginTop: 10,
     marginBottom: 24,
     paddingHorizontal: 20,
   },
@@ -244,6 +132,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
+    marginBottom:10,
     fontWeight: 'bold',
     color: '#2C3E50',
   },
