@@ -1,4 +1,5 @@
 import {useMutation, useQuery} from '@apollo/client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
@@ -12,7 +13,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {CREATE_GOAL_JOIN_REQUEST, GET_GOAL} from '../queries/goal';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {
+  CREATE_GOAL_JOIN_REQUEST,
+  GET_GOAL,
+  RECEIVE_STICKER,
+} from '../queries/goal';
 
 interface GoalDetailParams {
   id: string;
@@ -44,7 +50,7 @@ const GoalDetailScreen: React.FC = () => {
   const route = useRoute<RouteProp<Record<string, GoalDetailParams>, string>>();
   const navigation = useNavigation<any>();
   const {id, from} = route.params || {};
-  const {data, loading, error} = useQuery(GET_GOAL, {variables: {id}});
+  const {data, loading, error, refetch} = useQuery(GET_GOAL, {variables: {id}});
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [createJoinRequest, {loading: joinLoading}] = useMutation(
@@ -52,6 +58,10 @@ const GoalDetailScreen: React.FC = () => {
   );
   const [joinMessage, setJoinMessage] = useState('');
   const [joinModalVisible, setJoinModalVisible] = useState(false);
+  const [giveStickerCount, setGiveStickerCount] = useState('1');
+  const [receiveSticker, {loading: giveStickerLoading}] =
+    useMutation(RECEIVE_STICKER);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
@@ -62,6 +72,20 @@ const GoalDetailScreen: React.FC = () => {
     });
     return unsubscribe;
   }, [navigation, from]);
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const userData = await AsyncStorage.getItem('@hamhibokka_user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          setCurrentUserId(user.userId);
+        }
+      } catch (e) {
+        setCurrentUserId(null);
+      }
+    })();
+  }, []);
 
   if (loading) {
     return (
@@ -189,10 +213,131 @@ const GoalDetailScreen: React.FC = () => {
                   <Text style={styles.modalLabel}>
                     닉네임: {selectedParticipant.nickname || '-'}
                   </Text>
-                  <Text style={styles.modalLabel}>
-                    ID: {selectedParticipant.id || '-'}
-                  </Text>
-                  {/* 추가 현황 정보가 있다면 여기에 표시 */}
+
+                  <View style={styles.stickerRow}>
+                    <Text style={styles.stickerCountText}>
+                      현재 스티커:{' '}
+                      {selectedParticipant.currentStickerCount ?? 0}개
+                    </Text>
+                  </View>
+
+                  {/* 스티커 부여 현황(동그란 아이콘으로 시각화) */}
+                  <View
+                    style={{
+                      marginTop: 10,
+                      width: '100%',
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    {Array.from({length: goal.stickerCount}).map((_, idx) => (
+                      <MaterialIcons
+                        key={idx}
+                        name="star"
+                        size={28}
+                        style={{marginHorizontal: 2}}
+                        color={
+                          idx < (selectedParticipant.currentStickerCount ?? 0)
+                            ? '#F9D923' // 채워진(획득한) 스티커: 노란색
+                            : '#E0E6ED' // 비어있는(미획득) 스티커: 연회색
+                        }
+                      />
+                    ))}
+                  </View>
+                  {/* goal 생성자일 때만 스티커 부여 UI 노출, 단 목표 달성 시에는 노출 X */}
+                  {goal.createdBy &&
+                    currentUserId &&
+                    goal.createdBy === currentUserId &&
+                    selectedParticipant.currentStickerCount !== undefined &&
+                    selectedParticipant.currentStickerCount <
+                      goal.stickerCount && (
+                      <View style={styles.giveStickerBox}>
+                        <Text style={styles.giveStickerLabel}>스티커 부여</Text>
+                        <View style={styles.giveStickerRow}>
+                          <TextInput
+                            style={styles.giveStickerInput}
+                            value={giveStickerCount}
+                            onChangeText={setGiveStickerCount}
+                            keyboardType="numeric"
+                            maxLength={2}
+                          />
+                          <TouchableOpacity
+                            style={styles.giveStickerBtn}
+                            onPress={async () => {
+                              const current =
+                                selectedParticipant.currentStickerCount ?? 0;
+                              const give = Number(giveStickerCount) || 1;
+                              if (current + give > goal.stickerCount) {
+                                Alert.alert(
+                                  '스티커 목표 초과',
+                                  '스티커 목표 개수를 초과할 수 없습니다.',
+                                );
+                                return;
+                              }
+                              try {
+                                await receiveSticker({
+                                  variables: {
+                                    input: {
+                                      goalId: goal.goalId,
+                                      toUserId:
+                                        selectedParticipant.userId ||
+                                        selectedParticipant.id,
+                                      stickerCount: give,
+                                    },
+                                  },
+                                });
+                                Alert.alert(
+                                  '스티커 부여 완료',
+                                  `${giveStickerCount}개 스티커를 부여했습니다!`,
+                                );
+                                setGiveStickerCount('1');
+                                setModalVisible(false);
+                                if (typeof refetch === 'function')
+                                  await refetch();
+                              } catch (e: any) {
+                                let msg = '스티커 부여에 실패했습니다.';
+                                if (e?.graphQLErrors?.[0]?.message)
+                                  msg = e.graphQLErrors[0].message;
+                                else if (e?.message) msg = e.message;
+                                Alert.alert('실패', msg);
+                              }
+                            }}
+                            disabled={giveStickerLoading}>
+                            <Text style={styles.giveStickerBtnText}>
+                              {giveStickerLoading ? '부여 중...' : '부여'}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    )}
+
+                  {/* 참여자가 본인이고 목표 달성 시 축하 UI 노출 */}
+                  {selectedParticipant.userId === currentUserId &&
+                    selectedParticipant.currentStickerCount ===
+                      goal.stickerCount && (
+                      <View style={{alignItems: 'center', marginTop: 24}}>
+                        <Text
+                          style={{
+                            fontSize: 28,
+                            color: '#F39C12',
+                            marginBottom: 8,
+                          }}>
+                          🎉
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 18,
+                            color: '#27AE60',
+                            fontWeight: 'bold',
+                            marginBottom: 4,
+                          }}>
+                          목표 달성!
+                        </Text>
+                        <Text style={{fontSize: 15, color: '#2C3E50'}}>
+                          축하합니다! 모든 스티커를 모았습니다.
+                        </Text>
+                      </View>
+                    )}
                 </>
               ) : null}
               <TouchableOpacity
@@ -392,6 +537,56 @@ const styles = StyleSheet.create({
     fontSize: 15,
     backgroundColor: '#F8F9FA',
     marginTop: 8,
+  },
+  stickerRow: {
+    marginTop: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  stickerCountText: {
+    fontSize: 14,
+    color: '#2C3E50',
+  },
+  giveStickerBox: {
+    marginTop: 18,
+    alignItems: 'center',
+    width: '100%',
+  },
+  giveStickerLabel: {
+    fontSize: 16,
+    color: '#2C3E50',
+    fontWeight: 'bold',
+    marginBottom: 6,
+  },
+  giveStickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  giveStickerInput: {
+    width: 48,
+    height: 36,
+    borderWidth: 1,
+    borderColor: '#E0E6ED',
+    borderRadius: 8,
+    padding: 8,
+    fontSize: 16,
+    marginRight: 10,
+    textAlign: 'center',
+    backgroundColor: '#F8F9FA',
+  },
+  giveStickerBtn: {
+    backgroundColor: '#F39C12',
+    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  giveStickerBtnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 

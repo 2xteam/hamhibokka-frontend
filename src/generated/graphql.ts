@@ -99,6 +99,7 @@ export type GoalParticipant = {
   joinedAt: Scalars['DateTime']['output'];
   nickname?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
+  stickerReceivedLogs?: Maybe<Array<StickerReceivedLog>>;
   userId: Scalars['String']['output'];
 };
 
@@ -122,6 +123,7 @@ export type Mutation = {
   deleteStickerImage: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
   login: AuthPayload;
+  receiveSticker: Goal;
   register: AuthPayload;
   updateFollow: Follow;
   updateGoal: Goal;
@@ -193,6 +195,11 @@ export type MutationDeleteUserArgs = {
 
 export type MutationLoginArgs = {
   loginInput: LoginInput;
+};
+
+
+export type MutationReceiveStickerArgs = {
+  input: ReceiveStickerInput;
 };
 
 
@@ -289,6 +296,13 @@ export type QueryGetUserArgs = {
   id: Scalars['String']['input'];
 };
 
+export type ReceiveStickerInput = {
+  goalId: Scalars['String']['input'];
+  recipientId?: InputMaybe<Scalars['String']['input']>;
+  stickerCount?: InputMaybe<Scalars['Float']['input']>;
+  toUserId: Scalars['String']['input'];
+};
+
 export type RegisterInput = {
   email: Scalars['String']['input'];
   nickname: Scalars['String']['input'];
@@ -322,6 +336,12 @@ export type StickerInput = {
   stickerImageId: Scalars['String']['input'];
 };
 
+export type StickerReceivedLog = {
+  __typename?: 'StickerReceivedLog';
+  count: Scalars['Float']['output'];
+  date: Scalars['String']['output'];
+};
+
 export type UpdateGoalInvitationInput = {
   message?: InputMaybe<Scalars['String']['input']>;
   status: Scalars['String']['input'];
@@ -347,14 +367,14 @@ export type UserInput = {
 export type GetGoalsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGoalsQuery = { __typename?: 'Query', getGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, status: string, currentStickerCount: number, joinedAt: any }> | null }> };
+export type GetGoalsQuery = { __typename?: 'Query', getGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: string, count: number }> | null }> | null }> };
 
 export type GetGoalQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type GetGoalQuery = { __typename?: 'Query', getGoal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any }> | null } | null };
+export type GetGoalQuery = { __typename?: 'Query', getGoal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: string, count: number }> | null }> | null } | null };
 
 export type CreateGoalMutationVariables = Exact<{
   input: GoalInput;
@@ -380,7 +400,22 @@ export type GetInvitationQueryVariables = Exact<{
 }>;
 
 
-export type GetInvitationQuery = { __typename?: 'Query', getInvitation?: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, status: string, currentStickerCount: number, joinedAt: any }> | null } | null } | null };
+export type GetInvitationQuery = { __typename?: 'Query', getInvitation?: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: string, count: number }> | null }> | null } | null } | null };
+
+export type UpdateGoalInvitationMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+  input: UpdateGoalInvitationInput;
+}>;
+
+
+export type UpdateGoalInvitationMutation = { __typename?: 'Mutation', updateGoalInvitation: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: string, count: number }> | null }> | null } | null } };
+
+export type ReceiveStickerMutationVariables = Exact<{
+  input: ReceiveStickerInput;
+}>;
+
+
+export type ReceiveStickerMutation = { __typename?: 'Mutation', receiveSticker: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: string, count: number }> | null }> | null } };
 
 export type LoginUserMutationVariables = Exact<{
   loginInput: LoginInput;
@@ -413,9 +448,14 @@ export const GetGoalsDocument = gql`
     createdAt
     participants {
       userId
+      nickname
       status
       currentStickerCount
       joinedAt
+      stickerReceivedLogs {
+        date
+        count
+      }
     }
   }
 }
@@ -475,6 +515,10 @@ export const GetGoalDocument = gql`
       status
       currentStickerCount
       joinedAt
+      stickerReceivedLogs {
+        date
+        count
+      }
     }
   }
 }
@@ -672,9 +716,14 @@ export const GetInvitationDocument = gql`
       updatedAt
       participants {
         userId
+        nickname
         status
         currentStickerCount
         joinedAt
+        stickerReceivedLogs {
+          date
+          count
+        }
       }
     }
     respondedAt
@@ -716,6 +765,132 @@ export type GetInvitationQueryHookResult = ReturnType<typeof useGetInvitationQue
 export type GetInvitationLazyQueryHookResult = ReturnType<typeof useGetInvitationLazyQuery>;
 export type GetInvitationSuspenseQueryHookResult = ReturnType<typeof useGetInvitationSuspenseQuery>;
 export type GetInvitationQueryResult = Apollo.QueryResult<GetInvitationQuery, GetInvitationQueryVariables>;
+export const UpdateGoalInvitationDocument = gql`
+    mutation UpdateGoalInvitation($id: String!, $input: UpdateGoalInvitationInput!) {
+  updateGoalInvitation(id: $id, input: $input) {
+    id
+    invitationId
+    goalId
+    fromUserId
+    toUserId
+    type
+    status
+    message
+    respondedAt
+    createdAt
+    updatedAt
+    goal {
+      id
+      goalId
+      title
+      description
+      stickerCount
+      mode
+      visibility
+      status
+      createdBy
+      autoApprove
+      createdAt
+      updatedAt
+      participants {
+        userId
+        nickname
+        status
+        currentStickerCount
+        joinedAt
+        stickerReceivedLogs {
+          date
+          count
+        }
+      }
+    }
+  }
+}
+    `;
+export type UpdateGoalInvitationMutationFn = Apollo.MutationFunction<UpdateGoalInvitationMutation, UpdateGoalInvitationMutationVariables>;
+
+/**
+ * __useUpdateGoalInvitationMutation__
+ *
+ * To run a mutation, you first call `useUpdateGoalInvitationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateGoalInvitationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateGoalInvitationMutation, { data, loading, error }] = useUpdateGoalInvitationMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateGoalInvitationMutation(baseOptions?: Apollo.MutationHookOptions<UpdateGoalInvitationMutation, UpdateGoalInvitationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateGoalInvitationMutation, UpdateGoalInvitationMutationVariables>(UpdateGoalInvitationDocument, options);
+      }
+export type UpdateGoalInvitationMutationHookResult = ReturnType<typeof useUpdateGoalInvitationMutation>;
+export type UpdateGoalInvitationMutationResult = Apollo.MutationResult<UpdateGoalInvitationMutation>;
+export type UpdateGoalInvitationMutationOptions = Apollo.BaseMutationOptions<UpdateGoalInvitationMutation, UpdateGoalInvitationMutationVariables>;
+export const ReceiveStickerDocument = gql`
+    mutation ReceiveSticker($input: ReceiveStickerInput!) {
+  receiveSticker(input: $input) {
+    id
+    goalId
+    title
+    description
+    stickerCount
+    mode
+    visibility
+    status
+    createdBy
+    creatorNickname
+    autoApprove
+    createdAt
+    updatedAt
+    isParticipant
+    participants {
+      userId
+      nickname
+      status
+      currentStickerCount
+      joinedAt
+      stickerReceivedLogs {
+        date
+        count
+      }
+    }
+  }
+}
+    `;
+export type ReceiveStickerMutationFn = Apollo.MutationFunction<ReceiveStickerMutation, ReceiveStickerMutationVariables>;
+
+/**
+ * __useReceiveStickerMutation__
+ *
+ * To run a mutation, you first call `useReceiveStickerMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useReceiveStickerMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [receiveStickerMutation, { data, loading, error }] = useReceiveStickerMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useReceiveStickerMutation(baseOptions?: Apollo.MutationHookOptions<ReceiveStickerMutation, ReceiveStickerMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ReceiveStickerMutation, ReceiveStickerMutationVariables>(ReceiveStickerDocument, options);
+      }
+export type ReceiveStickerMutationHookResult = ReturnType<typeof useReceiveStickerMutation>;
+export type ReceiveStickerMutationResult = Apollo.MutationResult<ReceiveStickerMutation>;
+export type ReceiveStickerMutationOptions = Apollo.BaseMutationOptions<ReceiveStickerMutation, ReceiveStickerMutationVariables>;
 export const LoginUserDocument = gql`
     mutation LoginUser($loginInput: LoginInput!) {
   login(loginInput: $loginInput) {

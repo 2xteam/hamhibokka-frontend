@@ -16,9 +16,14 @@ export const GET_GOALS = gql`
       createdAt
       participants {
         userId
+        nickname
         status
         currentStickerCount
         joinedAt
+        stickerReceivedLogs {
+          date
+          count
+        }
       }
     }
   }
@@ -47,6 +52,10 @@ export const GET_GOAL = gql`
         status
         currentStickerCount
         joinedAt
+        stickerReceivedLogs {
+          date
+          count
+        }
       }
     }
   }
@@ -131,9 +140,14 @@ export const GET_INVITATION = gql`
         updatedAt
         participants {
           userId
+          nickname
           status
           currentStickerCount
           joinedAt
+          stickerReceivedLogs {
+            date
+            count
+          }
         }
       }
       respondedAt
@@ -175,9 +189,46 @@ export const UPDATE_GOAL_INVITATION = gql`
         updatedAt
         participants {
           userId
+          nickname
           status
           currentStickerCount
           joinedAt
+          stickerReceivedLogs {
+            date
+            count
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const RECEIVE_STICKER = gql`
+  mutation ReceiveSticker($input: ReceiveStickerInput!) {
+    receiveSticker(input: $input) {
+      id
+      goalId
+      title
+      description
+      stickerCount
+      mode
+      visibility
+      status
+      createdBy
+      creatorNickname
+      autoApprove
+      createdAt
+      updatedAt
+      isParticipant
+      participants {
+        userId
+        nickname
+        status
+        currentStickerCount
+        joinedAt
+        stickerReceivedLogs {
+          date
+          count
         }
       }
     }
