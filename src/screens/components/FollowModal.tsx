@@ -1,27 +1,18 @@
 import {useMutation, useQuery} from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Image,
-  ScrollView,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {APPROVE_FOLLOW, GET_FOLLOWS} from '../queries/user';
-import UserList, {User} from './components/UserList';
-
-interface ProfileUser {
-  id: string;
-  userId: string;
-  email: string;
-  nickname: string;
-  profileImage?: string;
-}
+import {APPROVE_FOLLOW, GET_FOLLOWS} from '../../queries/user';
+import ProfileModal from './ProfileModal';
+import UserList, {User} from './UserList';
 
 interface Follow {
   id: string;
@@ -41,17 +32,33 @@ interface Follow {
   updatedAt: string;
 }
 
-interface ProfileScreenProps {
-  user: ProfileUser | null;
-  onLogout: () => void;
+interface FollowModalProps {
+  visible: boolean;
+  onClose: () => void;
+  currentUserId: string;
 }
 
-const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
-  const navigation = useNavigation<any>();
+const FollowModal: React.FC<FollowModalProps> = ({
+  visible,
+  onClose,
+  currentUserId,
+}) => {
   const [followsList, setFollowsList] = useState<Follow[]>([]);
   const [actualCurrentUserId, setActualCurrentUserId] = useState<string>('');
+  const [profileModalVisible, setProfileModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  // 현재 사용자 ID 가져오기
+  // 모든 팔로우 데이터 조회
+  const {
+    data: followsData,
+    loading: followsLoading,
+    refetch: refetchFollows,
+  } = useQuery(GET_FOLLOWS, {
+    variables: {status: null},
+    fetchPolicy: 'network-only', // 캐시 무시하고 항상 네트워크에서 새로 가져오기
+  });
+
+  // 현재 사용자 ID 가져오기 및 데이터 새로고침
   useEffect(() => {
     const getCurrentUser = async () => {
       try {
@@ -65,18 +72,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
       }
     };
 
-    getCurrentUser();
-  }, []);
-
-  // 모든 팔로우 데이터 조회
-  const {
-    data: followsData,
-    loading: followsLoading,
-    refetch: refetchFollows,
-  } = useQuery(GET_FOLLOWS, {
-    variables: {status: null},
-    fetchPolicy: 'network-only',
-  });
+    if (visible) {
+      getCurrentUser();
+      // 모달이 열릴 때마다 데이터 새로고침
+      refetchFollows();
+    }
+  }, [visible, refetchFollows]);
 
   // 팔로우 승인 뮤테이션
   const [approveFollow] = useMutation(APPROVE_FOLLOW, {
@@ -154,8 +155,30 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
   };
 
   const handleUserPress = (user: User) => {
-    // 사용자 클릭 시 UserProfileScreen으로 이동
-    navigation.navigate('UserProfile', {user});
+    // 사용자 클릭 시 프로필 모달 띄우기
+    setSelectedUser(user);
+    setProfileModalVisible(true);
+  };
+
+  const handleCloseProfileModal = () => {
+    setProfileModalVisible(false);
+    setSelectedUser(null);
+  };
+
+  // 팔로우 상태 변경 처리
+  const handleFollowStatusChange = (userId: string, isFollowed: boolean) => {
+    // 팔로우 상태가 변경되면 리스트도 업데이트
+    setFollowsList(prevFollows =>
+      prevFollows.map(follow => {
+        if (follow.followerId === userId || follow.followingId === userId) {
+          return {
+            ...follow,
+            status: isFollowed ? 'approved' : 'pending',
+          };
+        }
+        return follow;
+      }),
+    );
   };
 
   const handleApproveFollow = (userId: string) => {
@@ -177,145 +200,108 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
     ]);
   };
 
-  const handleLogout = () => {
-    Alert.alert('로그아웃', '정말 로그아웃 하시겠습니까?', [
-      {text: '취소', style: 'cancel'},
-      {text: '로그아웃', style: 'destructive', onPress: onLogout},
-    ]);
-  };
-
   const users = convertFollowsToUsers();
 
   return (
-    <View style={styles.container}>
-      {/* 헤더 */}
-      <View style={styles.header}>
-        <View style={styles.headerSpacer} />
-        <Text style={styles.headerTitle}>내 프로필</Text>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>로그아웃</Text>
-        </TouchableOpacity>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}>
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>친구 관리</Text>
+
+          {/* 리스트 */}
+          {followsLoading ? (
+            <ActivityIndicator style={styles.loading} />
+          ) : (
+            <View style={styles.listContainer}>
+              {/* 디버깅 정보 */}
+              <Text style={styles.debugInfo}>
+                총 {users.length}개의 팔로우 데이터
+              </Text>
+              <UserList
+                users={users}
+                onPressUser={handleUserPress}
+                emptyText="팔로우 데이터가 없습니다."
+                contentContainerStyle={styles.listContent}
+                showFollowStatus={false}
+                showApproveButton={true}
+                onApproveFollow={handleApproveFollow}
+              />
+            </View>
+          )}
+
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <Text style={styles.closeButtonText}>닫기</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <ScrollView style={styles.content}>
-        {/* 프로필 정보 */}
-        <View style={styles.profileSection}>
-          <Image
-            source={
-              user?.profileImage
-                ? {uri: user.profileImage}
-                : require('../../assets/default-profile.jpg')
-            }
-            style={styles.profileImage}
-          />
-          <Text style={styles.nickname}>{user?.nickname}</Text>
-          <Text style={styles.email}>{user?.email}</Text>
-        </View>
-
-        {/* 친구 관리 섹션 */}
-        <View style={styles.friendsSection}>
-          <Text style={styles.friendsSectionTitle}>친구 관리</Text>
-          <Text style={styles.friendsSectionSubtitle}>
-            총 {users.length}개의 팔로우 데이터
-          </Text>
-
-          {followsLoading ? (
-            <ActivityIndicator style={styles.friendsLoading} />
-          ) : (
-            <UserList
-              users={users}
-              onPressUser={handleUserPress}
-              emptyText="팔로우 데이터가 없습니다."
-              contentContainerStyle={styles.friendsList}
-              showFollowStatus={false}
-              showApproveButton={true}
-              onApproveFollow={handleApproveFollow}
-            />
-          )}
-        </View>
-      </ScrollView>
-    </View>
+      {/* 프로필 모달 */}
+      <ProfileModal
+        visible={profileModalVisible}
+        user={selectedUser}
+        onClose={handleCloseProfileModal}
+        currentUserId={actualCurrentUserId}
+        onFollowStatusChange={handleFollowStatusChange}
+      />
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  modalOverlay: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
-  },
-  header: {
-    flexDirection: 'row',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'space-between',
+  },
+  modalContent: {
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E6ED',
+    borderRadius: 16,
+    padding: 24,
+    width: '90%',
+    maxWidth: 500,
+    height: '80%',
   },
-  headerSpacer: {
-    width: 60,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-  },
-  logoutButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  logoutButtonText: {
-    fontSize: 16,
-    color: '#E74C3C',
-    fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-  },
-  profileSection: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#E0E6ED',
-    marginBottom: 16,
-  },
-  nickname: {
+  modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#2C3E50',
-    marginBottom: 4,
+    textAlign: 'center',
+    marginBottom: 20,
   },
-  email: {
-    fontSize: 14,
-    color: '#7F8C8D',
-  },
-  friendsSection: {
+  listContainer: {
     flex: 1,
+    minHeight: 200,
   },
-  friendsSectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 8,
+  listContent: {
+    paddingBottom: 20,
   },
-  friendsSectionSubtitle: {
+  loading: {
+    marginVertical: 40,
+  },
+  closeButton: {
+    backgroundColor: '#95A5A6',
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  closeButtonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  debugInfo: {
     fontSize: 12,
     color: '#7F8C8D',
-    marginBottom: 16,
-  },
-  friendsLoading: {
-    marginTop: 10,
-  },
-  friendsList: {
-    paddingHorizontal: 0,
+    textAlign: 'center',
+    marginBottom: 10,
   },
 });
 
-export default ProfileScreen;
+export default FollowModal;

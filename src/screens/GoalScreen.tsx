@@ -1,20 +1,16 @@
 import {useQuery} from '@apollo/client';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback} from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {GET_GOALS} from '../queries/goal';
 import FloatingAddGoalButton from './components/FloatingAddGoalButton';
+import GoalList, {Goal} from './components/GoalList';
 
 const GoalScreen: React.FC = () => {
   const navigation = useNavigation<any>();
-  const {data, loading, error, refetch} = useQuery(GET_GOALS);
+  const {data, loading, error, refetch} = useQuery(GET_GOALS, {
+    fetchPolicy: 'network-only', // 캐시 무시하고 항상 네트워크에서 새로 가져오기
+  });
 
   useFocusEffect(
     useCallback(() => {
@@ -22,47 +18,18 @@ const GoalScreen: React.FC = () => {
     }, [refetch]),
   );
 
-  const renderItem = ({item}: any) => (
-    <TouchableOpacity
-      style={styles.goalItem}
-      onPress={() => navigation.navigate('GoalDetail', {id: item.id})}>
-      <Text style={styles.goalTitle}>{item.title}</Text>
-      <Text style={styles.goalDesc}>{item.description || '설명 없음'}</Text>
-      <Text style={styles.stickerCount}>
-        스티커 목표: {item.stickerCount ?? '-'}개
-      </Text>
-    </TouchableOpacity>
-  );
-
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#4A90E2" />
-      </View>
-    );
-  }
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text>목표를 불러올 수 없습니다.</Text>
-      </View>
-    );
-  }
   const goals = data?.getGoals || [];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>나의 목표</Text>
-      {goals.length === 0 ? (
-        <Text style={styles.emptyText}>아직 등록된 목표가 없습니다.</Text>
-      ) : (
-        <FlatList
-          data={goals}
-          keyExtractor={item => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContainer}
-        />
-      )}
+      <GoalList
+        goals={goals}
+        onPressGoal={(goal: Goal) =>
+          navigation.navigate('GoalDetail', {id: goal.id})
+        }
+        contentContainerStyle={styles.listContainer}
+        emptyText="아직 등록된 목표가 없습니다."
+      />
       <FloatingAddGoalButton />
     </View>
   );

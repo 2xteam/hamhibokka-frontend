@@ -10,6 +10,7 @@ import CreateGoalScreen from './src/screens/CreateGoalScreen';
 import GoalDetailScreen from './src/screens/GoalDetailScreen';
 import InvitationDetailScreen from './src/screens/InvitationDetailScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
+import UserProfileScreen from './src/screens/UserProfileScreen';
 import apolloClient from './src/services/apollo-client';
 
 if (__DEV__) {
@@ -111,6 +112,11 @@ const App: React.FC = () => {
                 name="InvitationDetail"
                 component={InvitationDetailScreen}
                 options={{headerShown: true, title: '요청/초대 상세'}}
+              />
+              <Stack.Screen
+                name="UserProfile"
+                component={UserProfileScreen}
+                options={{headerShown: false}}
               />
             </>
           ) : (
