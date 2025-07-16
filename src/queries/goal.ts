@@ -12,8 +12,11 @@ export const GET_GOALS = gql`
       visibility
       status
       createdBy
+      creatorNickname
       autoApprove
       createdAt
+      updatedAt
+      isParticipant
       participants {
         userId
         nickname
@@ -206,6 +209,70 @@ export const UPDATE_GOAL_INVITATION = gql`
 export const RECEIVE_STICKER = gql`
   mutation ReceiveSticker($input: ReceiveStickerInput!) {
     receiveSticker(input: $input) {
+      id
+      goalId
+      title
+      description
+      stickerCount
+      mode
+      visibility
+      status
+      createdBy
+      creatorNickname
+      autoApprove
+      createdAt
+      updatedAt
+      isParticipant
+      participants {
+        userId
+        nickname
+        status
+        currentStickerCount
+        joinedAt
+        stickerReceivedLogs {
+          date
+          count
+        }
+      }
+    }
+  }
+`;
+
+export const SEARCH_GOALS_BY_TITLE = gql`
+  query SearchGoalsByTitle($title: String!) {
+    searchGoalsByTitle(title: $title) {
+      id
+      goalId
+      title
+      description
+      stickerCount
+      mode
+      visibility
+      status
+      createdBy
+      creatorNickname
+      autoApprove
+      createdAt
+      updatedAt
+      isParticipant
+      participants {
+        userId
+        nickname
+        status
+        currentStickerCount
+        joinedAt
+        stickerReceivedLogs {
+          date
+          count
+        }
+      }
+    }
+  }
+`;
+
+export const GET_GOALS_BY_USER_ID = gql`
+  query GetGoalsByUserId($userId: String!) {
+    getGoalsByUserId(userId: $userId) {
       id
       goalId
       title

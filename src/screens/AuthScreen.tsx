@@ -1,21 +1,20 @@
-import React, { useState } from 'react';
+import {useMutation} from '@apollo/client';
+import React, {useState} from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
   Alert,
+  Dimensions,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Dimensions,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useMutation } from '@apollo/client';
-import { LOGIN_USER, REGISTER_USER } from '../queries/user';
+import {LOGIN_USER, REGISTER_USER} from '../queries/user';
 
-
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 interface User {
   id: string;
@@ -29,7 +28,7 @@ interface AuthScreenProps {
   onAuthSuccess: (token: string, user: User) => void;
 }
 
-const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
+const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -54,29 +53,29 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
 
     try {
       let result;
-      
+
       if (isLogin) {
         result = await login({
           variables: {
-            loginInput: { email, password }
-          }
+            loginInput: {email, password},
+          },
         });
-        
+
         console.log('Login result:', result); // 디버깅용
-        
+
         if (result.data?.login) {
-          const { accessToken, user } = result.data.login;
+          const {accessToken, user} = result.data.login;
           onAuthSuccess(accessToken, user);
         }
       } else {
         result = await register({
           variables: {
-            registerInput: { email, password, nickname, userId: '1234567890', profileImage: 'https://via.placeholder.com/150'  }
-          }
+            registerInput: {email, password, nickname},
+          },
         });
-        
+
         if (result.data?.register) {
-          const { accessToken, user } = result.data.register;
+          const {accessToken, user} = result.data.register;
           onAuthSuccess(accessToken, user);
         }
       }
@@ -86,11 +85,13 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
         message: error.message,
         graphQLErrors: error.graphQLErrors,
         networkError: error.networkError,
-        clientErrors: error.clientErrors
+        clientErrors: error.clientErrors,
       });
-      
-      let errorMessage = isLogin ? '로그인에 실패했습니다.' : '회원가입에 실패했습니다.';
-      
+
+      let errorMessage = isLogin
+        ? '로그인에 실패했습니다.'
+        : '회원가입에 실패했습니다.';
+
       // GraphQL 에러 메시지 추출
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         errorMessage = error.graphQLErrors[0].message;
@@ -99,7 +100,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       Alert.alert('오류', errorMessage);
     } finally {
       setIsLoading(false);
@@ -118,14 +119,12 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
   };
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollView
         contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
+        keyboardShouldPersistTaps="handled">
         {/* 로고 영역 */}
         <View style={styles.logoContainer}>
           <Text style={styles.appName}>함히보까</Text>
@@ -180,17 +179,15 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthSuccess }) => {
           <TouchableOpacity
             style={[styles.authButton, isLoading && styles.disabledButton]}
             onPress={handleAuth}
-            disabled={isLoading}
-          >
+            disabled={isLoading}>
             <Text style={styles.authButtonText}>
-              {isLoading ? '처리 중...' : (isLogin ? '로그인' : '회원가입')}
+              {isLoading ? '처리 중...' : isLogin ? '로그인' : '회원가입'}
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.switchButton}
-            onPress={toggleAuthMode}
-          >
+            onPress={toggleAuthMode}>
             <Text style={styles.switchButtonText}>
               {isLogin ? '계정이 없으신가요? ' : '이미 계정이 있으신가요? '}
               <Text style={styles.switchButtonHighlight}>
@@ -261,7 +258,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 12,
     shadowColor: '#4A90E2',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,

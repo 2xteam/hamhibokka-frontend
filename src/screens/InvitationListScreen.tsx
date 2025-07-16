@@ -1,6 +1,6 @@
 import {useQuery} from '@apollo/client';
-import {useNavigation} from '@react-navigation/native';
-import React from 'react';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import React, {useCallback} from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -24,7 +24,16 @@ const statusIconMap: Record<string, {name: string; color: string}> = {
 
 const InvitationListScreen: React.FC = () => {
   const navigation = useNavigation<any>();
-  const {data, loading, error, refetch} = useQuery(GET_MY_INVITATIONS);
+  const {data, loading, error, refetch} = useQuery(GET_MY_INVITATIONS, {
+    fetchPolicy: 'network-only', // 캐시 무시하고 항상 네트워크에서 새로 가져오기
+  });
+
+  // 화면에 포커스될 때마다 데이터 새로고침
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
 
   const renderItem = ({item}: any) => (
     <TouchableOpacity

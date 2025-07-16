@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import {useNavigation} from '@react-navigation/native';
+import React, {useState} from 'react';
 import {
-  View,
-  Text,
+  RefreshControl,
   ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
-  RefreshControl,
+  View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useNavigation } from '@react-navigation/native';
-import GoalSummarySection from './components/GoalSummarySection';
-import FollowFeedSection from './components/FollowFeedSection';
 import ChallengeSection from './components/ChallengeSection';
 import FloatingAddGoalButton from './components/FloatingAddGoalButton';
+import FollowFeedSection from './components/FollowFeedSection';
+import GoalSummarySection from './components/GoalSummarySection';
 
 interface User {
   id: string;
@@ -26,7 +26,7 @@ interface HomeScreenProps {
   user: User | null;
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation<any>();
 
@@ -42,11 +42,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
     <View style={styles.container}>
       {/* 헤더 */}
       <View style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>안녕하세요! 👋</Text>
-          <Text style={styles.userName}>{user?.nickname}님</Text>
-        </View>
-        <TouchableOpacity style={styles.notificationButton}>
+        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+          <View>
+            <Text style={styles.userName}>{user?.nickname}님</Text>
+            <Text style={styles.greeting}>안녕하세요! 👋</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.notificationButton}
+          onPress={() => navigation.navigate('Goals', {screen: 'Invitations'})}>
           <MaterialIcons name="notifications" size={24} color="#2C3E50" />
           <View style={styles.notificationBadge}>
             <Text style={styles.notificationCount}>3</Text>
@@ -59,8 +63,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ user }) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        showsVerticalScrollIndicator={false}
-      >
+        showsVerticalScrollIndicator={false}>
         <GoalSummarySection navigation={navigation} />
         <FollowFeedSection />
         <ChallengeSection />
@@ -132,7 +135,7 @@ export const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    marginBottom:10,
+    marginBottom: 10,
     fontWeight: 'bold',
     color: '#2C3E50',
   },
@@ -153,7 +156,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
@@ -177,7 +180,7 @@ export const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
@@ -263,7 +266,7 @@ export const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
@@ -327,7 +330,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#4A90E2',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,

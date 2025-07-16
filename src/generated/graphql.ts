@@ -38,14 +38,32 @@ export type CreateGoalJoinRequestInput = {
 
 export type Follow = {
   __typename?: 'Follow';
+  approvedAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  createdBy?: Maybe<Scalars['String']['output']>;
+  followerEmail?: Maybe<Scalars['String']['output']>;
   followerId: Scalars['String']['output'];
+  followerNickname?: Maybe<Scalars['String']['output']>;
+  followerProfileImage?: Maybe<Scalars['String']['output']>;
+  followingEmail?: Maybe<Scalars['String']['output']>;
   followingId: Scalars['String']['output'];
+  followingNickname?: Maybe<Scalars['String']['output']>;
+  followingProfileImage?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  status?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedBy?: Maybe<Scalars['String']['output']>;
 };
 
 export type FollowInput = {
   followerId: Scalars['String']['input'];
   followingId: Scalars['String']['input'];
+};
+
+export type FollowStatus = {
+  __typename?: 'FollowStatus';
+  followId?: Maybe<Scalars['String']['output']>;
+  isFollowed: Scalars['Boolean']['output'];
 };
 
 export type Goal = {
@@ -110,6 +128,7 @@ export type LoginInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  approveFollow: Follow;
   createFollow: Follow;
   createGoal: Goal;
   createGoalInvitation: GoalInvitation;
@@ -130,6 +149,11 @@ export type Mutation = {
   updateGoalInvitation: GoalInvitation;
   updateSticker: Sticker;
   updateUser: User;
+};
+
+
+export type MutationApproveFollowArgs = {
+  followId: Scalars['String']['input'];
 };
 
 
@@ -239,6 +263,7 @@ export type MutationUpdateUserArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  checkFollowStatus: FollowStatus;
   defaultStickerImages: Array<StickerImage>;
   getFollow?: Maybe<Follow>;
   getFollows: Array<Follow>;
@@ -259,11 +284,24 @@ export type Query = {
   getUsers: Array<User>;
   hello: Scalars['String']['output'];
   myStickerImages: Array<StickerImage>;
+  searchGoalsByTitle: Array<Goal>;
+  searchUsersByNickname: Array<User>;
+};
+
+
+export type QueryCheckFollowStatusArgs = {
+  followerId: Scalars['String']['input'];
+  followingId: Scalars['String']['input'];
 };
 
 
 export type QueryGetFollowArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryGetFollowsArgs = {
+  status?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -294,6 +332,16 @@ export type QueryGetStickerArgs = {
 
 export type QueryGetUserArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QuerySearchGoalsByTitleArgs = {
+  title: Scalars['String']['input'];
+};
+
+
+export type QuerySearchUsersByNicknameArgs = {
+  nickname: Scalars['String']['input'];
 };
 
 export type ReceiveStickerInput = {
@@ -339,7 +387,7 @@ export type StickerInput = {
 export type StickerReceivedLog = {
   __typename?: 'StickerReceivedLog';
   count: Scalars['Float']['output'];
-  date: Scalars['String']['output'];
+  date: Scalars['DateTime']['output'];
 };
 
 export type UpdateGoalInvitationInput = {
@@ -351,6 +399,7 @@ export type User = {
   __typename?: 'User';
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
+  isFollowed?: Maybe<Scalars['Boolean']['output']>;
   nickname: Scalars['String']['output'];
   profileImage?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
@@ -367,14 +416,14 @@ export type UserInput = {
 export type GetGoalsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGoalsQuery = { __typename?: 'Query', getGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: string, count: number }> | null }> | null }> };
+export type GetGoalsQuery = { __typename?: 'Query', getGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
 
 export type GetGoalQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type GetGoalQuery = { __typename?: 'Query', getGoal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: string, count: number }> | null }> | null } | null };
+export type GetGoalQuery = { __typename?: 'Query', getGoal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } | null };
 
 export type CreateGoalMutationVariables = Exact<{
   input: GoalInput;
@@ -400,7 +449,7 @@ export type GetInvitationQueryVariables = Exact<{
 }>;
 
 
-export type GetInvitationQuery = { __typename?: 'Query', getInvitation?: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: string, count: number }> | null }> | null } | null } | null };
+export type GetInvitationQuery = { __typename?: 'Query', getInvitation?: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } | null } | null };
 
 export type UpdateGoalInvitationMutationVariables = Exact<{
   id: Scalars['String']['input'];
@@ -408,14 +457,21 @@ export type UpdateGoalInvitationMutationVariables = Exact<{
 }>;
 
 
-export type UpdateGoalInvitationMutation = { __typename?: 'Mutation', updateGoalInvitation: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: string, count: number }> | null }> | null } | null } };
+export type UpdateGoalInvitationMutation = { __typename?: 'Mutation', updateGoalInvitation: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } | null } };
 
 export type ReceiveStickerMutationVariables = Exact<{
   input: ReceiveStickerInput;
 }>;
 
 
-export type ReceiveStickerMutation = { __typename?: 'Mutation', receiveSticker: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: string, count: number }> | null }> | null } };
+export type ReceiveStickerMutation = { __typename?: 'Mutation', receiveSticker: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } };
+
+export type SearchGoalsByTitleQueryVariables = Exact<{
+  title: Scalars['String']['input'];
+}>;
+
+
+export type SearchGoalsByTitleQuery = { __typename?: 'Query', searchGoalsByTitle: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
 
 export type LoginUserMutationVariables = Exact<{
   loginInput: LoginInput;
@@ -431,6 +487,57 @@ export type RegisterUserMutationVariables = Exact<{
 
 export type RegisterUserMutation = { __typename?: 'Mutation', register: { __typename?: 'AuthPayload', accessToken: string, user: { __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null } } };
 
+export type SearchUsersByNicknameQueryVariables = Exact<{
+  nickname: Scalars['String']['input'];
+}>;
+
+
+export type SearchUsersByNicknameQuery = { __typename?: 'Query', searchUsersByNickname: Array<{ __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null, isFollowed?: boolean | null }> };
+
+export type CreateFollowMutationVariables = Exact<{
+  input: FollowInput;
+}>;
+
+
+export type CreateFollowMutation = { __typename?: 'Mutation', createFollow: { __typename?: 'Follow', id: string, followerId: string, followingId: string } };
+
+export type UpdateFollowMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+  input: FollowInput;
+}>;
+
+
+export type UpdateFollowMutation = { __typename?: 'Mutation', updateFollow: { __typename?: 'Follow', id: string, followerId: string, followingId: string } };
+
+export type DeleteFollowMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type DeleteFollowMutation = { __typename?: 'Mutation', deleteFollow: boolean };
+
+export type CheckFollowStatusQueryVariables = Exact<{
+  followerId: Scalars['String']['input'];
+  followingId: Scalars['String']['input'];
+}>;
+
+
+export type CheckFollowStatusQuery = { __typename?: 'Query', checkFollowStatus: { __typename?: 'FollowStatus', isFollowed: boolean, followId?: string | null } };
+
+export type GetFollowsQueryVariables = Exact<{
+  status?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetFollowsQuery = { __typename?: 'Query', getFollows: Array<{ __typename?: 'Follow', id: string, followerId: string, followingId: string, followerNickname?: string | null, followingNickname?: string | null, followerEmail?: string | null, followerProfileImage?: string | null, followingEmail?: string | null, followingProfileImage?: string | null, status?: string | null, approvedAt?: any | null, createdBy?: string | null, updatedBy?: string | null, createdAt?: any | null, updatedAt?: any | null }> };
+
+export type ApproveFollowMutationVariables = Exact<{
+  followId: Scalars['String']['input'];
+}>;
+
+
+export type ApproveFollowMutation = { __typename?: 'Mutation', approveFollow: { __typename?: 'Follow', id: string, followerId: string, followingId: string, status?: string | null, approvedAt?: any | null, createdBy?: string | null, updatedBy?: string | null, createdAt?: any | null, updatedAt?: any | null } };
+
 
 export const GetGoalsDocument = gql`
     query GetGoals {
@@ -444,8 +551,11 @@ export const GetGoalsDocument = gql`
     visibility
     status
     createdBy
+    creatorNickname
     autoApprove
     createdAt
+    updatedAt
+    isParticipant
     participants {
       userId
       nickname
@@ -891,6 +1001,70 @@ export function useReceiveStickerMutation(baseOptions?: Apollo.MutationHookOptio
 export type ReceiveStickerMutationHookResult = ReturnType<typeof useReceiveStickerMutation>;
 export type ReceiveStickerMutationResult = Apollo.MutationResult<ReceiveStickerMutation>;
 export type ReceiveStickerMutationOptions = Apollo.BaseMutationOptions<ReceiveStickerMutation, ReceiveStickerMutationVariables>;
+export const SearchGoalsByTitleDocument = gql`
+    query SearchGoalsByTitle($title: String!) {
+  searchGoalsByTitle(title: $title) {
+    id
+    goalId
+    title
+    description
+    stickerCount
+    mode
+    visibility
+    status
+    createdBy
+    creatorNickname
+    autoApprove
+    createdAt
+    updatedAt
+    isParticipant
+    participants {
+      userId
+      nickname
+      status
+      currentStickerCount
+      joinedAt
+      stickerReceivedLogs {
+        date
+        count
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useSearchGoalsByTitleQuery__
+ *
+ * To run a query within a React component, call `useSearchGoalsByTitleQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchGoalsByTitleQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchGoalsByTitleQuery({
+ *   variables: {
+ *      title: // value for 'title'
+ *   },
+ * });
+ */
+export function useSearchGoalsByTitleQuery(baseOptions: Apollo.QueryHookOptions<SearchGoalsByTitleQuery, SearchGoalsByTitleQueryVariables> & ({ variables: SearchGoalsByTitleQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchGoalsByTitleQuery, SearchGoalsByTitleQueryVariables>(SearchGoalsByTitleDocument, options);
+      }
+export function useSearchGoalsByTitleLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchGoalsByTitleQuery, SearchGoalsByTitleQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchGoalsByTitleQuery, SearchGoalsByTitleQueryVariables>(SearchGoalsByTitleDocument, options);
+        }
+export function useSearchGoalsByTitleSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SearchGoalsByTitleQuery, SearchGoalsByTitleQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SearchGoalsByTitleQuery, SearchGoalsByTitleQueryVariables>(SearchGoalsByTitleDocument, options);
+        }
+export type SearchGoalsByTitleQueryHookResult = ReturnType<typeof useSearchGoalsByTitleQuery>;
+export type SearchGoalsByTitleLazyQueryHookResult = ReturnType<typeof useSearchGoalsByTitleLazyQuery>;
+export type SearchGoalsByTitleSuspenseQueryHookResult = ReturnType<typeof useSearchGoalsByTitleSuspenseQuery>;
+export type SearchGoalsByTitleQueryResult = Apollo.QueryResult<SearchGoalsByTitleQuery, SearchGoalsByTitleQueryVariables>;
 export const LoginUserDocument = gql`
     mutation LoginUser($loginInput: LoginInput!) {
   login(loginInput: $loginInput) {
@@ -971,3 +1145,287 @@ export function useRegisterUserMutation(baseOptions?: Apollo.MutationHookOptions
 export type RegisterUserMutationHookResult = ReturnType<typeof useRegisterUserMutation>;
 export type RegisterUserMutationResult = Apollo.MutationResult<RegisterUserMutation>;
 export type RegisterUserMutationOptions = Apollo.BaseMutationOptions<RegisterUserMutation, RegisterUserMutationVariables>;
+export const SearchUsersByNicknameDocument = gql`
+    query SearchUsersByNickname($nickname: String!) {
+  searchUsersByNickname(nickname: $nickname) {
+    id
+    userId
+    email
+    nickname
+    profileImage
+    isFollowed
+  }
+}
+    `;
+
+/**
+ * __useSearchUsersByNicknameQuery__
+ *
+ * To run a query within a React component, call `useSearchUsersByNicknameQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchUsersByNicknameQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchUsersByNicknameQuery({
+ *   variables: {
+ *      nickname: // value for 'nickname'
+ *   },
+ * });
+ */
+export function useSearchUsersByNicknameQuery(baseOptions: Apollo.QueryHookOptions<SearchUsersByNicknameQuery, SearchUsersByNicknameQueryVariables> & ({ variables: SearchUsersByNicknameQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchUsersByNicknameQuery, SearchUsersByNicknameQueryVariables>(SearchUsersByNicknameDocument, options);
+      }
+export function useSearchUsersByNicknameLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchUsersByNicknameQuery, SearchUsersByNicknameQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchUsersByNicknameQuery, SearchUsersByNicknameQueryVariables>(SearchUsersByNicknameDocument, options);
+        }
+export function useSearchUsersByNicknameSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SearchUsersByNicknameQuery, SearchUsersByNicknameQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SearchUsersByNicknameQuery, SearchUsersByNicknameQueryVariables>(SearchUsersByNicknameDocument, options);
+        }
+export type SearchUsersByNicknameQueryHookResult = ReturnType<typeof useSearchUsersByNicknameQuery>;
+export type SearchUsersByNicknameLazyQueryHookResult = ReturnType<typeof useSearchUsersByNicknameLazyQuery>;
+export type SearchUsersByNicknameSuspenseQueryHookResult = ReturnType<typeof useSearchUsersByNicknameSuspenseQuery>;
+export type SearchUsersByNicknameQueryResult = Apollo.QueryResult<SearchUsersByNicknameQuery, SearchUsersByNicknameQueryVariables>;
+export const CreateFollowDocument = gql`
+    mutation CreateFollow($input: FollowInput!) {
+  createFollow(input: $input) {
+    id
+    followerId
+    followingId
+  }
+}
+    `;
+export type CreateFollowMutationFn = Apollo.MutationFunction<CreateFollowMutation, CreateFollowMutationVariables>;
+
+/**
+ * __useCreateFollowMutation__
+ *
+ * To run a mutation, you first call `useCreateFollowMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateFollowMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createFollowMutation, { data, loading, error }] = useCreateFollowMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateFollowMutation(baseOptions?: Apollo.MutationHookOptions<CreateFollowMutation, CreateFollowMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateFollowMutation, CreateFollowMutationVariables>(CreateFollowDocument, options);
+      }
+export type CreateFollowMutationHookResult = ReturnType<typeof useCreateFollowMutation>;
+export type CreateFollowMutationResult = Apollo.MutationResult<CreateFollowMutation>;
+export type CreateFollowMutationOptions = Apollo.BaseMutationOptions<CreateFollowMutation, CreateFollowMutationVariables>;
+export const UpdateFollowDocument = gql`
+    mutation UpdateFollow($id: String!, $input: FollowInput!) {
+  updateFollow(id: $id, input: $input) {
+    id
+    followerId
+    followingId
+  }
+}
+    `;
+export type UpdateFollowMutationFn = Apollo.MutationFunction<UpdateFollowMutation, UpdateFollowMutationVariables>;
+
+/**
+ * __useUpdateFollowMutation__
+ *
+ * To run a mutation, you first call `useUpdateFollowMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateFollowMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateFollowMutation, { data, loading, error }] = useUpdateFollowMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateFollowMutation(baseOptions?: Apollo.MutationHookOptions<UpdateFollowMutation, UpdateFollowMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateFollowMutation, UpdateFollowMutationVariables>(UpdateFollowDocument, options);
+      }
+export type UpdateFollowMutationHookResult = ReturnType<typeof useUpdateFollowMutation>;
+export type UpdateFollowMutationResult = Apollo.MutationResult<UpdateFollowMutation>;
+export type UpdateFollowMutationOptions = Apollo.BaseMutationOptions<UpdateFollowMutation, UpdateFollowMutationVariables>;
+export const DeleteFollowDocument = gql`
+    mutation DeleteFollow($id: String!) {
+  deleteFollow(id: $id)
+}
+    `;
+export type DeleteFollowMutationFn = Apollo.MutationFunction<DeleteFollowMutation, DeleteFollowMutationVariables>;
+
+/**
+ * __useDeleteFollowMutation__
+ *
+ * To run a mutation, you first call `useDeleteFollowMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteFollowMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteFollowMutation, { data, loading, error }] = useDeleteFollowMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteFollowMutation(baseOptions?: Apollo.MutationHookOptions<DeleteFollowMutation, DeleteFollowMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteFollowMutation, DeleteFollowMutationVariables>(DeleteFollowDocument, options);
+      }
+export type DeleteFollowMutationHookResult = ReturnType<typeof useDeleteFollowMutation>;
+export type DeleteFollowMutationResult = Apollo.MutationResult<DeleteFollowMutation>;
+export type DeleteFollowMutationOptions = Apollo.BaseMutationOptions<DeleteFollowMutation, DeleteFollowMutationVariables>;
+export const CheckFollowStatusDocument = gql`
+    query CheckFollowStatus($followerId: String!, $followingId: String!) {
+  checkFollowStatus(followerId: $followerId, followingId: $followingId) {
+    isFollowed
+    followId
+  }
+}
+    `;
+
+/**
+ * __useCheckFollowStatusQuery__
+ *
+ * To run a query within a React component, call `useCheckFollowStatusQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCheckFollowStatusQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCheckFollowStatusQuery({
+ *   variables: {
+ *      followerId: // value for 'followerId'
+ *      followingId: // value for 'followingId'
+ *   },
+ * });
+ */
+export function useCheckFollowStatusQuery(baseOptions: Apollo.QueryHookOptions<CheckFollowStatusQuery, CheckFollowStatusQueryVariables> & ({ variables: CheckFollowStatusQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CheckFollowStatusQuery, CheckFollowStatusQueryVariables>(CheckFollowStatusDocument, options);
+      }
+export function useCheckFollowStatusLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CheckFollowStatusQuery, CheckFollowStatusQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CheckFollowStatusQuery, CheckFollowStatusQueryVariables>(CheckFollowStatusDocument, options);
+        }
+export function useCheckFollowStatusSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<CheckFollowStatusQuery, CheckFollowStatusQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CheckFollowStatusQuery, CheckFollowStatusQueryVariables>(CheckFollowStatusDocument, options);
+        }
+export type CheckFollowStatusQueryHookResult = ReturnType<typeof useCheckFollowStatusQuery>;
+export type CheckFollowStatusLazyQueryHookResult = ReturnType<typeof useCheckFollowStatusLazyQuery>;
+export type CheckFollowStatusSuspenseQueryHookResult = ReturnType<typeof useCheckFollowStatusSuspenseQuery>;
+export type CheckFollowStatusQueryResult = Apollo.QueryResult<CheckFollowStatusQuery, CheckFollowStatusQueryVariables>;
+export const GetFollowsDocument = gql`
+    query GetFollows($status: String) {
+  getFollows(status: $status) {
+    id
+    followerId
+    followingId
+    followerNickname
+    followingNickname
+    followerEmail
+    followerProfileImage
+    followingEmail
+    followingProfileImage
+    status
+    approvedAt
+    createdBy
+    updatedBy
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetFollowsQuery__
+ *
+ * To run a query within a React component, call `useGetFollowsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetFollowsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetFollowsQuery({
+ *   variables: {
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useGetFollowsQuery(baseOptions?: Apollo.QueryHookOptions<GetFollowsQuery, GetFollowsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetFollowsQuery, GetFollowsQueryVariables>(GetFollowsDocument, options);
+      }
+export function useGetFollowsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetFollowsQuery, GetFollowsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetFollowsQuery, GetFollowsQueryVariables>(GetFollowsDocument, options);
+        }
+export function useGetFollowsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetFollowsQuery, GetFollowsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetFollowsQuery, GetFollowsQueryVariables>(GetFollowsDocument, options);
+        }
+export type GetFollowsQueryHookResult = ReturnType<typeof useGetFollowsQuery>;
+export type GetFollowsLazyQueryHookResult = ReturnType<typeof useGetFollowsLazyQuery>;
+export type GetFollowsSuspenseQueryHookResult = ReturnType<typeof useGetFollowsSuspenseQuery>;
+export type GetFollowsQueryResult = Apollo.QueryResult<GetFollowsQuery, GetFollowsQueryVariables>;
+export const ApproveFollowDocument = gql`
+    mutation ApproveFollow($followId: String!) {
+  approveFollow(followId: $followId) {
+    id
+    followerId
+    followingId
+    status
+    approvedAt
+    createdBy
+    updatedBy
+    createdAt
+    updatedAt
+  }
+}
+    `;
+export type ApproveFollowMutationFn = Apollo.MutationFunction<ApproveFollowMutation, ApproveFollowMutationVariables>;
+
+/**
+ * __useApproveFollowMutation__
+ *
+ * To run a mutation, you first call `useApproveFollowMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useApproveFollowMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [approveFollowMutation, { data, loading, error }] = useApproveFollowMutation({
+ *   variables: {
+ *      followId: // value for 'followId'
+ *   },
+ * });
+ */
+export function useApproveFollowMutation(baseOptions?: Apollo.MutationHookOptions<ApproveFollowMutation, ApproveFollowMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ApproveFollowMutation, ApproveFollowMutationVariables>(ApproveFollowDocument, options);
+      }
+export type ApproveFollowMutationHookResult = ReturnType<typeof useApproveFollowMutation>;
+export type ApproveFollowMutationResult = Apollo.MutationResult<ApproveFollowMutation>;
+export type ApproveFollowMutationOptions = Apollo.BaseMutationOptions<ApproveFollowMutation, ApproveFollowMutationVariables>;

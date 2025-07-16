@@ -349,15 +349,17 @@ const GoalDetailScreen: React.FC = () => {
           </View>
         </Modal>
       </ScrollView>
-      {/* 목표 참여 요청 플로팅 버튼 */}
-      <TouchableOpacity
-        style={styles.fabJoin}
-        onPress={handleJoinRequest}
-        disabled={joinLoading}>
-        <Text style={styles.fabJoinText}>
-          {joinLoading ? '요청 중...' : '목표 참여 요청'}
-        </Text>
-      </TouchableOpacity>
+      {/* 목표 참여 요청 플로팅 버튼 - personal 모드가 아닐 때만 표시 */}
+      {goal.mode !== 'personal' && (
+        <TouchableOpacity
+          style={styles.fabJoin}
+          onPress={handleJoinRequest}
+          disabled={joinLoading}>
+          <Text style={styles.fabJoinText}>
+            {joinLoading ? '요청 중...' : '목표 참여 요청'}
+          </Text>
+        </TouchableOpacity>
+      )}
       {/* 참여 메시지 입력 모달 */}
       <Modal
         visible={joinModalVisible}
