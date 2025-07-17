@@ -1,6 +1,6 @@
 import {useMutation, useQuery} from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 import {APPROVE_FOLLOW, GET_FOLLOWS} from '../queries/user';
+import {colors} from '../styles/colors';
 import UserList, {User} from './components/UserList';
 
 interface ProfileUser {
@@ -78,6 +79,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
     fetchPolicy: 'network-only',
   });
 
+  // 화면 진입 시마다 데이터 새로고침
+  useFocusEffect(
+    React.useCallback(() => {
+      refetchFollows();
+    }, [refetchFollows]),
+  );
+
   // 팔로우 승인 뮤테이션
   const [approveFollow] = useMutation(APPROVE_FOLLOW, {
     onCompleted: () => {
@@ -114,7 +122,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
           email: follow.followingEmail || '',
           nickname: follow.followingNickname || follow.followingId,
           profileImage: follow.followingProfileImage,
-          isFollowed: isApproved,
+          followStatus: follow.status,
           followData: follow,
           status: follow.status,
           isMyRequest,
@@ -135,7 +143,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
           email: follow.followerEmail || '',
           nickname: follow.followerNickname || follow.followerId,
           profileImage: follow.followerProfileImage,
-          isFollowed: isApproved,
+          followStatus: follow.status,
           followData: follow,
           status: follow.status,
           isMyRequest,
@@ -197,35 +205,43 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 프로필 정보 */}
         <View style={styles.profileSection}>
-          <Image
-            source={
-              user?.profileImage
-                ? {uri: user.profileImage}
-                : require('../../assets/default-profile.jpg')
-            }
-            style={styles.profileImage}
-          />
-          <Text style={styles.nickname}>{user?.nickname}</Text>
-          <Text style={styles.email}>{user?.email}</Text>
+          <View style={styles.profileImageContainer}>
+            <Image
+              source={
+                user?.profileImage
+                  ? {uri: user.profileImage}
+                  : require('../../assets/default-profile.jpg')
+              }
+              style={styles.profileImage}
+            />
+            <View style={styles.profileImageBorder} />
+          </View>
+          <Text style={styles.nickname}>🌟 {user?.nickname}</Text>
+          <Text style={styles.email}>📧 {user?.email}</Text>
         </View>
 
         {/* 친구 관리 섹션 */}
         <View style={styles.friendsSection}>
-          <Text style={styles.friendsSectionTitle}>친구 관리</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.friendsSectionTitle}>👬 친구 관리</Text>
+          </View>
           <Text style={styles.friendsSectionSubtitle}>
-            총 {users.length}개의 팔로우 데이터
+            💫 총 {users.length}개의 팔로우 데이터가 있어요!
           </Text>
 
           {followsLoading ? (
-            <ActivityIndicator style={styles.friendsLoading} />
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={styles.loadingText}>친구 목록을 불러오는 중...</Text>
+            </View>
           ) : (
             <UserList
               users={users}
               onPressUser={handleUserPress}
-              emptyText="팔로우 데이터가 없습니다."
+              emptyText="아직 친구가 없어요! 🥺"
               contentContainerStyle={styles.friendsList}
               showFollowStatus={false}
               showApproveButton={true}
@@ -241,35 +257,52 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E6ED',
+    borderBottomWidth: 3,
+    borderBottomColor: colors.primaryLight,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   headerSpacer: {
     width: 60,
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: colors.white,
+    textShadowColor: colors.primaryDark,
+    textShadowOffset: {width: 1, height: 1},
+    textShadowRadius: 2,
   },
   logoutButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: colors.primaryLight,
   },
   logoutButtonText: {
     fontSize: 16,
-    color: '#E74C3C',
-    fontWeight: '600',
+    color: colors.primary,
+    fontWeight: 'bold',
   },
   content: {
     flex: 1,
@@ -278,40 +311,100 @@ const styles = StyleSheet.create({
   profileSection: {
     alignItems: 'center',
     marginBottom: 24,
+    backgroundColor: colors.white,
+    borderRadius: 25,
+    padding: 28,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 6},
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 3,
+    borderColor: colors.primaryLight,
+  },
+  profileImageContainer: {
+    position: 'relative',
+    marginBottom: 20,
   },
   profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#E0E6ED',
-    marginBottom: 16,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: colors.primaryLight,
+    borderWidth: 4,
+    borderColor: colors.primary,
+  },
+  profileImageBorder: {
+    position: 'absolute',
+    top: -6,
+    left: -6,
+    right: -6,
+    bottom: -6,
+    borderRadius: 56,
+    borderWidth: 3,
+    borderColor: colors.primaryLight,
+    borderStyle: 'dashed',
   },
   nickname: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 4,
+    color: colors.primary,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   email: {
-    fontSize: 14,
-    color: '#7F8C8D',
+    fontSize: 16,
+    color: colors.medium,
+    fontWeight: '600',
+    marginBottom: 20,
+    textAlign: 'center',
   },
+
   friendsSection: {
     flex: 1,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   friendsSectionTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 8,
+    color: colors.primary,
+    marginRight: 12,
   },
+  sectionBadge: {
+    backgroundColor: colors.primary,
+    borderRadius: 15,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    minWidth: 30,
+    alignItems: 'center',
+  },
+
   friendsSectionSubtitle: {
-    fontSize: 12,
-    color: '#7F8C8D',
-    marginBottom: 16,
+    fontSize: 14,
+    color: colors.medium,
+    marginBottom: 20,
+    fontWeight: '600',
+    textAlign: 'center',
+    backgroundColor: colors.primaryLight,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
-  friendsLoading: {
-    marginTop: 10,
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: '600',
   },
   friendsList: {
     paddingHorizontal: 0,

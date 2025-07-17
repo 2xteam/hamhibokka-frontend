@@ -1,61 +1,93 @@
+import {useQuery} from '@apollo/client';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {GET_MY_PARTICIPATED_GOALS} from '../../queries/goal';
+import {colors} from '../../styles/colors';
+import GoalCard from './GoalCard';
 
-const FollowFeedSection = () => (
-  <View style={styles.section}>
-    <Text style={styles.sectionTitle}>팔로우 피드</Text>
-    {/* 피드 아이템 예시 */}
-    <View style={styles.feedItem}>
-      <View style={styles.feedHeader}>
-        <View style={styles.feedUserInfo}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>김</Text>
-          </View>
-          <View>
-            <Text style={styles.feedUserName}>김철수</Text>
-            <Text style={styles.feedTime}>2시간 전</Text>
-          </View>
+interface Goal {
+  id: string;
+  goalId: string;
+  title: string;
+  description?: string;
+  stickerCount: number;
+  mode?: string;
+  visibility?: string;
+  status?: string;
+  createdBy?: string;
+  creatorNickname?: string;
+  autoApprove?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  participants?: any[];
+}
+
+interface FollowFeedSectionProps {
+  navigation: any;
+}
+
+const FollowFeedSection: React.FC<FollowFeedSectionProps> = ({navigation}) => {
+  const {data: participatedGoalsData, loading} = useQuery(
+    GET_MY_PARTICIPATED_GOALS,
+    {
+      fetchPolicy: 'cache-and-network',
+    },
+  );
+
+  const participatedGoals = participatedGoalsData?.getMyParticipatedGoals || [];
+
+  const handleGoalPress = (goal: Goal) => {
+    navigation.navigate('GoalDetail', {id: goal.id});
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>👬 팔로우 목표</Text>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>참여한 목표를 불러오는 중...</Text>
         </View>
-        <TouchableOpacity style={styles.stickerButton}>
-          <MaterialIcons name="star" size={16} color="#F39C12" />
-          <Text style={styles.stickerButtonText}>스티커</Text>
+      </View>
+    );
+  }
+
+  if (participatedGoals.length === 0) {
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>👬 팔로우 목표</Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>아직 참여한 목표가 없어요! 🥺</Text>
+          <Text style={styles.emptySubtext}>
+            목표에 참여하고 함께 달성해보세요!
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>👬 팔로우 목표</Text>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate('Goals', {screen: 'MyParticipated'})
+          }>
+          <Text style={styles.seeAllText}>전체보기</Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.feedGoalTitle}>매일 영어 단어 20개 외우기</Text>
-      <View style={styles.feedProgress}>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: '60%' }]} />
-        </View>
-        <Text style={styles.progressText}>12/20 스티커</Text>
-      </View>
+      {participatedGoals.slice(0, 3).map((goal: Goal) => (
+        <GoalCard
+          key={goal.id}
+          goal={goal}
+          onPress={handleGoalPress}
+          showProgress={true}
+          showParticipantCount={false}
+        />
+      ))}
     </View>
-    <View style={styles.feedItem}>
-      <View style={styles.feedHeader}>
-        <View style={styles.feedUserInfo}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>이</Text>
-          </View>
-          <View>
-            <Text style={styles.feedUserName}>이영희</Text>
-            <Text style={styles.feedTime}>5시간 전</Text>
-          </View>
-        </View>
-        <TouchableOpacity style={styles.stickerButton}>
-          <MaterialIcons name="star" size={16} color="#F39C12" />
-          <Text style={styles.stickerButtonText}>스티커</Text>
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.feedGoalTitle}>주 3회 운동하기</Text>
-      <View style={styles.feedProgress}>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: '80%' }]} />
-        </View>
-        <Text style={styles.progressText}>8/10 스티커</Text>
-      </View>
-    </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   section: {
@@ -63,99 +95,57 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     paddingHorizontal: 20,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 10,
+    color: colors.primary,
   },
-  feedItem: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  feedHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  feedUserInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#4A90E2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  avatarText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  feedUserName: {
+  seeAllText: {
     fontSize: 14,
+    color: colors.primary,
     fontWeight: '600',
-    color: '#2C3E50',
   },
-  feedTime: {
-    fontSize: 12,
-    color: '#95A5A6',
-    marginTop: 2,
-  },
-  stickerButton: {
-    flexDirection: 'row',
+  loadingContainer: {
     alignItems: 'center',
-    backgroundColor: '#FFF3CD',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingVertical: 20,
   },
-  stickerButtonText: {
-    fontSize: 12,
-    color: '#F39C12',
-    fontWeight: '500',
-    marginLeft: 4,
-  },
-  feedGoalTitle: {
+  loadingText: {
     fontSize: 16,
+    color: colors.primary,
     fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 12,
   },
-  feedProgress: {
-    flexDirection: 'row',
+  emptyContainer: {
     alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingVertical: 30,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 2,
+    borderColor: colors.primaryLight,
   },
-  progressBar: {
-    flex: 1,
-    height: 8,
-    backgroundColor: '#E9ECEF',
-    borderRadius: 4,
-    marginRight: 12,
+  emptyText: {
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 8,
   },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#4A90E2',
-    borderRadius: 4,
-  },
-  progressText: {
-    fontSize: 12,
-    color: '#7F8C8D',
-    fontWeight: '500',
+  emptySubtext: {
+    fontSize: 14,
+    color: colors.medium,
+    textAlign: 'center',
   },
 });
 
-export default FollowFeedSection; 
+export default FollowFeedSection;

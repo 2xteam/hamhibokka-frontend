@@ -64,7 +64,7 @@ const CreateGoalScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>새 목표 만들기</Text>
+      <Text style={styles.title}>🥇 새 목표 만들기</Text>
       <TextInput
         style={styles.input}
         placeholder="목표명을 입력하세요"
@@ -87,7 +87,13 @@ const CreateGoalScreen: React.FC = () => {
       />
       {/* mode 선택 UI */}
       <View style={{marginBottom: 16}}>
-        <Text style={{marginBottom: 8, fontWeight: 'bold', fontSize: 16}}>
+        <Text
+          style={{
+            marginBottom: 8,
+            fontWeight: 'bold',
+            fontSize: 16,
+            color: '#FF6B9D',
+          }}>
           모드 선택
         </Text>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -106,7 +112,7 @@ const CreateGoalScreen: React.FC = () => {
               개인
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[
               styles.modeButton,
               mode === GoalMode.COMPETITION && styles.modeButtonSelected,
@@ -120,7 +126,7 @@ const CreateGoalScreen: React.FC = () => {
               }>
               경쟁
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             style={[
               styles.modeButton,
@@ -134,7 +140,7 @@ const CreateGoalScreen: React.FC = () => {
                   ? styles.modeButtonTextSelected
                   : styles.modeButtonText
               }>
-              챌린저 모집
+              챌린저
             </Text>
           </TouchableOpacity>
         </View>
@@ -144,7 +150,7 @@ const CreateGoalScreen: React.FC = () => {
         onPress={handleSave}
         disabled={loading}>
         <Text style={styles.saveButtonText}>
-          {loading ? '저장 중...' : '저장'}
+          {loading ? '만드는 중...' : '만들기'}
         </Text>
       </TouchableOpacity>
     </View>
@@ -154,35 +160,41 @@ const CreateGoalScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#FFF5F7',
     padding: 24,
     justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#FF6B9D',
     marginBottom: 32,
     alignSelf: 'center',
   },
   input: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     padding: 16,
     fontSize: 16,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#E0E6ED',
+    borderWidth: 2,
+    borderColor: '#FFE5F0',
+    color: '#8E44AD',
   },
   saveButton: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#FF6B9D',
     paddingVertical: 16,
-    borderRadius: 8,
+    borderRadius: 16,
     alignItems: 'center',
     marginTop: 8,
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   saveButtonText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -191,22 +203,27 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     marginHorizontal: 4,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E0E6ED',
-    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#FFE5F0',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   modeButtonSelected: {
-    backgroundColor: '#4A90E2',
-    borderColor: '#4A90E2',
+    backgroundColor: '#FF6B9D',
+    borderColor: '#FF6B9D',
   },
   modeButtonText: {
-    color: '#2C3E50',
+    color: '#8E44AD',
     fontWeight: 'bold',
   },
   modeButtonTextSelected: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: 'bold',
   },
 });

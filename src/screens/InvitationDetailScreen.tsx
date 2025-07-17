@@ -10,35 +10,54 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {GET_INVITATION, UPDATE_GOAL_INVITATION} from '../queries/goal';
+import {colors} from '../styles/colors';
 
 const typeIconMap: Record<string, string> = {
   invite: 'person-add',
   request: 'send',
 };
 const statusIconMap: Record<string, {name: string; color: string}> = {
-  pending: {name: 'hourglass-empty', color: '#F39C12'},
-  accepted: {name: 'check-circle', color: '#27AE60'},
-  rejected: {name: 'cancel', color: '#E74C3C'},
+  pending: {name: 'hourglass-empty', color: colors.warning},
+  accepted: {name: 'check-circle', color: colors.success},
+  rejected: {name: 'cancel', color: colors.error},
 };
 
 function statusColor(status?: string) {
   switch (status) {
     case 'active':
-      return {backgroundColor: '#4A90E2'};
+      return {backgroundColor: colors.primary};
     case 'completed':
-      return {backgroundColor: '#27AE60'};
+      return {backgroundColor: colors.success};
     case 'archived':
-      return {backgroundColor: '#BDC3C7'};
+      return {backgroundColor: colors.lighter};
     case 'pending':
-      return {backgroundColor: '#F39C12'};
+      return {backgroundColor: colors.warning};
     case 'accepted':
-      return {backgroundColor: '#27AE60'};
+      return {backgroundColor: colors.success};
     case 'rejected':
-      return {backgroundColor: '#E74C3C'};
+      return {backgroundColor: colors.error};
     default:
-      return {backgroundColor: '#BDC3C7'};
+      return {backgroundColor: colors.lighter};
+  }
+}
+
+function getStatusText(status?: string) {
+  switch (status) {
+    case 'active':
+      return '진행중';
+    case 'completed':
+      return '완료';
+    case 'archived':
+      return '보관됨';
+    case 'pending':
+      return '대기중';
+    case 'accepted':
+      return '승인됨';
+    case 'rejected':
+      return '거절됨';
+    default:
+      return '알 수 없음';
   }
 }
 
@@ -70,14 +89,15 @@ const InvitationDetailScreen: React.FC = () => {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#4A90E2" />
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.loadingText}>상세 정보를 불러오는 중...</Text>
       </View>
     );
   }
   if (error || !data?.getInvitation) {
     return (
       <View style={styles.centered}>
-        <Text>상세 정보를 불러올 수 없습니다.</Text>
+        <Text style={styles.errorText}>📄 상세 정보를 불러올 수 없습니다.</Text>
       </View>
     );
   }
@@ -92,108 +112,101 @@ const InvitationDetailScreen: React.FC = () => {
       {/* 목표 정보 카드 */}
       <View style={styles.cardSection}>
         <View style={styles.goalHeaderRow}>
-          <MaterialIcons
-            name="flag"
-            size={28}
-            color="#4A90E2"
-            style={{marginRight: 8}}
-          />
+          <Text style={styles.goalIcon}>🥇</Text>
           <Text style={styles.goalTitle}>{goal.title || '-'}</Text>
         </View>
         <Text style={styles.goalDesc}>{goal.description || '설명 없음'}</Text>
         <View style={styles.goalInfoRow}>
-          <Text style={styles.goalInfo}>
-            <MaterialIcons name="emoji-events" size={18} color="#F39C12" />{' '}
-            스티커 목표:{' '}
-            <Text style={styles.goalInfoValue}>{goal.stickerCount ?? '-'}</Text>
-            개
-          </Text>
-          <Text style={styles.goalInfo}>
-            <MaterialIcons name="group" size={18} color="#27AE60" /> 모드:{' '}
-            <Text style={styles.goalInfoValue}>
-              {goal.mode === 'group' ? '그룹' : '개인'}
+          <View style={styles.infoItem}>
+            <Text style={styles.infoIcon}>🏆</Text>
+            <Text style={styles.goalInfo}>
+              스티커 목표:{' '}
+              <Text style={styles.goalInfoValue}>
+                {goal.stickerCount ?? '-'}
+              </Text>
+              개
             </Text>
-          </Text>
-          <Text style={styles.goalInfo}>
-            <MaterialIcons name="calendar-today" size={18} color="#4A90E2" />{' '}
-            생성일:{' '}
-            <Text style={styles.goalInfoValue}>
-              {goal.createdAt
-                ? new Date(goal.createdAt).toLocaleDateString()
-                : '-'}
+          </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoIcon}>👥</Text>
+            <Text style={styles.goalInfo}>
+              모드:{' '}
+              <Text style={styles.goalInfoValue}>
+                {goal.mode === 'group' ? '그룹' : '개인'}
+              </Text>
             </Text>
-          </Text>
-          <Text style={styles.goalInfo}>
-            상태:{' '}
-            <View
-              style={[
-                styles.statusBadge,
-                statusColor(goal.status),
-                {flexDirection: 'row', alignItems: 'center'},
-              ]}>
-              <MaterialIcons
-                name={statusIconMap[goal.status]?.name || 'help-outline'}
-                size={18}
-                color="#fff"
-                style={{marginRight: 4}}
-              />
-              <Text style={styles.statusBadgeText}>{goal.status || '-'}</Text>
-            </View>
-          </Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoIcon}>📅</Text>
+            <Text style={styles.goalInfo}>
+              만든 날:{' '}
+              <Text style={styles.goalInfoValue}>
+                {goal.createdAt
+                  ? new Date(goal.createdAt).toLocaleDateString()
+                  : '-'}
+              </Text>
+            </Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoIcon}>📊</Text>
+            <Text style={styles.goalInfo}>
+              상태:{' '}
+              <View
+                style={[
+                  styles.statusBadge,
+                  statusColor(goal.status),
+                  {flexDirection: 'row', alignItems: 'center'},
+                ]}>
+                <Text style={styles.statusBadgeText}>
+                  {getStatusText(goal.status)}
+                </Text>
+              </View>
+            </Text>
+          </View>
         </View>
       </View>
       {/* 초대/요청 정보 카드 */}
       <View style={styles.cardSection}>
         <View style={styles.invHeaderRow}>
-          <MaterialIcons
-            name={typeIconMap[inv.type] || 'help-outline'}
-            size={24}
-            color="#F39C12"
-            style={{marginRight: 8}}
-          />
+          <Text style={styles.invIcon}>
+            {inv.type === 'invite' ? '📨' : '📤'}
+          </Text>
           <Text style={styles.invTypeText}>
             {inv.type === 'invite' ? '초대' : '요청'}
           </Text>
           <View style={[styles.statusBadge, statusColor(inv.status)]}>
-            <MaterialIcons
-              name={statusIconMap[inv.status]?.name || 'help-outline'}
-              size={18}
-              color="#fff"
-            />
-            <Text style={styles.statusBadgeText}>{inv.status}</Text>
+            <Text style={styles.statusBadgeText}>
+              {getStatusText(inv.status)}
+            </Text>
           </View>
         </View>
-        <Text style={styles.invMessageLabel}>메시지</Text>
+        <Text style={styles.invMessageLabel}>💬 메시지</Text>
         <Text style={styles.invMessage}>{inv.message || '메시지 없음'}</Text>
-        <Text style={styles.invInfo}>
-          <MaterialIcons name="person" size={16} color="#4A90E2" /> 보낸 사람:{' '}
-          <Text style={styles.invInfoValue}>{inv.fromUserId}</Text>
-        </Text>
-        <Text style={styles.invInfo}>
-          <MaterialIcons name="person" size={16} color="#4A90E2" /> 받는 사람:{' '}
-          <Text style={styles.invInfoValue}>{inv.toUserId}</Text>
-        </Text>
-        <Text style={styles.invInfo}>
-          <MaterialIcons name="calendar-today" size={16} color="#4A90E2" />{' '}
-          생성일:{' '}
-          <Text style={styles.invInfoValue}>
-            {new Date(inv.createdAt).toLocaleString()}
-          </Text>
-        </Text>
-        <View style={styles.respondedRow}>
-          <Text style={styles.invInfo}>
-            <MaterialIcons name="calendar-today" size={16} color="#4A90E2" />{' '}
-            응답일:{' '}
-            <Text style={styles.invInfoValue}>
-              {inv.respondedAt
-                ? new Date(inv.respondedAt).toLocaleString()
-                : '-'}
+        <View style={styles.invInfoContainer}>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoIcon}>📅</Text>
+            <Text style={styles.invInfo}>
+              요청한 날:{' '}
+              <Text style={styles.invInfoValue}>
+                {new Date(inv.createdAt).toLocaleString()}
+              </Text>
             </Text>
-          </Text>
+          </View>
+          <View style={styles.infoItem}>
+            <Text style={styles.infoIcon}>⏰</Text>
+            <Text style={styles.invInfo}>
+              응답한 날:{' '}
+              <Text style={styles.invInfoValue}>
+                {inv.respondedAt
+                  ? new Date(inv.respondedAt).toLocaleString()
+                  : '-'}
+              </Text>
+            </Text>
+          </View>
         </View>
       </View>
       {canApprove && (
-        <View style={{marginTop: 16, alignItems: 'center'}}>
+        <View style={styles.approveContainer}>
           <TouchableOpacity
             style={[styles.approveBtn, isApproved && styles.approveBtnDisabled]}
             onPress={async () => {
@@ -202,7 +215,7 @@ const InvitationDetailScreen: React.FC = () => {
                   variables: {id: inv.id, input: {status: 'accepted'}},
                 });
                 await refetch();
-                Alert.alert('승인 완료', '요청이 승인되었습니다.');
+                Alert.alert('승인 완료', '✅ 요청이 승인되었습니다!');
               } catch (e: any) {
                 let msg = '승인에 실패했습니다.';
                 if (e?.graphQLErrors?.[0]?.message)
@@ -214,10 +227,10 @@ const InvitationDetailScreen: React.FC = () => {
             disabled={approveLoading || isApproved}>
             <Text style={styles.approveBtnText}>
               {isApproved
-                ? '승인 완료'
+                ? '✅ 승인 완료'
                 : approveLoading
-                ? '승인 중...'
-                : '요청 승인'}
+                ? '⏳ 승인 중...'
+                : '👍 요청 승인'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -229,242 +242,184 @@ const InvitationDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background,
     padding: 20,
   },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  errorText: {
+    fontSize: 16,
+    color: colors.error,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   cardSection: {
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    padding: 24,
-    marginBottom: 28,
-    shadowColor: '#4A90E2',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.1,
+    backgroundColor: colors.white,
+    borderRadius: 25,
+    padding: 28,
+    marginBottom: 24,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 6},
+    shadowOpacity: 0.2,
     shadowRadius: 12,
-    elevation: 4,
+    elevation: 8,
+    borderWidth: 3,
+    borderColor: colors.primaryLight,
   },
   goalHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 16,
     justifyContent: 'center',
   },
-  goalTitle: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-    marginLeft: 4,
+  goalIcon: {
+    fontSize: 32,
+    marginRight: 12,
   },
-  goalDesc: {
-    fontSize: 17,
-    color: '#7F8C8D',
-    marginBottom: 16,
+  goalTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: colors.primary,
     textAlign: 'center',
   },
+  goalDesc: {
+    fontSize: 18,
+    color: colors.medium,
+    marginBottom: 20,
+    textAlign: 'center',
+    lineHeight: 24,
+    fontWeight: '500',
+  },
   goalInfoRow: {
-    marginTop: 12,
-    gap: 2,
+    marginTop: 16,
+    gap: 12,
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  infoIcon: {
+    fontSize: 20,
+    marginRight: 8,
   },
   goalInfo: {
     fontSize: 16,
-    color: '#7F8C8D',
-    marginBottom: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
+    color: colors.medium,
+    flex: 1,
+    fontWeight: '500',
   },
   goalInfoValue: {
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: colors.primary,
     fontSize: 16,
   },
   statusBadge: {
-    backgroundColor: '#F39C12',
-    borderRadius: 12,
-    paddingVertical: 4,
+    backgroundColor: colors.warning,
+    borderRadius: 15,
+    paddingVertical: 6,
     paddingHorizontal: 12,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    marginLeft: 4,
+    marginLeft: 8,
   },
   statusBadgeText: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 14,
     fontWeight: 'bold',
-    marginLeft: 5,
   },
   invHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 16,
     justifyContent: 'center',
   },
+  invIcon: {
+    fontSize: 28,
+    marginRight: 12,
+  },
   invTypeText: {
-    fontSize: 19,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginRight: 10,
+    color: colors.primary,
+    marginRight: 16,
   },
   invMessageLabel: {
-    fontSize: 15,
-    color: '#7F8C8D',
-    marginBottom: 2,
-    marginTop: 10,
+    fontSize: 18,
+    color: colors.medium,
+    marginBottom: 8,
+    marginTop: 16,
+    fontWeight: '600',
   },
   invMessage: {
-    color: '#2C3E50',
+    color: colors.dark,
     fontSize: 16,
-    marginBottom: 10,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 8,
-    padding: 10,
-    minHeight: 36,
+    marginBottom: 16,
+    backgroundColor: colors.primaryLight,
+    borderRadius: 15,
+    padding: 16,
+    minHeight: 40,
+    lineHeight: 22,
+    fontWeight: '500',
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  invInfoContainer: {
+    marginTop: 8,
   },
   invInfo: {
     fontSize: 16,
-    color: '#7F8C8D',
-    marginBottom: 6,
+    color: colors.medium,
+    marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    fontWeight: '500',
   },
   invInfoValue: {
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: colors.dark,
     fontSize: 16,
   },
-  respondedRow: {
-    flexDirection: 'row',
+  approveContainer: {
+    marginTop: 16,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 0,
-    marginTop: 4,
   },
   approveBtn: {
-    backgroundColor: '#27AE60',
-    borderRadius: 12,
+    backgroundColor: colors.success,
+    borderRadius: 25,
     paddingVertical: 18,
     paddingHorizontal: 48,
     alignItems: 'center',
     marginTop: 16,
-    shadowColor: '#27AE60',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowColor: colors.success,
+    shadowOffset: {width: 0, height: 6},
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 3,
+    borderColor: colors.successLight,
   },
   approveBtnDisabled: {
-    backgroundColor: '#BDC3C7',
+    backgroundColor: colors.lighter,
+    borderColor: colors.light,
   },
   approveBtnText: {
-    color: '#fff',
+    color: colors.white,
     fontWeight: 'bold',
-    fontSize: 19,
+    fontSize: 20,
     letterSpacing: 1,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 25,
-    width: '80%',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 20,
-  },
-  modalLabel: {
-    fontSize: 18,
-    color: '#7F8C8D',
-    marginBottom: 10,
-  },
-  stickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 4,
-    justifyContent: 'center',
-  },
-  stickerCountText: {
-    fontSize: 16,
-    color: '#F39C12',
-    fontWeight: 'bold',
-  },
-  modalCloseBtn: {
-    backgroundColor: '#E74C3C',
-    borderRadius: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    marginTop: 20,
-    shadowColor: '#E74C3C',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  modalCloseText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  giveStickerBox: {
-    marginTop: 18,
-    alignItems: 'center',
-    width: '100%',
-  },
-  giveStickerLabel: {
-    fontSize: 16,
-    color: '#2C3E50',
-    fontWeight: 'bold',
-    marginBottom: 6,
-  },
-  giveStickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  giveStickerInput: {
-    width: 48,
-    height: 36,
-    borderWidth: 1,
-    borderColor: '#E0E6ED',
-    borderRadius: 8,
-    padding: 8,
-    fontSize: 16,
-    marginRight: 10,
-    textAlign: 'center',
-    backgroundColor: '#F8F9FA',
-  },
-  giveStickerBtn: {
-    backgroundColor: '#F39C12',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  giveStickerBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
 });
 

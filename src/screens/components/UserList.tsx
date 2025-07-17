@@ -14,7 +14,7 @@ export interface User {
   email: string;
   nickname: string;
   profileImage?: string;
-  isFollowed?: boolean;
+  followStatus?: string;
 }
 
 interface UserListProps {
@@ -51,7 +51,7 @@ const UserList: React.FC<UserListProps> = ({
       <View style={styles.userInfo}>
         <Text style={styles.userNickname}>{item.nickname}</Text>
         <Text style={styles.userEmail}>{item.email}</Text>
-        {showFollowStatus && item.isFollowed && (
+        {showFollowStatus && item.followStatus && (
           <Text style={styles.followedText}>팔로우 중</Text>
         )}
         {/* 친구 관리 모달용 상태 표시 */}
@@ -63,8 +63,11 @@ const UserList: React.FC<UserListProps> = ({
           !(item as any).showPendingStatus && (
             <Text style={styles.requestText}>요청받음</Text>
           )}
+        {showApproveButton && (item as any).status === 'approved' && (
+          <Text style={styles.mutualFollowText}>맞팔중</Text>
+        )}
         {/* 일반 팔로우 상태 표시 (친구 관리 모달이 아닌 경우) */}
-        {!showApproveButton && showFollowStatus && item.isFollowed && (
+        {!showApproveButton && showFollowStatus && item.followStatus && (
           <Text style={styles.followedText}>팔로우 중</Text>
         )}
       </View>
@@ -148,6 +151,12 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   friendText: {
+    fontSize: 12,
+    color: '#27AE60',
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  mutualFollowText: {
     fontSize: 12,
     color: '#27AE60',
     fontWeight: '500',

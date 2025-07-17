@@ -38,7 +38,7 @@ export const SEARCH_USERS_BY_NICKNAME = gql`
       email
       nickname
       profileImage
-      isFollowed
+      followStatus
     }
   }
 `;
@@ -49,6 +49,7 @@ export const CREATE_FOLLOW = gql`
       id
       followerId
       followingId
+      status
     }
   }
 `;
@@ -72,7 +73,7 @@ export const DELETE_FOLLOW = gql`
 export const CHECK_FOLLOW_STATUS = gql`
   query CheckFollowStatus($followerId: String!, $followingId: String!) {
     checkFollowStatus(followerId: $followerId, followingId: $followingId) {
-      isFollowed
+      followStatus
       followId
     }
   }

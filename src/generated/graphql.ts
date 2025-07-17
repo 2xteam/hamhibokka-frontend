@@ -63,7 +63,7 @@ export type FollowInput = {
 export type FollowStatus = {
   __typename?: 'FollowStatus';
   followId?: Maybe<Scalars['String']['output']>;
-  isFollowed: Scalars['Boolean']['output'];
+  followStatus?: Maybe<Scalars['String']['output']>;
 };
 
 export type Goal = {
@@ -269,10 +269,12 @@ export type Query = {
   getFollows: Array<Follow>;
   getGoal?: Maybe<Goal>;
   getGoals: Array<Goal>;
+  getGoalsByUserId: Array<Goal>;
   getInvitation?: Maybe<GoalInvitation>;
   getInvitationsByGoalId: Array<GoalInvitation>;
   getInvitationsByStatus: Array<GoalInvitation>;
   getMyInvitations: Array<GoalInvitation>;
+  getMyParticipatedGoals: Array<Goal>;
   getReceivedInvitations: Array<GoalInvitation>;
   getReceivedInvites: Array<GoalInvitation>;
   getSentInvitations: Array<GoalInvitation>;
@@ -307,6 +309,11 @@ export type QueryGetFollowsArgs = {
 
 export type QueryGetGoalArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryGetGoalsByUserIdArgs = {
+  userId: Scalars['String']['input'];
 };
 
 
@@ -398,8 +405,8 @@ export type UpdateGoalInvitationInput = {
 export type User = {
   __typename?: 'User';
   email: Scalars['String']['output'];
+  followStatus?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
-  isFollowed?: Maybe<Scalars['Boolean']['output']>;
   nickname: Scalars['String']['output'];
   profileImage?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
@@ -473,6 +480,18 @@ export type SearchGoalsByTitleQueryVariables = Exact<{
 
 export type SearchGoalsByTitleQuery = { __typename?: 'Query', searchGoalsByTitle: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
 
+export type GetGoalsByUserIdQueryVariables = Exact<{
+  userId: Scalars['String']['input'];
+}>;
+
+
+export type GetGoalsByUserIdQuery = { __typename?: 'Query', getGoalsByUserId: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
+
+export type GetMyParticipatedGoalsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyParticipatedGoalsQuery = { __typename?: 'Query', getMyParticipatedGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
+
 export type LoginUserMutationVariables = Exact<{
   loginInput: LoginInput;
 }>;
@@ -492,14 +511,14 @@ export type SearchUsersByNicknameQueryVariables = Exact<{
 }>;
 
 
-export type SearchUsersByNicknameQuery = { __typename?: 'Query', searchUsersByNickname: Array<{ __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null, isFollowed?: boolean | null }> };
+export type SearchUsersByNicknameQuery = { __typename?: 'Query', searchUsersByNickname: Array<{ __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null, followStatus?: string | null }> };
 
 export type CreateFollowMutationVariables = Exact<{
   input: FollowInput;
 }>;
 
 
-export type CreateFollowMutation = { __typename?: 'Mutation', createFollow: { __typename?: 'Follow', id: string, followerId: string, followingId: string } };
+export type CreateFollowMutation = { __typename?: 'Mutation', createFollow: { __typename?: 'Follow', id: string, followerId: string, followingId: string, status?: string | null } };
 
 export type UpdateFollowMutationVariables = Exact<{
   id: Scalars['String']['input'];
@@ -522,7 +541,7 @@ export type CheckFollowStatusQueryVariables = Exact<{
 }>;
 
 
-export type CheckFollowStatusQuery = { __typename?: 'Query', checkFollowStatus: { __typename?: 'FollowStatus', isFollowed: boolean, followId?: string | null } };
+export type CheckFollowStatusQuery = { __typename?: 'Query', checkFollowStatus: { __typename?: 'FollowStatus', followStatus?: string | null, followId?: string | null } };
 
 export type GetFollowsQueryVariables = Exact<{
   status?: InputMaybe<Scalars['String']['input']>;
@@ -1065,6 +1084,132 @@ export type SearchGoalsByTitleQueryHookResult = ReturnType<typeof useSearchGoals
 export type SearchGoalsByTitleLazyQueryHookResult = ReturnType<typeof useSearchGoalsByTitleLazyQuery>;
 export type SearchGoalsByTitleSuspenseQueryHookResult = ReturnType<typeof useSearchGoalsByTitleSuspenseQuery>;
 export type SearchGoalsByTitleQueryResult = Apollo.QueryResult<SearchGoalsByTitleQuery, SearchGoalsByTitleQueryVariables>;
+export const GetGoalsByUserIdDocument = gql`
+    query GetGoalsByUserId($userId: String!) {
+  getGoalsByUserId(userId: $userId) {
+    id
+    goalId
+    title
+    description
+    stickerCount
+    mode
+    visibility
+    status
+    createdBy
+    creatorNickname
+    autoApprove
+    createdAt
+    updatedAt
+    isParticipant
+    participants {
+      userId
+      nickname
+      status
+      currentStickerCount
+      joinedAt
+      stickerReceivedLogs {
+        date
+        count
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetGoalsByUserIdQuery__
+ *
+ * To run a query within a React component, call `useGetGoalsByUserIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetGoalsByUserIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetGoalsByUserIdQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useGetGoalsByUserIdQuery(baseOptions: Apollo.QueryHookOptions<GetGoalsByUserIdQuery, GetGoalsByUserIdQueryVariables> & ({ variables: GetGoalsByUserIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetGoalsByUserIdQuery, GetGoalsByUserIdQueryVariables>(GetGoalsByUserIdDocument, options);
+      }
+export function useGetGoalsByUserIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetGoalsByUserIdQuery, GetGoalsByUserIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetGoalsByUserIdQuery, GetGoalsByUserIdQueryVariables>(GetGoalsByUserIdDocument, options);
+        }
+export function useGetGoalsByUserIdSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetGoalsByUserIdQuery, GetGoalsByUserIdQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetGoalsByUserIdQuery, GetGoalsByUserIdQueryVariables>(GetGoalsByUserIdDocument, options);
+        }
+export type GetGoalsByUserIdQueryHookResult = ReturnType<typeof useGetGoalsByUserIdQuery>;
+export type GetGoalsByUserIdLazyQueryHookResult = ReturnType<typeof useGetGoalsByUserIdLazyQuery>;
+export type GetGoalsByUserIdSuspenseQueryHookResult = ReturnType<typeof useGetGoalsByUserIdSuspenseQuery>;
+export type GetGoalsByUserIdQueryResult = Apollo.QueryResult<GetGoalsByUserIdQuery, GetGoalsByUserIdQueryVariables>;
+export const GetMyParticipatedGoalsDocument = gql`
+    query GetMyParticipatedGoals {
+  getMyParticipatedGoals {
+    id
+    goalId
+    title
+    description
+    stickerCount
+    mode
+    visibility
+    status
+    createdBy
+    creatorNickname
+    autoApprove
+    createdAt
+    updatedAt
+    participants {
+      userId
+      nickname
+      status
+      currentStickerCount
+      joinedAt
+      stickerReceivedLogs {
+        date
+        count
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetMyParticipatedGoalsQuery__
+ *
+ * To run a query within a React component, call `useGetMyParticipatedGoalsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMyParticipatedGoalsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMyParticipatedGoalsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMyParticipatedGoalsQuery(baseOptions?: Apollo.QueryHookOptions<GetMyParticipatedGoalsQuery, GetMyParticipatedGoalsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMyParticipatedGoalsQuery, GetMyParticipatedGoalsQueryVariables>(GetMyParticipatedGoalsDocument, options);
+      }
+export function useGetMyParticipatedGoalsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyParticipatedGoalsQuery, GetMyParticipatedGoalsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMyParticipatedGoalsQuery, GetMyParticipatedGoalsQueryVariables>(GetMyParticipatedGoalsDocument, options);
+        }
+export function useGetMyParticipatedGoalsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMyParticipatedGoalsQuery, GetMyParticipatedGoalsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMyParticipatedGoalsQuery, GetMyParticipatedGoalsQueryVariables>(GetMyParticipatedGoalsDocument, options);
+        }
+export type GetMyParticipatedGoalsQueryHookResult = ReturnType<typeof useGetMyParticipatedGoalsQuery>;
+export type GetMyParticipatedGoalsLazyQueryHookResult = ReturnType<typeof useGetMyParticipatedGoalsLazyQuery>;
+export type GetMyParticipatedGoalsSuspenseQueryHookResult = ReturnType<typeof useGetMyParticipatedGoalsSuspenseQuery>;
+export type GetMyParticipatedGoalsQueryResult = Apollo.QueryResult<GetMyParticipatedGoalsQuery, GetMyParticipatedGoalsQueryVariables>;
 export const LoginUserDocument = gql`
     mutation LoginUser($loginInput: LoginInput!) {
   login(loginInput: $loginInput) {
@@ -1153,7 +1298,7 @@ export const SearchUsersByNicknameDocument = gql`
     email
     nickname
     profileImage
-    isFollowed
+    followStatus
   }
 }
     `;
@@ -1196,6 +1341,7 @@ export const CreateFollowDocument = gql`
     id
     followerId
     followingId
+    status
   }
 }
     `;
@@ -1295,7 +1441,7 @@ export type DeleteFollowMutationOptions = Apollo.BaseMutationOptions<DeleteFollo
 export const CheckFollowStatusDocument = gql`
     query CheckFollowStatus($followerId: String!, $followingId: String!) {
   checkFollowStatus(followerId: $followerId, followingId: $followingId) {
-    isFollowed
+    followStatus
     followId
   }
 }

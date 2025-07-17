@@ -1,25 +1,27 @@
 import React from 'react';
 import {
-  View,
-  Text,
   ActivityIndicator,
-  StyleSheet,
   Dimensions,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const LoadingScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Text style={styles.appName}>함히보까</Text>
-        <Text style={styles.subtitle}>칭찬 스티커로 목표를 달성해보세요</Text>
+        <Text style={styles.appName}>🥇 함히보까</Text>
+        <Text style={styles.subtitle}>
+          칭찬 스티커로 목표를 달성해보세요 ✨
+        </Text>
       </View>
-      
+
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#4A90E2" />
-        <Text style={styles.loadingText}>잠깐만 기다려주세요...</Text>
+        <ActivityIndicator size="large" color="#FF6B9D" />
+        <Text style={styles.loadingText}>잠깐만 기다려주세요... 💫</Text>
       </View>
     </View>
   );
@@ -28,7 +30,7 @@ const LoadingScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF5F7',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -40,23 +42,25 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#FF6B9D',
     marginBottom: 8,
     letterSpacing: -1,
   },
   subtitle: {
     fontSize: 16,
-    color: '#7F8C8D',
+    color: '#8E44AD',
     textAlign: 'center',
     lineHeight: 22,
+    fontWeight: '500',
   },
   loadingContainer: {
     alignItems: 'center',
   },
   loadingText: {
     fontSize: 14,
-    color: '#95A5A6',
+    color: '#8E44AD',
     marginTop: 16,
+    fontWeight: '500',
   },
 });
 

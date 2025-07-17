@@ -27,7 +27,7 @@ const CommonTabView: React.FC<CommonTabViewProps> = ({
   tabBarStyle,
   tabBarLabelStyle,
   tabBarIndicatorStyle,
-  tabBarActiveTintColor = '#4A90E2',
+  tabBarActiveTintColor = '#FF6B9D',
   tabBarInactiveTintColor = '#2C3E50',
 }) => {
   const [index, setIndex] = useState(initialIndex);
@@ -45,7 +45,7 @@ const CommonTabView: React.FC<CommonTabViewProps> = ({
           <TabBar
             {...props}
             indicatorStyle={
-              tabBarIndicatorStyle || {backgroundColor: '#4A90E2'}
+              tabBarIndicatorStyle || {backgroundColor: '#FF6B9D'}
             }
             style={[
               {backgroundColor: '#fff', height: 48, elevation: 2, zIndex: 10},

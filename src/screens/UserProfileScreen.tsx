@@ -23,7 +23,7 @@ interface UserProfileParams {
     email: string;
     nickname: string;
     profileImage?: string;
-    isFollowed?: boolean;
+    followStatus?: string;
   };
 }
 
@@ -33,7 +33,7 @@ const UserProfileScreen: React.FC = () => {
     useRoute<RouteProp<Record<string, UserProfileParams>, string>>();
   const {user} = route.params;
 
-  const [isFollowed, setIsFollowed] = useState(user.isFollowed || false);
+  const [followStatus, setFollowStatus] = useState(user.followStatus || '');
   const [isLoading, setIsLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string>('');
 
@@ -65,7 +65,7 @@ const UserProfileScreen: React.FC = () => {
   // 팔로우 생성 뮤테이션
   const [createFollow] = useMutation(CREATE_FOLLOW, {
     onCompleted: data => {
-      setIsFollowed(true);
+      setFollowStatus(data.createFollow.status);
       setIsLoading(false);
       Alert.alert('성공', '팔로우 요청을 보냈습니다.');
     },
@@ -77,11 +77,8 @@ const UserProfileScreen: React.FC = () => {
   });
 
   const handleFollowToggle = async () => {
-    if (!user || !currentUserId || isLoading || isFollowed) return;
-
+    if (!user || !currentUserId || isLoading || followStatus) return;
     setIsLoading(true);
-
-    // 팔로우만 가능 (취소 기능 비활성화)
     await createFollow({
       variables: {
         input: {
@@ -107,17 +104,6 @@ const UserProfileScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* 헤더 */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}>
-          <Text style={styles.backButtonText}>← 뒤로</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>프로필</Text>
-        <View style={styles.headerSpacer} />
-      </View>
-
       <ScrollView style={styles.content}>
         {/* 프로필 정보 */}
         <View style={styles.profileSection}>
@@ -133,8 +119,8 @@ const UserProfileScreen: React.FC = () => {
           <Text style={styles.email}>{user.email}</Text>
         </View>
 
-        {/* 팔로우 버튼 - 자기 자신이 아니고 팔로우하지 않은 경우에만 표시 */}
-        {!isOwnProfile && !isFollowed && (
+        {/* 팔로우 버튼 - 자기 자신이 아니고 팔로우 상태가 없을 때만 표시 */}
+        {!isOwnProfile && !followStatus && (
           <TouchableOpacity
             style={[styles.followButton, isLoading && styles.disabledButton]}
             onPress={handleFollowToggle}
@@ -145,10 +131,16 @@ const UserProfileScreen: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {/* 팔로우 중인 경우 상태 표시 */}
-        {!isOwnProfile && isFollowed && (
+        {/* 팔로우 상태 표시 */}
+        {!isOwnProfile && followStatus && (
           <View style={styles.followedStatus}>
-            <Text style={styles.followedStatusText}>팔로우 중</Text>
+            <Text style={styles.followedStatusText}>
+              {followStatus === 'pending'
+                ? '대기중'
+                : followStatus === 'approved'
+                ? '맞팔중'
+                : '팔로우 중'}
+            </Text>
           </View>
         )}
 
@@ -176,35 +168,7 @@ const UserProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E6ED',
-  },
-  backButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: '#4A90E2',
-    fontWeight: '600',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-  },
-  headerSpacer: {
-    width: 60,
+    backgroundColor: '#FFF5F7',
   },
   content: {
     flex: 1,
@@ -213,32 +177,50 @@ const styles = StyleSheet.create({
   profileSection: {
     alignItems: 'center',
     marginBottom: 24,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 2,
+    borderColor: '#FFE5F0',
   },
   profileImage: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#E0E6ED',
+    backgroundColor: '#FFE5F0',
     marginBottom: 16,
+    borderWidth: 3,
+    borderColor: '#FFD1DC',
   },
   nickname: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#FF6B9D',
     marginBottom: 4,
   },
   email: {
     fontSize: 14,
-    color: '#7F8C8D',
+    color: '#8E44AD',
+    fontWeight: '500',
   },
   followButton: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#FF6B9D',
     paddingHorizontal: 32,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 16,
     width: '100%',
     alignItems: 'center',
     marginBottom: 24,
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   disabledButton: {
     opacity: 0.6,
@@ -252,10 +234,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#27AE60',
     paddingHorizontal: 32,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 16,
     width: '100%',
     alignItems: 'center',
     marginBottom: 24,
+    shadowColor: '#27AE60',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   followedStatusText: {
     color: '#FFFFFF',
@@ -266,16 +253,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   goalsSectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#FF6B9D',
     marginBottom: 12,
   },
   goalsLoading: {
     marginTop: 10,
   },
   goalsList: {
-    paddingHorizontal: 0,
+    paddingBottom: 20,
   },
 });
 

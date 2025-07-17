@@ -19,8 +19,8 @@ const screens = [
 
 const tabBarOptions = {
   tabBarLabelStyle: {fontSize: 15, fontWeight: 'bold'},
-  tabBarIndicatorStyle: {backgroundColor: '#4A90E2'},
-  tabBarActiveTintColor: '#4A90E2',
+  tabBarIndicatorStyle: {backgroundColor: '#FF6B9D'},
+  tabBarActiveTintColor: '#FF6B9D',
   tabBarInactiveTintColor: '#7F8C8D',
   tabBarStyle: {backgroundColor: '#fff', elevation: 2, zIndex: 10},
 };

@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import {GET_GOALS_BY_USER_ID} from '../../queries/goal';
-import {CREATE_FOLLOW, DELETE_FOLLOW} from '../../queries/user';
+import {CREATE_FOLLOW} from '../../queries/user';
 import GoalList, {Goal} from './GoalList';
 
 interface User {
@@ -21,7 +21,7 @@ interface User {
   email: string;
   nickname: string;
   profileImage?: string;
-  isFollowed?: boolean;
+  followStatus?: string; // 'pending', 'approved', 'mutual'
 }
 
 interface ProfileModalProps {
@@ -29,6 +29,7 @@ interface ProfileModalProps {
   user: User | null;
   onClose: () => void;
   currentUserId: string; // 현재 로그인한 사용자 ID
+  status?: string; // 초기 팔로우 상태
   onFollowStatusChange?: (userId: string, isFollowed: boolean) => void; // 팔로우 상태 변경 콜백
 }
 
@@ -37,22 +38,31 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   user,
   onClose,
   currentUserId,
+  status,
   onFollowStatusChange,
 }) => {
   const navigation = useNavigation<any>();
-  const [isFollowed, setIsFollowed] = useState(false);
+  const [followStatus, setFollowStatus] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
   // 팔로우 생성 뮤테이션
   const [createFollow] = useMutation(CREATE_FOLLOW, {
     onCompleted: data => {
-      setIsFollowed(true);
+      const status = data.createFollow.status;
+      setFollowStatus(status);
       setIsLoading(false);
+
       // 부모 컴포넌트에 팔로우 상태 변경 알림
       if (onFollowStatusChange && user) {
-        onFollowStatusChange(user.userId, true);
+        const isFollowed = status === 'approved' || status === 'pending';
+        onFollowStatusChange(user.userId, isFollowed);
       }
-      Alert.alert('성공', '팔로우 요청을 보냈습니다.');
+
+      if (status === 'approved') {
+        Alert.alert('성공', '맞팔로우가 되었습니다!');
+      } else {
+        Alert.alert('성공', '팔로우 요청을 보냈습니다.');
+      }
     },
     onError: error => {
       setIsLoading(false);
@@ -61,33 +71,24 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     },
   });
 
-  // 팔로우 삭제 뮤테이션
-  const [deleteFollow] = useMutation(DELETE_FOLLOW, {
-    onCompleted: () => {
-      setIsFollowed(false);
-      setIsLoading(false);
-      // 부모 컴포넌트에 팔로우 상태 변경 알림
-      if (onFollowStatusChange && user) {
-        onFollowStatusChange(user.userId, false);
-      }
-      Alert.alert('성공', '팔로우를 취소했습니다.');
-    },
-    onError: error => {
-      setIsLoading(false);
-      Alert.alert('오류', '팔로우 취소에 실패했습니다.');
-      console.error('Delete follow error:', error);
-    },
-  });
-
-  // 사용자 데이터의 isFollowed 값으로 초기화
+  // 사용자 데이터의 팔로우 상태로 초기화
   useEffect(() => {
     if (user) {
-      setIsFollowed(user.isFollowed || false);
+      // props로 전달된 status가 있으면 우선 사용
+      if (status) {
+        setFollowStatus(status);
+      } else if (user.followStatus) {
+        setFollowStatus(user.followStatus);
+      } else if (user.followStatus) {
+        setFollowStatus(user.followStatus);
+      } else {
+        setFollowStatus('');
+      }
     }
-  }, [user]);
+  }, [user, status]);
 
   const handleFollowToggle = async () => {
-    if (!user || !currentUserId || isLoading || isFollowed) return;
+    if (!user || !currentUserId || isLoading || followStatus) return;
 
     setIsLoading(true);
 
@@ -100,6 +101,30 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         },
       },
     });
+  };
+
+  // 팔로우 상태에 따른 표시 텍스트
+  const getFollowStatusText = () => {
+    switch (followStatus) {
+      case 'pending':
+        return '대기중';
+      case 'approved':
+        return '맞팔중';
+      default:
+        return '팔로우 중';
+    }
+  };
+
+  // 팔로우 상태에 따른 배경색
+  const getFollowStatusStyle = () => {
+    switch (followStatus) {
+      case 'pending':
+        return styles.pendingStatus;
+      case 'approved':
+        return styles.mutualFollowStatus;
+      default:
+        return styles.followedStatus;
+    }
   };
 
   // 목표 클릭 핸들러
@@ -147,7 +172,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           </View>
 
           {/* 팔로우 버튼 - 자기 자신이 아니고 팔로우하지 않은 경우에만 표시 */}
-          {!isOwnProfile && !isFollowed && (
+          {!isOwnProfile && !followStatus && (
             <TouchableOpacity
               style={[styles.followButton, isLoading && styles.disabledButton]}
               onPress={handleFollowToggle}
@@ -158,10 +183,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             </TouchableOpacity>
           )}
 
-          {/* 팔로우 중인 경우 상태 표시 */}
-          {!isOwnProfile && isFollowed && (
-            <View style={styles.followedStatus}>
-              <Text style={styles.followedStatusText}>팔로우 중</Text>
+          {/* 팔로우 상태 표시 */}
+          {!isOwnProfile && followStatus && (
+            <View style={getFollowStatusStyle()}>
+              <Text style={styles.followedStatusText}>
+                {getFollowStatusText()}
+              </Text>
             </View>
           )}
 
@@ -251,13 +278,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   followButton: {
-    backgroundColor: '#4A90E2',
+    backgroundColor: '#FF6B9D',
     paddingHorizontal: 32,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 16,
     width: '100%',
     alignItems: 'center',
     marginBottom: 12,
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   unfollowButton: {
     backgroundColor: '#E74C3C',
@@ -318,6 +350,24 @@ const styles = StyleSheet.create({
   },
   goalsList: {
     paddingHorizontal: 0,
+  },
+  pendingStatus: {
+    backgroundColor: '#F39C12',
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  mutualFollowStatus: {
+    backgroundColor: '#27AE60',
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 8,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 24,
   },
 });
 
