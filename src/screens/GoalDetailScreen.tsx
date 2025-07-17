@@ -5,6 +5,7 @@ import React, {useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Image,
   Modal,
   ScrollView,
   StyleSheet,
@@ -13,7 +14,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
   CREATE_GOAL_JOIN_REQUEST,
   GET_GOAL,
@@ -37,6 +37,7 @@ function formatDate(dateStr?: string) {
 function getModeLabel(mode?: string) {
   if (mode === 'personal') return '개인';
   if (mode === 'group') return '그룹';
+  if (mode === 'challenger_recruitment') return '챌린저 모집';
   return mode || '-';
 }
 function getStatusLabel(status?: string) {
@@ -90,14 +91,17 @@ const GoalDetailScreen: React.FC = () => {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#4A90E2" />
+        <ActivityIndicator size="large" color="#FF6B9D" />
+        <Text style={styles.loadingText}>
+          목표 정보를 불러오는 중이에요! ✨
+        </Text>
       </View>
     );
   }
   if (error || !data?.getGoal) {
     return (
       <View style={styles.centered}>
-        <Text>목표 정보를 불러올 수 없습니다.</Text>
+        <Text style={styles.errorText}>목표 정보를 불러올 수 없어요 😢</Text>
       </View>
     );
   }
@@ -124,10 +128,10 @@ const GoalDetailScreen: React.FC = () => {
       });
       setJoinModalVisible(false);
       setJoinMessage('');
-      Alert.alert('참여 요청이 완료되었습니다!');
+      Alert.alert('🎉', '참여 요청이 완료되었어요!');
     } catch (e: any) {
       // 에러 메시지 추출
-      let msg = '참여 요청에 실패했습니다.';
+      let msg = '참여 요청에 실패했어요.';
       if (e?.graphQLErrors?.[0]?.message) {
         msg = e.graphQLErrors[0].message;
       } else if (e?.message) {
@@ -147,43 +151,43 @@ const GoalDetailScreen: React.FC = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* 제목/설명 */}
         <View style={styles.headerSection}>
-          <Text style={styles.title}>{goal.title}</Text>
+          <Text style={styles.title}>🥇 {goal.title}</Text>
           <Text style={styles.description}>
-            {goal.description || '설명 없음'}
+            {goal.description || '설명이 없어요 😊'}
           </Text>
         </View>
         {/* 주요 정보 */}
         <View style={styles.cardSection}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>스티커 목표</Text>
+            <Text style={styles.infoLabel}>⭐ 스티커 목표</Text>
             <Text style={styles.infoValue}>{goal.stickerCount}개</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>상태</Text>
+            <Text style={styles.infoLabel}>📊 상태</Text>
             <Text style={styles.infoValue}>{getStatusLabel(goal.status)}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>모드</Text>
+            <Text style={styles.infoLabel}>🕹️ 모드</Text>
             <Text style={styles.infoValue}>{getModeLabel(goal.mode)}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>생성자</Text>
+            <Text style={styles.infoLabel}>👑 생성자</Text>
             <Text style={styles.infoValue}>{goal.creatorNickname || '-'}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>참가자 수</Text>
+            <Text style={styles.infoLabel}>🤝 참가자 수</Text>
             <Text style={styles.infoValue}>
               {goal.participants?.length ?? 0}명
             </Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>생성일</Text>
+            <Text style={styles.infoLabel}>📅 생성일</Text>
             <Text style={styles.infoValue}>{formatDate(goal.createdAt)}</Text>
           </View>
         </View>
         {/* 참가자 목록 */}
         <View style={styles.cardSection}>
-          <Text style={styles.sectionTitle}>참가자 목록</Text>
+          <Text style={styles.sectionTitle}>🤝 참가자 목록</Text>
           {goal.participants && goal.participants.length > 0 ? (
             goal.participants.map((p: any, idx: number) => (
               <TouchableOpacity
@@ -191,12 +195,12 @@ const GoalDetailScreen: React.FC = () => {
                 style={styles.participantItem}
                 onPress={() => handleParticipantPress(p)}>
                 <Text style={styles.participantName}>
-                  {p.nickname || p.id || '이름없음'}
+                  👬 {p.nickname || p.id || '이름없음'}
                 </Text>
               </TouchableOpacity>
             ))
           ) : (
-            <Text style={styles.emptyText}>참가자가 없습니다.</Text>
+            <Text style={styles.emptyText}>아직 참가자가 없어요 😊</Text>
           )}
         </View>
         {/* 참가자 현황 모달 */}
@@ -206,42 +210,53 @@ const GoalDetailScreen: React.FC = () => {
           animationType="slide"
           onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>참가자 현황</Text>
+            <View style={styles.modalContentChild}>
+              <Text style={styles.modalTitle}>👬 참가자 현황</Text>
               {selectedParticipant ? (
                 <>
+                  <View style={styles.avatarRow}>
+                    <Image
+                      source={
+                        selectedParticipant.profileImage
+                          ? {uri: selectedParticipant.profileImage}
+                          : require('../../assets/default-profile.jpg')
+                      }
+                      style={styles.avatarImage}
+                    />
+                  </View>
                   <Text style={styles.modalLabel}>
-                    닉네임: {selectedParticipant.nickname || '-'}
+                    닉네임:{' '}
+                    <Text style={{color: '#FF6B9D', fontWeight: 'bold'}}>
+                      {selectedParticipant.nickname || '-'}
+                    </Text>
                   </Text>
 
                   <View style={styles.stickerRow}>
                     <Text style={styles.stickerCountText}>
                       현재 스티커:{' '}
-                      {selectedParticipant.currentStickerCount ?? 0}개
+                      <Text style={{color: '#FFD700', fontWeight: 'bold'}}>
+                        {selectedParticipant.currentStickerCount ?? 0}개
+                      </Text>
                     </Text>
                   </View>
 
                   {/* 스티커 부여 현황(동그란 아이콘으로 시각화) */}
-                  <View
-                    style={{
-                      marginTop: 10,
-                      width: '100%',
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
+                  <View style={styles.stickerIconRow}>
                     {Array.from({length: goal.stickerCount}).map((_, idx) => (
-                      <MaterialIcons
+                      <Text
                         key={idx}
-                        name="star"
-                        size={28}
-                        style={{marginHorizontal: 2}}
-                        color={
-                          idx < (selectedParticipant.currentStickerCount ?? 0)
-                            ? '#F9D923' // 채워진(획득한) 스티커: 노란색
-                            : '#E0E6ED' // 비어있는(미획득) 스티커: 연회색
-                        }
-                      />
+                        style={{
+                          fontSize: 32,
+                          marginHorizontal: 2,
+                          opacity:
+                            idx < (selectedParticipant.currentStickerCount ?? 0)
+                              ? 1
+                              : 0.3,
+                        }}>
+                        {idx < (selectedParticipant.currentStickerCount ?? 0)
+                          ? '🌟'
+                          : '⭐️'}
+                      </Text>
                     ))}
                   </View>
                   {/* goal 생성자일 때만 스티커 부여 UI 노출, 단 목표 달성 시에는 노출 X */}
@@ -252,7 +267,9 @@ const GoalDetailScreen: React.FC = () => {
                     selectedParticipant.currentStickerCount <
                       goal.stickerCount && (
                       <View style={styles.giveStickerBox}>
-                        <Text style={styles.giveStickerLabel}>스티커 부여</Text>
+                        <Text style={styles.giveStickerLabel}>
+                          ⭐ 스티커 부여
+                        </Text>
                         <View style={styles.giveStickerRow}>
                           <TextInput
                             style={styles.giveStickerInput}
@@ -270,7 +287,7 @@ const GoalDetailScreen: React.FC = () => {
                               if (current + give > goal.stickerCount) {
                                 Alert.alert(
                                   '스티커 목표 초과',
-                                  '스티커 목표 개수를 초과할 수 없습니다.',
+                                  '스티커 목표 개수를 초과할 수 없어요!',
                                 );
                                 return;
                               }
@@ -287,15 +304,15 @@ const GoalDetailScreen: React.FC = () => {
                                   },
                                 });
                                 Alert.alert(
-                                  '스티커 부여 완료',
-                                  `${giveStickerCount}개 스티커를 부여했습니다!`,
+                                  '🎉',
+                                  `${giveStickerCount}개 스티커를 부여했어요!`,
                                 );
                                 setGiveStickerCount('1');
                                 setModalVisible(false);
                                 if (typeof refetch === 'function')
                                   await refetch();
                               } catch (e: any) {
-                                let msg = '스티커 부여에 실패했습니다.';
+                                let msg = '스티커 부여에 실패했어요.';
                                 if (e?.graphQLErrors?.[0]?.message)
                                   msg = e.graphQLErrors[0].message;
                                 else if (e?.message) msg = e.message;
@@ -315,26 +332,11 @@ const GoalDetailScreen: React.FC = () => {
                   {selectedParticipant.userId === currentUserId &&
                     selectedParticipant.currentStickerCount ===
                       goal.stickerCount && (
-                      <View style={{alignItems: 'center', marginTop: 24}}>
-                        <Text
-                          style={{
-                            fontSize: 28,
-                            color: '#F39C12',
-                            marginBottom: 8,
-                          }}>
-                          🎉
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: 18,
-                            color: '#27AE60',
-                            fontWeight: 'bold',
-                            marginBottom: 4,
-                          }}>
-                          목표 달성!
-                        </Text>
-                        <Text style={{fontSize: 15, color: '#2C3E50'}}>
-                          축하합니다! 모든 스티커를 모았습니다.
+                      <View style={styles.celebrateBox}>
+                        <Text style={styles.celebrateEmoji}>🎉🎊</Text>
+                        <Text style={styles.celebrateTitle}>목표 달성!</Text>
+                        <Text style={styles.celebrateText}>
+                          축하해요! 모든 스티커를 모았어요! 🥳
                         </Text>
                       </View>
                     )}
@@ -356,7 +358,7 @@ const GoalDetailScreen: React.FC = () => {
           onPress={handleJoinRequest}
           disabled={joinLoading}>
           <Text style={styles.fabJoinText}>
-            {joinLoading ? '요청 중...' : '목표 참여 요청'}
+            {joinLoading ? '요청 중...' : '🥇 참여 하기'}
           </Text>
         </TouchableOpacity>
       )}
@@ -368,7 +370,7 @@ const GoalDetailScreen: React.FC = () => {
         onRequestClose={() => setJoinModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>참여 요청 메시지</Text>
+            <Text style={styles.modalTitle}>💬 참여 요청 메시지</Text>
             <TextInput
               style={styles.input}
               placeholder="참여 메시지를 입력하세요 (선택)"
@@ -404,108 +406,170 @@ const GoalDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   scrollContainer: {
     padding: 24,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#FFF5F7',
   },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#FFF5F7',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#FF6B9D',
+    marginTop: 16,
+    fontWeight: '600',
+  },
+  errorText: {
+    fontSize: 18,
+    color: '#FF6B9D',
+    textAlign: 'center',
   },
   headerSection: {
     marginBottom: 24,
     alignItems: 'center',
+    backgroundColor: '#FFE5F0',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   title: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#FF6B9D',
     marginBottom: 8,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#7F8C8D',
+    color: '#8E44AD',
     textAlign: 'center',
+    lineHeight: 22,
   },
   cardSection: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 1,
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 6},
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 2,
+    borderColor: '#FFE5F0',
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: '#FFF8FA',
+    borderRadius: 12,
   },
   infoLabel: {
-    fontSize: 15,
-    color: '#95A5A6',
+    fontSize: 16,
+    color: '#8E44AD',
+    fontWeight: '600',
   },
   infoValue: {
-    fontSize: 16,
-    color: '#2C3E50',
+    fontSize: 18,
+    color: '#FF6B9D',
     fontWeight: 'bold',
   },
   sectionTitle: {
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 12,
+    color: '#FF6B9D',
+    marginBottom: 16,
   },
   participantItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 2,
+    borderBottomColor: '#FFE5F0',
+    backgroundColor: '#FFF8FA',
+    borderRadius: 12,
+    marginBottom: 8,
   },
   participantName: {
-    fontSize: 15,
-    color: '#2C3E50',
+    fontSize: 16,
+    color: '#8E44AD',
+    fontWeight: '600',
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#BDC3C7',
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 16,
+    fontStyle: 'italic',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(255,107,157,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
-    width: 300,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 28,
+    width: 320,
     alignItems: 'center',
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 12,
+    borderWidth: 3,
+    borderColor: '#FFE5F0',
+  },
+  modalContentChild: {
+    backgroundColor: '#FFF8FA',
+    borderRadius: 28,
+    padding: 32,
+    width: 340,
+    alignItems: 'center',
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 12,
+    borderWidth: 4,
+    borderColor: '#FFE5F0',
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 20,
+    color: '#FF6B9D',
   },
   modalLabel: {
-    fontSize: 15,
-    marginBottom: 8,
+    fontSize: 16,
+    marginBottom: 12,
+    color: '#8E44AD',
+    fontWeight: '600',
   },
   modalCloseBtn: {
-    marginTop: 20,
-    backgroundColor: '#4A90E2',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 24,
+    marginTop: 24,
+    backgroundColor: '#FF6B9D',
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 28,
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   modalCloseText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -513,52 +577,59 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 24,
     bottom: 24,
-    backgroundColor: '#F39C12',
-    borderRadius: 28,
-    width: 180,
-    height: 56,
+    backgroundColor: '#FF6B9D',
+    borderRadius: 32,
+    width: 200,
+    height: 64,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#F39C12',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 12,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
   },
   fabJoinText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 18,
   },
   input: {
     width: '100%',
-    borderWidth: 1,
-    borderColor: '#E0E6ED',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 15,
-    backgroundColor: '#F8F9FA',
-    marginTop: 8,
+    borderWidth: 3,
+    borderColor: '#FFE5F0',
+    borderRadius: 16,
+    padding: 16,
+    fontSize: 16,
+    backgroundColor: '#FFF8FA',
+    marginTop: 12,
+    color: '#8E44AD',
   },
   stickerRow: {
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 12,
+    marginBottom: 12,
     alignItems: 'center',
   },
   stickerCountText: {
-    fontSize: 14,
-    color: '#2C3E50',
+    fontSize: 16,
+    color: '#8E44AD',
+    fontWeight: '600',
   },
   giveStickerBox: {
-    marginTop: 18,
+    marginTop: 20,
     alignItems: 'center',
     width: '100%',
+    backgroundColor: '#FFF8FA',
+    borderRadius: 16,
+    padding: 16,
   },
   giveStickerLabel: {
-    fontSize: 16,
-    color: '#2C3E50',
+    fontSize: 18,
+    color: '#FF6B9D',
     fontWeight: 'bold',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   giveStickerRow: {
     flexDirection: 'row',
@@ -566,29 +637,96 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   giveStickerInput: {
-    width: 48,
-    height: 36,
-    borderWidth: 1,
-    borderColor: '#E0E6ED',
-    borderRadius: 8,
-    padding: 8,
-    fontSize: 16,
-    marginRight: 10,
+    width: 56,
+    height: 44,
+    borderWidth: 3,
+    borderColor: '#FFE5F0',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 18,
+    marginRight: 12,
     textAlign: 'center',
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#FFFFFF',
+    color: '#8E44AD',
   },
   giveStickerBtn: {
-    backgroundColor: '#F39C12',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
+    backgroundColor: '#FF6B9D',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#FF6B9D',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   giveStickerBtnText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  stickerIconRow: {
+    marginTop: 10,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  celebrateBox: {
+    alignItems: 'center',
+    marginTop: 24,
+    backgroundColor: '#FFE5F0',
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#FF6B9D',
+  },
+  celebrateEmoji: {
+    fontSize: 48,
+    marginBottom: 8,
+  },
+  celebrateTitle: {
+    fontSize: 22,
+    color: '#FF6B9D',
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  celebrateText: {
+    fontSize: 16,
+    color: '#8E44AD',
+    fontWeight: '600',
+  },
+  avatarRow: {
+    marginBottom: 8,
+  },
+  avatarImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    borderWidth: 3,
+    borderColor: '#FFD1DC',
+  },
+  avatarFallback: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#FFE5F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#FFD1DC',
+  },
+  avatarEmoji: {
+    fontSize: 24,
+    marginBottom: 2,
+  },
+  avatarText: {
+    fontSize: 18,
+    color: '#FF6B9D',
+    fontWeight: 'bold',
   },
 });
 

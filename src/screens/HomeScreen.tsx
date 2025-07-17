@@ -1,5 +1,6 @@
-import {useNavigation} from '@react-navigation/native';
-import React, {useState} from 'react';
+import {useQuery} from '@apollo/client';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import React, {useCallback, useState} from 'react';
 import {
   RefreshControl,
   ScrollView,
@@ -9,10 +10,13 @@ import {
   View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {GET_INVITATIONS} from '../queries/goal';
+import {colors} from '../styles/colors';
 import ChallengeSection from './components/ChallengeSection';
 import FloatingAddGoalButton from './components/FloatingAddGoalButton';
 import FollowFeedSection from './components/FollowFeedSection';
-import GoalSummarySection from './components/GoalSummarySection';
+import MyCreatedGoalsSection from './components/GoalSummarySection';
+import NotificationViewer from './components/NotificationViewer';
 
 interface User {
   id: string;
@@ -28,7 +32,30 @@ interface HomeScreenProps {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
   const [refreshing, setRefreshing] = useState(false);
+  const [notificationViewerVisible, setNotificationViewerVisible] =
+    useState(false);
   const navigation = useNavigation<any>();
+
+  // 초대 요청 조회
+  const {data: invitationsData, refetch: refetchInvitations} = useQuery(
+    GET_INVITATIONS,
+    {
+      fetchPolicy: 'cache-and-network',
+    },
+  );
+
+  // 화면이 포커스될 때마다 초대 요청 데이터 새로고침
+  useFocusEffect(
+    useCallback(() => {
+      refetchInvitations();
+    }, [refetchInvitations]),
+  );
+
+  // pending 상태의 초대 요청 개수 계산
+  const pendingCount =
+    invitationsData?.getInvitations?.filter(
+      (invitation: any) => invitation.status === 'pending',
+    )?.length || 0;
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -36,6 +63,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
+  };
+
+  const handleNotificationPress = () => {
+    setNotificationViewerVisible(true);
   };
 
   return (
@@ -50,11 +81,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.notificationButton}
-          onPress={() => navigation.navigate('Goals', {screen: 'Invitations'})}>
-          <MaterialIcons name="notifications" size={24} color="#2C3E50" />
-          <View style={styles.notificationBadge}>
-            <Text style={styles.notificationCount}>3</Text>
-          </View>
+          onPress={handleNotificationPress}>
+          <MaterialIcons
+            name="notifications"
+            size={24}
+            color={colors.primary}
+          />
+          {pendingCount > 0 && (
+            <View style={styles.notificationBadge}>
+              <Text style={styles.notificationCount}>{pendingCount}</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -64,13 +101,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         showsVerticalScrollIndicator={false}>
-        <GoalSummarySection navigation={navigation} />
-        <FollowFeedSection />
-        <ChallengeSection />
+        <MyCreatedGoalsSection navigation={navigation} />
+        <FollowFeedSection navigation={navigation} />
+        <ChallengeSection navigation={navigation} />
       </ScrollView>
 
       {/* 플로팅 액션 버튼 */}
       <FloatingAddGoalButton />
+
+      {/* 알림 뷰어 */}
+      <NotificationViewer
+        visible={notificationViewerVisible}
+        onClose={() => setNotificationViewerVisible(false)}
+      />
     </View>
   );
 };
@@ -78,7 +121,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -87,36 +130,58 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 50,
     paddingBottom: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.primary,
+    borderBottomWidth: 3,
+    borderBottomColor: colors.primaryLight,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   greeting: {
-    fontSize: 14,
-    color: '#7F8C8D',
+    fontSize: 16,
+    color: colors.white,
+    fontWeight: '600',
   },
   userName: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: colors.white,
     marginTop: 2,
+    textShadowColor: colors.primaryDark,
+    textShadowOffset: {width: 1, height: 1},
+    textShadowRadius: 2,
   },
   notificationButton: {
     position: 'relative',
-    padding: 8,
+    padding: 12,
+    backgroundColor: colors.white,
+    borderRadius: 25,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
+    borderWidth: 2,
+    borderColor: colors.primaryLight,
   },
   notificationBadge: {
     position: 'absolute',
-    top: 4,
-    right: 4,
-    backgroundColor: '#E74C3C',
-    borderRadius: 8,
-    minWidth: 16,
-    height: 16,
+    top: 6,
+    right: 6,
+    backgroundColor: colors.error,
+    borderRadius: 12,
+    minWidth: 20,
+    height: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.white,
   },
   notificationCount: {
-    fontSize: 10,
-    color: '#FFFFFF',
+    fontSize: 12,
+    color: colors.white,
     fontWeight: 'bold',
   },
   scrollView: {
@@ -134,15 +199,15 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     marginBottom: 10,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#FF6B9D',
   },
   seeAllText: {
     fontSize: 14,
-    color: '#4A90E2',
-    fontWeight: '500',
+    color: '#FF6B9D',
+    fontWeight: '600',
   },
   goalSummaryContainer: {
     flexDirection: 'row',
@@ -150,190 +215,18 @@ export const styles = StyleSheet.create({
   },
   goalSummaryCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     alignItems: 'center',
     flex: 1,
     marginHorizontal: 4,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  goalSummaryIcon: {
-    marginBottom: 8,
-  },
-  goalSummaryNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 4,
-  },
-  goalSummaryLabel: {
-    fontSize: 12,
-    color: '#7F8C8D',
-  },
-  feedItem: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  feedHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  feedUserInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#4A90E2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  avatarText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  feedUserName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#2C3E50',
-  },
-  feedTime: {
-    fontSize: 12,
-    color: '#95A5A6',
-    marginTop: 2,
-  },
-  stickerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF3CD',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  stickerButtonText: {
-    fontSize: 12,
-    color: '#F39C12',
-    fontWeight: '500',
-    marginLeft: 4,
-  },
-  feedGoalTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2C3E50',
-    marginBottom: 12,
-  },
-  feedProgress: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  progressBar: {
-    flex: 1,
-    height: 8,
-    backgroundColor: '#E9ECEF',
-    borderRadius: 4,
-    marginRight: 12,
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: '#4A90E2',
-    borderRadius: 4,
-  },
-  progressText: {
-    fontSize: 12,
-    color: '#7F8C8D',
-    fontWeight: '500',
-  },
-  challengeCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  challengeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  challengeTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2C3E50',
-    flex: 1,
-  },
-  challengeParticipants: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  participantCount: {
-    fontSize: 12,
-    color: '#7F8C8D',
-    marginLeft: 4,
-  },
-  challengeDescription: {
-    fontSize: 14,
-    color: '#7F8C8D',
-    lineHeight: 20,
-    marginBottom: 12,
-  },
-  challengeFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  challengeDuration: {
-    fontSize: 12,
-    color: '#E74C3C',
-    fontWeight: '500',
-  },
-  joinButton: {
-    backgroundColor: '#4A90E2',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 16,
-  },
-  joinButtonText: {
-    fontSize: 12,
-    color: '#FFFFFF',
-    fontWeight: '600',
-  },
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#4A90E2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#4A90E2',
+    shadowColor: '#FF6B9D',
     shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.15,
     shadowRadius: 8,
-    elevation: 8,
+    elevation: 6,
+    borderWidth: 2,
+    borderColor: '#FFE5F0',
   },
 });
 

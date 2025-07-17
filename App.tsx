@@ -4,6 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
 import Reactotron from 'reactotron-react-native';
+import CustomBackButton from './src/components/CustomBackButton';
 import MainTabNavigator from './src/navigation/MainTabNavigator';
 import AuthScreen from './src/screens/AuthScreen';
 import CreateGoalScreen from './src/screens/CreateGoalScreen';
@@ -12,6 +13,7 @@ import InvitationDetailScreen from './src/screens/InvitationDetailScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
 import UserProfileScreen from './src/screens/UserProfileScreen';
 import apolloClient from './src/services/apollo-client';
+import {colors} from './src/styles/colors';
 
 if (__DEV__) {
   import('./ReactotronConfig').then(() =>
@@ -92,7 +94,22 @@ const App: React.FC = () => {
   return (
     <ApolloProvider client={apolloClient}>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            headerStyle: {
+              backgroundColor: colors.primary,
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 0,
+            },
+            headerTintColor: colors.white,
+            headerTitleStyle: {
+              fontWeight: 'bold',
+              fontSize: 18,
+              color: colors.white,
+            },
+          }}>
           {isAuthenticated ? (
             <>
               <Stack.Screen name="Main">
@@ -101,22 +118,94 @@ const App: React.FC = () => {
               <Stack.Screen
                 name="CreateGoal"
                 component={CreateGoalScreen}
-                options={{headerShown: true, title: '새 목표 만들기'}}
+                options={({navigation}) => ({
+                  headerShown: true,
+                  title: '✨ 새 목표 만들기',
+                  headerStyle: {
+                    backgroundColor: colors.primary,
+                    elevation: 0,
+                    shadowOpacity: 0,
+                    borderBottomWidth: 0,
+                  },
+                  headerTintColor: colors.white,
+                  headerTitleStyle: {
+                    fontWeight: 'bold',
+                    fontSize: 18,
+                    color: colors.white,
+                  },
+                  headerLeft: () => (
+                    <CustomBackButton onPress={() => navigation.goBack()} />
+                  ),
+                })}
               />
               <Stack.Screen
                 name="GoalDetail"
                 component={GoalDetailScreen}
-                options={{headerShown: true, title: '목표 상세'}}
+                options={({navigation}) => ({
+                  headerShown: true,
+                  title: '🥇 목표 상세',
+                  headerStyle: {
+                    backgroundColor: colors.primary,
+                    elevation: 0,
+                    shadowOpacity: 0,
+                    borderBottomWidth: 0,
+                  },
+                  headerTintColor: colors.white,
+                  headerTitleStyle: {
+                    fontWeight: 'bold',
+                    fontSize: 18,
+                    color: colors.white,
+                  },
+                  headerLeft: () => (
+                    <CustomBackButton onPress={() => navigation.goBack()} />
+                  ),
+                })}
               />
               <Stack.Screen
                 name="InvitationDetail"
                 component={InvitationDetailScreen}
-                options={{headerShown: true, title: '요청/초대 상세'}}
+                options={({navigation}) => ({
+                  headerShown: true,
+                  title: '📨 목표 요청 상세',
+                  headerStyle: {
+                    backgroundColor: colors.primary,
+                    elevation: 0,
+                    shadowOpacity: 0,
+                    borderBottomWidth: 0,
+                  },
+                  headerTintColor: colors.white,
+                  headerTitleStyle: {
+                    fontWeight: 'bold',
+                    fontSize: 18,
+                    color: colors.white,
+                  },
+                  headerLeft: () => (
+                    <CustomBackButton onPress={() => navigation.goBack()} />
+                  ),
+                })}
               />
               <Stack.Screen
                 name="UserProfile"
                 component={UserProfileScreen}
-                options={{headerShown: false}}
+                options={({navigation}) => ({
+                  headerShown: true,
+                  title: '🤖 프로필',
+                  headerStyle: {
+                    backgroundColor: colors.primary,
+                    elevation: 0,
+                    shadowOpacity: 0,
+                    borderBottomWidth: 0,
+                  },
+                  headerTintColor: colors.white,
+                  headerTitleStyle: {
+                    fontWeight: 'bold',
+                    fontSize: 18,
+                    color: colors.white,
+                  },
+                  headerLeft: () => (
+                    <CustomBackButton onPress={() => navigation.goBack()} />
+                  ),
+                })}
               />
             </>
           ) : (

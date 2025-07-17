@@ -127,9 +127,11 @@ const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
         keyboardShouldPersistTaps="handled">
         {/* 로고 영역 */}
         <View style={styles.logoContainer}>
-          <Text style={styles.appName}>함히보까</Text>
+          <Text style={styles.appName}>🥇 함히보까</Text>
           <Text style={styles.subtitle}>
-            {isLogin ? '다시 만나서 반가워요!' : '함께 목표를 달성해봐요!'}
+            {isLogin
+              ? '다시 만나서 반가워요! 👋'
+              : '함께 목표를 달성해봐요! ✨'}
           </Text>
         </View>
 
@@ -204,7 +206,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFF5F7',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -219,15 +221,16 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 42,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#FF6B9D',
     marginBottom: 12,
     letterSpacing: -1.5,
   },
   subtitle: {
     fontSize: 16,
-    color: '#7F8C8D',
+    color: '#8E44AD',
     textAlign: 'center',
     lineHeight: 22,
+    fontWeight: '500',
   },
   formContainer: {
     width: '100%',
@@ -238,30 +241,30 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#34495E',
+    color: '#8E44AD',
     marginBottom: 8,
   },
   textInput: {
-    borderWidth: 1,
-    borderColor: '#E0E6ED',
-    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#FFE5F0',
+    borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    backgroundColor: '#F8F9FA',
-    color: '#2C3E50',
+    backgroundColor: '#FFFFFF',
+    color: '#8E44AD',
   },
   authButton: {
-    backgroundColor: '#4A90E2',
-    borderRadius: 12,
+    backgroundColor: '#FF6B9D',
+    borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 12,
-    shadowColor: '#4A90E2',
+    shadowColor: '#FF6B9D',
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 6,
   },
   disabledButton: {
     backgroundColor: '#BDC3C7',
@@ -279,10 +282,10 @@ const styles = StyleSheet.create({
   },
   switchButtonText: {
     fontSize: 14,
-    color: '#7F8C8D',
+    color: '#8E44AD',
   },
   switchButtonHighlight: {
-    color: '#4A90E2',
+    color: '#FF6B9D',
     fontWeight: '600',
   },
 });

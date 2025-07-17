@@ -48,15 +48,20 @@ const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({
 
           return <Icon name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: '#4A90E2',
-        tabBarInactiveTintColor: '#95A5A6',
+        tabBarActiveTintColor: '#FF6B9D',
+        tabBarInactiveTintColor: '#8E44AD',
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
-          borderTopWidth: 1,
-          borderTopColor: '#E0E6ED',
+          borderTopWidth: 2,
+          borderTopColor: '#FFE5F0',
           paddingBottom: 8,
           paddingTop: 8,
-          height: 60,
+          height: 90,
+          shadowColor: '#FF6B9D',
+          shadowOffset: {width: 0, height: -2},
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          elevation: 8,
         },
         tabBarLabelStyle: {
           fontSize: 12,

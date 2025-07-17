@@ -1,0 +1,72 @@
+import {useQuery} from '@apollo/client';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import React, {useCallback} from 'react';
+import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
+import {GET_MY_PARTICIPATED_GOALS} from '../queries/goal';
+import FloatingAddGoalButton from './components/FloatingAddGoalButton';
+import GoalList, {Goal} from './components/GoalList';
+
+const ParticipatedGoalsScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
+  const {data, loading, error, refetch} = useQuery(GET_MY_PARTICIPATED_GOALS, {
+    fetchPolicy: 'network-only', // 캐시 무시하고 항상 네트워크에서 새로 가져오기
+  });
+
+  // 화면에 포커스될 때마다 데이터 새로고침
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch]),
+  );
+
+  const goals: Goal[] = data?.getMyParticipatedGoals || [];
+
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#FF6B9D" />
+      </View>
+    );
+  }
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text>참여한 목표를 불러올 수 없습니다.</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <GoalList
+        goals={goals}
+        onPressGoal={(goal: Goal) =>
+          navigation.navigate('GoalDetail', {id: goal.id})
+        }
+        contentContainerStyle={styles.listContainer}
+        emptyText="참여한 목표가 없습니다."
+        emptyType="participated"
+      />
+      <FloatingAddGoalButton />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F0F2F5', // 연한 회색 배경으로 구분
+    padding: 20,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F2F5',
+  },
+  listContainer: {
+    paddingBottom: 40,
+  },
+});
+
+export default ParticipatedGoalsScreen;

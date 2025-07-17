@@ -301,3 +301,96 @@ export const GET_GOALS_BY_USER_ID = gql`
     }
   }
 `;
+
+export const GET_MY_PARTICIPATED_GOALS = gql`
+  query GetMyParticipatedGoals {
+    getMyParticipatedGoals {
+      id
+      goalId
+      title
+      description
+      stickerCount
+      mode
+      visibility
+      status
+      createdBy
+      creatorNickname
+      autoApprove
+      createdAt
+      updatedAt
+      participants {
+        userId
+        nickname
+        status
+        currentStickerCount
+        joinedAt
+        stickerReceivedLogs {
+          date
+          count
+        }
+      }
+    }
+  }
+`;
+
+export const GET_FOLLOWED_USERS_GOALS = gql`
+  query GetFollowedUsersGoals {
+    getFollowedUsersGoals {
+      id
+      goalId
+      title
+      description
+      stickerCount
+      mode
+      visibility
+      status
+      createdBy
+      autoApprove
+      createdAt
+      updatedAt
+      participants {
+        userId
+        nickname
+        status
+        currentStickerCount
+        joinedAt
+        stickerReceivedLogs {
+          date
+          count
+        }
+      }
+    }
+  }
+`;
+
+export const GET_INVITATIONS = gql`
+  query GetInvitations {
+    getInvitations {
+      id
+      invitationId
+      goalId
+      fromUserId
+      toUserId
+      type
+      status
+      message
+      respondedAt
+      createdAt
+      updatedAt
+      goal {
+        id
+        goalId
+        title
+        description
+        stickerCount
+        mode
+        visibility
+        status
+        createdBy
+        autoApprove
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;

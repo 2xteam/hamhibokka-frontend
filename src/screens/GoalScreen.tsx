@@ -29,6 +29,7 @@ const GoalScreen: React.FC = () => {
         }
         contentContainerStyle={styles.listContainer}
         emptyText="아직 등록된 목표가 없습니다."
+        emptyType="goals"
       />
       <FloatingAddGoalButton />
     </View>
@@ -38,7 +39,7 @@ const GoalScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F0F2F5', // 연한 회색 배경으로 구분
     padding: 20,
   },
   title: {

@@ -1,9 +1,9 @@
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import React from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
-import GoalScreen from './GoalScreen';
-import InvitationListScreen from './InvitationListScreen';
 import CommonTabNavigator from './components/CommonTabNavigator';
+import GoalScreen from './GoalScreen';
+import ParticipatedGoalsScreen from './ParticipatedGoalsScreen';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -11,19 +11,19 @@ const screens = [
   {
     name: 'Goals',
     component: GoalScreen,
-    options: {tabBarLabel: '나의 목표'},
+    options: {tabBarLabel: '목표'},
   },
   {
-    name: 'Invitations',
-    component: InvitationListScreen,
-    options: {tabBarLabel: '요청 & 초대'},
+    name: 'MyParticipated',
+    component: ParticipatedGoalsScreen,
+    options: {tabBarLabel: '참여한 목표'},
   },
 ];
 
 const tabBarOptions = {
   tabBarLabelStyle: {fontSize: 15, fontWeight: 'bold'},
-  tabBarIndicatorStyle: {backgroundColor: '#4A90E2'},
-  tabBarActiveTintColor: '#4A90E2',
+  tabBarIndicatorStyle: {backgroundColor: '#FF6B9D'},
+  tabBarActiveTintColor: '#FF6B9D',
   tabBarInactiveTintColor: '#7F8C8D',
   tabBarStyle: {backgroundColor: '#fff', elevation: 2, zIndex: 10},
 };
