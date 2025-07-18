@@ -106,6 +106,30 @@ const InvitationDetailScreen: React.FC = () => {
   const canApprove =
     goal.createdBy && currentUserId && goal.createdBy === currentUserId;
   const isApproved = inv.status === 'accepted';
+  const getModeEmoji = (mode?: string) => {
+    switch (mode) {
+      case 'personal':
+        return '💪';
+      case 'competition':
+        return '🏆';
+      case 'challenger_recruitment':
+        return '👬';
+      default:
+        return '🥇';
+    }
+  };
+  function getModeLabel(mode?: string): string {
+    switch (mode) {
+      case 'personal':
+        return '개인';
+      case 'competition':
+        return '경쟁';
+      case 'challenger_recruitment':
+        return '챌린저';
+      default:
+        return '개인';
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -128,11 +152,11 @@ const InvitationDetailScreen: React.FC = () => {
             </Text>
           </View>
           <View style={styles.infoItem}>
-            <Text style={styles.infoIcon}>👥</Text>
+            <Text style={styles.infoIcon}>🕹️</Text>
             <Text style={styles.goalInfo}>
               모드:{' '}
               <Text style={styles.goalInfoValue}>
-                {goal.mode === 'group' ? '그룹' : '개인'}
+                {getModeEmoji(goal.mode)} {getModeLabel(goal.mode)}
               </Text>
             </Text>
           </View>
@@ -212,7 +236,10 @@ const InvitationDetailScreen: React.FC = () => {
             onPress={async () => {
               try {
                 await updateGoalInvitation({
-                  variables: {id: inv.id, input: {status: 'accepted'}},
+                  variables: {
+                    id: inv.invitationId,
+                    input: {status: 'accepted'},
+                  },
                 });
                 await refetch();
                 Alert.alert('승인 완료', '✅ 요청이 승인되었습니다!');

@@ -101,7 +101,7 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
   const handleInvitationPress = (invitation: Invitation) => {
     onClose(); // 뷰어 닫기
     navigation.navigate('InvitationDetail', {
-      id: invitation.id, // invitationId가 아닌 id를 전달
+      id: invitation.invitationId, // invitationId를 사용
     });
   };
 
@@ -154,14 +154,22 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
     </View>
   );
 
-  const renderSection = (title: string, data: Invitation[]) => (
-    <View style={styles.section}>
-      {renderSectionHeader(title, data.length)}
-      {data.map(item => (
-        <View key={item.id}>{renderInvitation({item})}</View>
-      ))}
-    </View>
-  );
+  const renderSection = (title: string, data: Invitation[]) => {
+    return (
+      <View style={styles.section}>
+        {renderSectionHeader(title, data.length)}
+        {data.length > 0 ? (
+          data.map(item => (
+            <View key={item.id}>{renderInvitation({item})}</View>
+          ))
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>{title}이 없어요.</Text>
+          </View>
+        )}
+      </View>
+    );
+  };
 
   return (
     <Modal
@@ -200,11 +208,6 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
               }
               contentContainerStyle={styles.listContainer}
               showsVerticalScrollIndicator={false}
-              ListEmptyComponent={
-                <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>초대 요청이 없습니다.</Text>
-                </View>
-              }
             />
           )}
         </TouchableOpacity>

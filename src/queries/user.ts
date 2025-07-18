@@ -116,3 +116,17 @@ export const APPROVE_FOLLOW = gql`
     }
   }
 `;
+
+export const GET_FOLLOW_REQUESTS = gql`
+  query GetFollowRequests {
+    getFollowRequests {
+      id
+      followerId
+      followingId
+      followerNickname
+      followingNickname
+      status
+      createdAt
+    }
+  }
+`;

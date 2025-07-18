@@ -18,6 +18,13 @@ export enum GoalMode {
   CHALLENGER_RECRUITMENT = 'challenger_recruitment',
 }
 
+// Visibility enum 추가
+export enum Visibility {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+  FOLLOWERS = 'followers',
+}
+
 const CreateGoalScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const [title, setTitle] = useState('');
@@ -25,6 +32,8 @@ const CreateGoalScreen: React.FC = () => {
   const [stickerCount, setStickerCount] = useState('');
   // mode 상태 추가, 기본값은 PERSONAL
   const [mode, setMode] = useState<GoalMode>(GoalMode.PERSONAL);
+  // visibility 상태 추가, 기본값은 PUBLIC
+  const [visibility, setVisibility] = useState<Visibility>(Visibility.PUBLIC);
   const [createGoal, {loading}] = useMutation(CREATE_GOAL);
 
   const handleSave = async () => {
@@ -48,6 +57,7 @@ const CreateGoalScreen: React.FC = () => {
             description,
             stickerCount: Number(stickerCount),
             mode, // mode 추가
+            visibility, // visibility 추가
           },
         },
       });
@@ -141,6 +151,67 @@ const CreateGoalScreen: React.FC = () => {
                   : styles.modeButtonText
               }>
               챌린저
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* 공개 범위 선택 UI */}
+      <View style={{marginBottom: 16}}>
+        <Text
+          style={{
+            marginBottom: 8,
+            fontWeight: 'bold',
+            fontSize: 16,
+            color: '#FF6B9D',
+          }}>
+          공개 범위
+        </Text>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+          <TouchableOpacity
+            style={[
+              styles.modeButton,
+              visibility === Visibility.PUBLIC && styles.modeButtonSelected,
+            ]}
+            onPress={() => setVisibility(Visibility.PUBLIC)}>
+            <Text
+              style={
+                visibility === Visibility.PUBLIC
+                  ? styles.modeButtonTextSelected
+                  : styles.modeButtonText
+              }>
+              공개
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.modeButton,
+              visibility === Visibility.FOLLOWERS && styles.modeButtonSelected,
+            ]}
+            onPress={() => setVisibility(Visibility.FOLLOWERS)}>
+            <Text
+              style={
+                visibility === Visibility.FOLLOWERS
+                  ? styles.modeButtonTextSelected
+                  : styles.modeButtonText
+              }>
+              팔로워
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.modeButton,
+              visibility === Visibility.PRIVATE && styles.modeButtonSelected,
+            ]}
+            onPress={() => setVisibility(Visibility.PRIVATE)}>
+            <Text
+              style={
+                visibility === Visibility.PRIVATE
+                  ? styles.modeButtonTextSelected
+                  : styles.modeButtonText
+              }>
+              비공개
             </Text>
           </TouchableOpacity>
         </View>

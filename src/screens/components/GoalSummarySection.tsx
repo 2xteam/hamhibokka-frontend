@@ -1,5 +1,6 @@
 import {useQuery} from '@apollo/client';
-import React from 'react';
+import {useFocusEffect} from '@react-navigation/native';
+import React, {useCallback} from 'react';
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {GET_GOALS} from '../../queries/goal';
 import {colors} from '../../styles/colors';
@@ -29,9 +30,20 @@ interface MyCreatedGoalsSectionProps {
 const MyCreatedGoalsSection: React.FC<MyCreatedGoalsSectionProps> = ({
   navigation,
 }) => {
-  const {data: goalsData, loading} = useQuery(GET_GOALS, {
+  const {
+    data: goalsData,
+    loading,
+    refetch: refetchGoals,
+  } = useQuery(GET_GOALS, {
     fetchPolicy: 'cache-and-network',
   });
+
+  // 화면이 포커스될 때마다 데이터 새로고침
+  useFocusEffect(
+    useCallback(() => {
+      refetchGoals();
+    }, [refetchGoals]),
+  );
 
   const goals = goalsData?.getGoals || [];
 
@@ -59,12 +71,10 @@ const MyCreatedGoalsSection: React.FC<MyCreatedGoalsSectionProps> = ({
     switch (mode) {
       case 'personal':
         return '💪';
-      case 'group':
-        return '👬';
       case 'competition':
         return '🏆';
       case 'challenger_recruitment':
-        return '🤝';
+        return '👬';
       default:
         return '🥇';
     }
@@ -89,8 +99,6 @@ const MyCreatedGoalsSection: React.FC<MyCreatedGoalsSectionProps> = ({
         <Text style={styles.modeText}>
           {item.mode === 'personal'
             ? '개인'
-            : item.mode === 'group'
-            ? '그룹'
             : item.mode === 'competition'
             ? '경쟁'
             : item.mode === 'challenger_recruitment'

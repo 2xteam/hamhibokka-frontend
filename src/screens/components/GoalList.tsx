@@ -1,4 +1,5 @@
-import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 export interface Goal {
@@ -39,6 +40,7 @@ interface GoalListProps {
   emptyText?: string;
   contentContainerStyle?: any;
   emptyType?: 'goals' | 'participated';
+  userId?: string;
 }
 
 const GoalList: React.FC<GoalListProps> = ({
@@ -47,7 +49,32 @@ const GoalList: React.FC<GoalListProps> = ({
   emptyText = '등록된 목표가 없습니다.',
   contentContainerStyle,
   emptyType = 'goals',
+  userId,
 }) => {
+  const [currentUserId, setCurrentUserId] = useState<string | null>(
+    userId || null,
+  );
+
+  useEffect(() => {
+    if (!userId) {
+      // userId가 props로 전달되지 않은 경우 AsyncStorage에서 가져오기
+      const getUserId = async () => {
+        try {
+          const userData = await AsyncStorage.getItem('@hamhibokka_user');
+          if (userData) {
+            const user = JSON.parse(userData);
+            setCurrentUserId(user.userId);
+          }
+        } catch (e) {
+          console.log('Failed to get user data');
+        }
+      };
+      getUserId();
+    } else {
+      setCurrentUserId(userId);
+    }
+  }, [userId]);
+
   const getGoalEmoji = (title: string) => {
     const lowerTitle = title.toLowerCase();
     if (lowerTitle.includes('운동') || lowerTitle.includes('스포츠'))
@@ -60,19 +87,17 @@ const GoalList: React.FC<GoalListProps> = ({
     if (lowerTitle.includes('청소') || lowerTitle.includes('정리')) return '🧹';
     if (lowerTitle.includes('게임')) return '🎮';
     if (lowerTitle.includes('산책') || lowerTitle.includes('걷기')) return '🚶‍♂️';
-    return '🥇'; // 기본 이모지
+    return '🥇';
   };
 
   const getModeEmoji = (mode?: string) => {
     switch (mode) {
       case 'personal':
         return '💪';
-      case 'group':
-        return '👬';
       case 'competition':
         return '🏆';
       case 'challenger_recruitment':
-        return '🤝';
+        return '👬';
       default:
         return '🥇';
     }
@@ -81,95 +106,135 @@ const GoalList: React.FC<GoalListProps> = ({
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'active':
-        return '#4CAF50';
+        return '#27AE60';
       case 'completed':
-        return '#FF9800';
+        return '#E74C3C';
       case 'archived':
-        return '#9E9E9E';
+        return '#95A5A6';
       default:
         return '#FF6B9D';
     }
   };
 
-  const renderItem = ({item}: {item: Goal}) => (
-    <TouchableOpacity
-      style={styles.goalItem}
-      onPress={() => onPressGoal && onPressGoal(item)}>
-      <View style={styles.goalHeader}>
-        <View style={styles.goalIconContainer}>
-          <Text style={styles.goalEmoji}>{getGoalEmoji(item.title)}</Text>
-        </View>
-        <View style={styles.goalTitleContainer}>
-          <Text style={styles.goalTitle}>{item.title}</Text>
-          <View style={styles.goalMeta}>
-            <Text style={styles.modeEmoji}>{getModeEmoji(item.mode)}</Text>
-            <Text style={styles.modeText}>
-              {item.mode === 'personal'
-                ? '개인'
-                : item.mode === 'group'
-                ? '그룹'
-                : item.mode === 'competition'
-                ? '경쟁'
-                : item.mode === 'challenger_recruitment'
-                ? '챌린저 모집'
-                : '목표'}
-            </Text>
-          </View>
-        </View>
-        {item.isParticipant && (
-          <View style={styles.participantBadge}>
-            <Text style={styles.participantBadgeText}>🎉 참여중</Text>
+  const renderItem = ({item}: {item: Goal}) => {
+    // 내가 참여한 목표에서 완료 상태 확인
+    const myParticipant = item.participants?.find(
+      p => p.userId === currentUserId,
+    );
+    const isCompleted =
+      myParticipant && myParticipant.currentStickerCount >= item.stickerCount;
+
+    return (
+      <TouchableOpacity
+        style={[styles.goalItem, isCompleted && styles.completedGoalItem]}
+        onPress={() => onPressGoal && onPressGoal(item)}>
+        {/* 완료 오버레이 아이콘 */}
+        {isCompleted && (
+          <View style={styles.completedOverlay}>
+            <Text style={styles.completedIcon}>🏆</Text>
           </View>
         )}
-      </View>
 
-      {item.description && (
-        <Text style={styles.goalDesc}>{item.description}</Text>
-      )}
-
-      <View style={styles.goalInfoRow}>
-        <View style={styles.stickerContainer}>
-          <Text style={styles.stickerEmoji}>⭐</Text>
-          <Text style={styles.stickerCount}>{item.stickerCount}개 목표</Text>
-        </View>
-        {item.creatorNickname && (
-          <View style={styles.creatorContainer}>
-            <Text style={styles.creatorEmoji}>👑</Text>
-            <Text style={styles.creator}>{item.creatorNickname}</Text>
+        <View style={styles.goalHeader}>
+          <View style={styles.goalIconContainer}>
+            <Text style={styles.goalEmoji}>{getGoalEmoji(item.title)}</Text>
           </View>
-        )}
-      </View>
-
-      {item.participants && item.participants.length > 0 && (
-        <View style={styles.participantsSection}>
-          <View style={styles.participantsHeader}>
-            <Text style={styles.participantsEmoji}>👬</Text>
-            <Text style={styles.participantsTitle}>
-              참가자{' '}
-              <Text style={{color: '#FF6B9D'}}>
-                ({item.participants.length}명)
-              </Text>
-            </Text>
-          </View>
-          {item.participants.slice(0, 3).map((participant, index) => (
-            <View key={index} style={styles.participantInfo}>
-              <Text style={styles.participantName}>
-                {participant.nickname || '익명'}
-              </Text>
-              <Text style={styles.participantStickers}>
-                ⭐ {participant.currentStickerCount}개 수집
+          <View style={styles.goalTitleContainer}>
+            <Text style={styles.goalTitle}>{item.title}</Text>
+            <View style={styles.goalMeta}>
+              <Text style={styles.modeEmoji}>{getModeEmoji(item.mode)}</Text>
+              <Text style={styles.modeText}>
+                {item.mode === 'personal'
+                  ? '개인'
+                  : item.mode === 'competition'
+                  ? '경쟁'
+                  : item.mode === 'challenger_recruitment'
+                  ? '챌린저 모집'
+                  : '목표'}
               </Text>
             </View>
-          ))}
-          {item.participants.length > 3 && (
-            <Text style={styles.moreParticipants}>
-              외 {item.participants.length - 3}명 더 있어요! 🎊
-            </Text>
+          </View>
+          {item.isParticipant && (
+            <View style={styles.participantBadge}>
+              <Text style={styles.participantBadgeText}>🎉 참여중</Text>
+            </View>
+          )}
+          {/* 스티커 완료 배지 */}
+          {item.isParticipant &&
+            item.participants &&
+            (() => {
+              const currentUser = item.participants.find(
+                (p: any) =>
+                  p.userId === item.createdBy ||
+                  p.currentStickerCount >= item.stickerCount,
+              );
+              if (
+                currentUser &&
+                currentUser.currentStickerCount >= item.stickerCount
+              ) {
+                return (
+                  <View style={styles.completedBadge}>
+                    <Text style={styles.completedBadgeText}>🏆 완료!</Text>
+                  </View>
+                );
+              }
+              return null;
+            })()}
+        </View>
+
+        {item.description && (
+          <Text style={styles.goalDesc}>{item.description}</Text>
+        )}
+
+        <View style={styles.goalInfoRow}>
+          <View style={styles.stickerContainer}>
+            <Text style={styles.stickerEmoji}>⭐</Text>
+            <Text style={styles.stickerCount}>{item.stickerCount}개 목표</Text>
+          </View>
+          {item.creatorNickname && (
+            <View style={styles.creatorContainer}>
+              <Text style={styles.creatorEmoji}>👑</Text>
+              <Text style={styles.creator}>{item.creatorNickname}</Text>
+            </View>
           )}
         </View>
-      )}
-    </TouchableOpacity>
-  );
+
+        {item.participants && item.participants.length > 0 && (
+          <View style={styles.participantsSection}>
+            <View style={styles.participantsHeader}>
+              <Text style={styles.participantsEmoji}>👬</Text>
+              <Text style={styles.participantsTitle}>
+                참가자{' '}
+                <Text style={{color: '#FF6B9D'}}>
+                  ({item.participants.length}명)
+                </Text>
+              </Text>
+            </View>
+            {item.participants.slice(0, 3).map((participant, index) => (
+              <View key={index} style={styles.participantInfo}>
+                <Text style={styles.participantName}>
+                  {participant.nickname || '익명'}
+                </Text>
+                <View style={styles.participantStickerInfo}>
+                  <Text style={styles.participantStickers}>
+                    ⭐ {participant.currentStickerCount}개 수집
+                  </Text>
+                  {participant.currentStickerCount >= item.stickerCount && (
+                    <Text style={styles.completedEmoji}>🏆</Text>
+                  )}
+                </View>
+              </View>
+            ))}
+            {item.participants.length > 3 && (
+              <Text style={styles.moreParticipants}>
+                외 {item.participants.length - 3}명 더 있어요! 🎊
+              </Text>
+            )}
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   if (!goals || goals.length === 0) {
     if (emptyType === 'participated') {
@@ -183,7 +248,7 @@ const GoalList: React.FC<GoalListProps> = ({
               친구들과 함께 목표에 참여해보세요! 🤝
             </Text>
             <View style={styles.emptyDecoration}>
-              <Text style={styles.decorationEmoji}>👥</Text>
+              <Text style={styles.decorationEmoji}>👬</Text>
               <Text style={styles.decorationEmoji}>🤝</Text>
               <Text style={styles.decorationEmoji}>🎉</Text>
             </View>
@@ -234,6 +299,34 @@ const styles = StyleSheet.create({
     elevation: 8,
     borderWidth: 2,
     borderColor: '#FFE5F0',
+    position: 'relative',
+  },
+  completedGoalItem: {
+    backgroundColor: '#E6FFE6',
+    borderColor: '#27AE60',
+    borderWidth: 3,
+    shadowColor: '#27AE60',
+    shadowOpacity: 0.2,
+  },
+  completedOverlay: {
+    position: 'absolute',
+    top: 10,
+    right: 16,
+    zIndex: 10,
+    backgroundColor: '#27AE60',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#27AE60',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  completedIcon: {
+    fontSize: 20,
   },
   goalHeader: {
     flexDirection: 'row',
@@ -292,6 +385,25 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: 'bold',
     fontSize: 13,
+  },
+  completedBadge: {
+    backgroundColor: '#27AE60',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginLeft: 8,
+    shadowColor: '#27AE60',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#2ECC71',
+  },
+  completedBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   goalDesc: {
     fontSize: 15,
@@ -375,6 +487,14 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#FF6B9D',
     fontWeight: 'bold',
+  },
+  participantStickerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  completedEmoji: {
+    fontSize: 14,
   },
   moreParticipants: {
     fontSize: 13,

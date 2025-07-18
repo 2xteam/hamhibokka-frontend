@@ -1,4 +1,5 @@
 import {useLazyQuery} from '@apollo/client';
+import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
   ActivityIndicator,
@@ -13,6 +14,7 @@ import {colors} from '../styles/colors';
 import GoalList, {Goal} from './components/GoalList';
 
 const GoalSearchScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
   const [title, setTitle] = useState('');
   const [search, {data, loading}] = useLazyQuery(SEARCH_GOALS_BY_TITLE);
   const [touched, setTouched] = useState(false);
@@ -22,6 +24,10 @@ const GoalSearchScreen: React.FC = () => {
     if (title.trim()) {
       search({variables: {title: title.trim()}});
     }
+  };
+
+  const handleGoalPress = (goal: Goal) => {
+    navigation.navigate('GoalDetail', {id: goal.id});
   };
 
   const goals: Goal[] = data?.searchGoalsByTitle || [];
@@ -86,6 +92,7 @@ const GoalSearchScreen: React.FC = () => {
       {!loading && touched && goals.length > 0 && (
         <GoalList
           goals={goals}
+          onPressGoal={handleGoalPress}
           emptyText=""
           contentContainerStyle={styles.goalList}
         />

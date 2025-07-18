@@ -1,6 +1,7 @@
 import {useQuery} from '@apollo/client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {GET_GOALS} from '../queries/goal';
 import FloatingAddGoalButton from './components/FloatingAddGoalButton';
@@ -8,9 +9,25 @@ import GoalList, {Goal} from './components/GoalList';
 
 const GoalScreen: React.FC = () => {
   const navigation = useNavigation<any>();
+  const [userId, setUserId] = useState<string | null>(null);
   const {data, loading, error, refetch} = useQuery(GET_GOALS, {
     fetchPolicy: 'network-only', // 캐시 무시하고 항상 네트워크에서 새로 가져오기
   });
+
+  useEffect(() => {
+    const getUserId = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('@hamhibokka_user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          setUserId(user.userId);
+        }
+      } catch (e) {
+        console.log('Failed to get user data');
+      }
+    };
+    getUserId();
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -24,6 +41,7 @@ const GoalScreen: React.FC = () => {
     <View style={styles.container}>
       <GoalList
         goals={goals}
+        userId={userId || undefined}
         onPressGoal={(goal: Goal) =>
           navigation.navigate('GoalDetail', {id: goal.id})
         }

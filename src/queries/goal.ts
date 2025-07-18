@@ -72,6 +72,7 @@ export const CREATE_GOAL = gql`
       title
       description
       stickerCount
+      visibility
     }
   }
 `;
@@ -90,29 +91,6 @@ export const CREATE_GOAL_JOIN_REQUEST = gql`
       respondedAt
       createdAt
       updatedAt
-    }
-  }
-`;
-
-export const GET_MY_INVITATIONS = gql`
-  query GetMyInvitations {
-    getMyInvitations {
-      id
-      invitationId
-      goalId
-      fromUserId
-      toUserId
-      type
-      status
-      message
-      respondedAt
-      createdAt
-      updatedAt
-      goal {
-        title
-        description
-        stickerCount
-      }
     }
   }
 `;

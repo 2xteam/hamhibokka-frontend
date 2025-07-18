@@ -1,6 +1,11 @@
 import {useMutation, useQuery} from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
@@ -13,7 +18,11 @@ import {
   View,
 } from 'react-native';
 import {GET_GOALS_BY_USER_ID} from '../queries/goal';
-import {CREATE_FOLLOW} from '../queries/user';
+import {
+  CHECK_FOLLOW_STATUS,
+  CREATE_FOLLOW,
+  GET_FOLLOW_REQUESTS,
+} from '../queries/user';
 import GoalList, {Goal} from './components/GoalList';
 
 interface UserProfileParams {
@@ -54,6 +63,43 @@ const UserProfileScreen: React.FC = () => {
     getCurrentUser();
   }, []);
 
+  // 팔로우 요청 상태 조회
+  const {data: followRequestsData, refetch: refetchFollowRequests} = useQuery(
+    GET_FOLLOW_REQUESTS,
+    {
+      skip: !currentUserId,
+    },
+  );
+
+  // 친구 상태 확인 쿼리
+  const {data: followStatusData, refetch: refetchFollowStatus} = useQuery(
+    CHECK_FOLLOW_STATUS,
+    {
+      variables: {
+        followerId: currentUserId || '',
+        followingId: user.userId || '',
+      },
+      skip: !currentUserId || !user.userId || currentUserId === user.userId,
+    },
+  );
+
+  // 화면이 포커스될 때마다 팔로우 요청 상태와 친구 상태 새로고침
+  useFocusEffect(
+    React.useCallback(() => {
+      if (currentUserId) {
+        refetchFollowRequests();
+        if (user.userId && currentUserId !== user.userId) {
+          refetchFollowStatus();
+        }
+      }
+    }, [
+      currentUserId,
+      user.userId,
+      refetchFollowRequests,
+      refetchFollowStatus,
+    ]),
+  );
+
   // 사용자의 목표 조회
   const {data: goalsData, loading: goalsLoading} = useQuery(
     GET_GOALS_BY_USER_ID,
@@ -65,8 +111,10 @@ const UserProfileScreen: React.FC = () => {
   // 팔로우 생성 뮤테이션
   const [createFollow] = useMutation(CREATE_FOLLOW, {
     onCompleted: data => {
-      setFollowStatus(data.createFollow.status);
+      setFollowStatus('pending'); // 대기중 상태로 설정
       setIsLoading(false);
+      // 팔로우 요청 상태 새로고침
+      refetchFollowRequests();
       Alert.alert('성공', '팔로우 요청을 보냈습니다.');
     },
     onError: error => {
@@ -91,6 +139,20 @@ const UserProfileScreen: React.FC = () => {
 
   // 자기 자신의 프로필인지 확인
   const isOwnProfile = user.userId === currentUserId;
+
+  // 팔로우 요청 상태 확인
+  const pendingRequest = followRequestsData?.getFollowRequests?.find(
+    (request: any) =>
+      request.followerId === currentUserId &&
+      request.followingId === user.userId &&
+      request.status === 'pending',
+  );
+
+  // 실제 친구 상태 확인
+  const actualFollowStatus = followStatusData?.checkFollowStatus?.followStatus;
+
+  // 팔로우 상태 결정 (요청이 pending이면 대기중, 아니면 실제 친구 상태)
+  const displayFollowStatus = pendingRequest ? 'pending' : actualFollowStatus;
 
   const goals: Goal[] = goalsData?.getGoalsByUserId || [];
 
@@ -120,7 +182,7 @@ const UserProfileScreen: React.FC = () => {
         </View>
 
         {/* 팔로우 버튼 - 자기 자신이 아니고 팔로우 상태가 없을 때만 표시 */}
-        {!isOwnProfile && !followStatus && (
+        {!isOwnProfile && !displayFollowStatus && !followStatus && (
           <TouchableOpacity
             style={[styles.followButton, isLoading && styles.disabledButton]}
             onPress={handleFollowToggle}
@@ -132,12 +194,20 @@ const UserProfileScreen: React.FC = () => {
         )}
 
         {/* 팔로우 상태 표시 */}
-        {!isOwnProfile && followStatus && (
-          <View style={styles.followedStatus}>
+        {!isOwnProfile && (displayFollowStatus || followStatus) && (
+          <View
+            style={[
+              styles.followedStatus,
+              (displayFollowStatus === 'pending' ||
+                followStatus === 'pending') &&
+                styles.pendingStatus,
+            ]}>
             <Text style={styles.followedStatusText}>
-              {followStatus === 'pending'
+              {displayFollowStatus === 'pending' || followStatus === 'pending'
                 ? '대기중'
-                : followStatus === 'approved'
+                : displayFollowStatus === 'approved'
+                ? '맞팔중'
+                : displayFollowStatus === 'mutual'
                 ? '맞팔중'
                 : '팔로우 중'}
             </Text>
@@ -248,6 +318,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '600',
     fontSize: 16,
+  },
+  pendingStatus: {
+    backgroundColor: '#FF9800', // 대기중 상태일 때 다른 색상 적용
   },
   goalsSection: {
     flex: 1,

@@ -1,6 +1,7 @@
 import {useQuery} from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useEffect, useState} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
+import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {GET_FOLLOWED_USERS_GOALS} from '../../queries/goal';
 import {colors} from '../../styles/colors';
@@ -46,11 +47,19 @@ const ChallengeSection: React.FC<ChallengeSectionProps> = ({navigation}) => {
     getCurrentUser();
   }, []);
 
-  const {data: followedGoalsData, loading} = useQuery(
-    GET_FOLLOWED_USERS_GOALS,
-    {
-      fetchPolicy: 'cache-and-network',
-    },
+  const {
+    data: followedGoalsData,
+    loading,
+    refetch: refetchFollowedGoals,
+  } = useQuery(GET_FOLLOWED_USERS_GOALS, {
+    fetchPolicy: 'cache-and-network',
+  });
+
+  // 화면이 포커스될 때마다 데이터 새로고침
+  useFocusEffect(
+    useCallback(() => {
+      refetchFollowedGoals();
+    }, [refetchFollowedGoals]),
   );
 
   const followedGoals = followedGoalsData?.getFollowedUsersGoals || [];
@@ -74,7 +83,7 @@ const ChallengeSection: React.FC<ChallengeSectionProps> = ({navigation}) => {
   if (loading) {
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🏆 참여 가능한 챌린저</Text>
+        <Text style={styles.sectionTitle}>🏆 참여 가능한 목표</Text>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>챌린저를 불러오는 중...</Text>
         </View>
@@ -85,7 +94,7 @@ const ChallengeSection: React.FC<ChallengeSectionProps> = ({navigation}) => {
   if (challengeGoals.length === 0) {
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🏆 참여 가능한 챌린저</Text>
+        <Text style={styles.sectionTitle}>🏆 참여 가능한 목표</Text>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>
             아직 참여할 수 있는 챌린저가 없어요! 🥺
@@ -100,7 +109,7 @@ const ChallengeSection: React.FC<ChallengeSectionProps> = ({navigation}) => {
 
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle}>🏆 참여 가능한 챌린저</Text>
+      <Text style={styles.sectionTitle}>🏆 참여 가능한 목표</Text>
       {challengeGoals.map((goal: Goal) => (
         <GoalCard
           key={goal.id}

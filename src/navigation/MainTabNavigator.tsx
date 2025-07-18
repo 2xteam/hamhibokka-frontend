@@ -33,39 +33,43 @@ const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({
 
           switch (route.name) {
             case 'Home':
-              iconName = 'home';
+              iconName = focused ? 'home' : 'home-outline';
               break;
             case 'Goals':
-              iconName = 'flag';
+              iconName = focused ? 'flag' : 'flag-outline';
               break;
             case 'Explore':
-              iconName = 'search';
+              iconName = focused ? 'search' : 'search-outline';
               break;
             case 'Profile':
-              iconName = 'person';
+              iconName = focused ? 'person' : 'person-outline';
               break;
           }
 
-          return <Icon name={iconName} size={size} color={color} />;
+          return (
+            <Icon name={iconName} size={focused ? 28 : 24} color={color} />
+          );
         },
         tabBarActiveTintColor: '#FF6B9D',
-        tabBarInactiveTintColor: '#8E44AD',
+        tabBarInactiveTintColor: '#FFB3D1',
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
-          borderTopWidth: 2,
-          borderTopColor: '#FFE5F0',
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 90,
+          borderTopWidth: 0,
+          paddingBottom: 12,
+          paddingTop: 12,
+          height: 100,
           shadowColor: '#FF6B9D',
-          shadowOffset: {width: 0, height: -2},
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-          elevation: 8,
+          shadowOffset: {width: 0, height: -4},
+          shadowOpacity: 0.15,
+          shadowRadius: 8,
+          elevation: 12,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '500',
+          fontSize: 13,
+          fontWeight: '600',
+          marginTop: 4,
         },
         headerShown: false,
       })}>
