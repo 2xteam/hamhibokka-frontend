@@ -1,6 +1,11 @@
 import {useMutation, useQuery} from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
   ActivityIndicator,
@@ -19,6 +24,7 @@ import {
   GET_GOAL,
   RECEIVE_STICKER,
 } from '../queries/goal';
+import {CHECK_FOLLOW_STATUS} from '../queries/user';
 
 interface GoalDetailParams {
   id: string;
@@ -36,7 +42,6 @@ function formatDate(dateStr?: string) {
 
 function getModeLabel(mode?: string) {
   if (mode === 'personal') return '개인';
-  if (mode === 'group') return '그룹';
   if (mode === 'challenger_recruitment') return '챌린저 모집';
   return mode || '-';
 }
@@ -63,6 +68,27 @@ const GoalDetailScreen: React.FC = () => {
   const [receiveSticker, {loading: giveStickerLoading}] =
     useMutation(RECEIVE_STICKER);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // 팔로우 상태 확인 쿼리 - 항상 호출 (조건부 렌더링 이전)
+  const {data: followData, refetch: refetchFollowStatus} = useQuery(
+    CHECK_FOLLOW_STATUS,
+    {
+      variables: {
+        followerId: currentUserId || '',
+        followingId: data?.getGoal?.createdBy || '',
+      },
+      skip: !currentUserId || !data?.getGoal?.createdBy,
+    },
+  );
+
+  // 화면이 포커스될 때마다 팔로우 상태 새로고침
+  useFocusEffect(
+    React.useCallback(() => {
+      if (currentUserId && data?.getGoal?.createdBy) {
+        refetchFollowStatus();
+      }
+    }, [currentUserId, data?.getGoal?.createdBy, refetchFollowStatus]),
+  );
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e: any) => {
@@ -107,12 +133,53 @@ const GoalDetailScreen: React.FC = () => {
   }
   const goal = data.getGoal;
 
+  // 로그인한 사용자가 이미 참여하고 있는지 확인
+  const isUserParticipating = goal.participants?.some(
+    (participant: any) => participant.userId === currentUserId,
+  );
+
   const handleParticipantPress = (participant: any) => {
     setSelectedParticipant(participant);
     setModalVisible(true);
   };
 
   const handleJoinRequest = () => {
+    // 자기 자신의 목표인지 확인
+    if (goal.createdBy === currentUserId) {
+      setJoinModalVisible(true);
+      return;
+    }
+
+    // 팔로우 상태 확인
+    const followStatus = followData?.checkFollowStatus?.followStatus;
+    const isFollowing =
+      followStatus === 'approved' || followStatus === 'mutual';
+
+    // 팔로우 상태가 아니면 친구 요청 안내
+    if (!isFollowing) {
+      Alert.alert('친구가 아니에요 😊', '먼저 친구 요청을 해보세요!', [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '프로필 보기',
+          onPress: () => {
+            // 생성자 프로필로 이동
+            navigation.navigate('UserProfile', {
+              user: {
+                id: goal.createdBy,
+                userId: goal.createdBy,
+                nickname: goal.creatorNickname || '알 수 없음',
+              },
+            });
+          },
+        },
+      ]);
+      return;
+    }
+
+    // 팔로우 상태이면 모달 띄우기
     setJoinModalVisible(true);
   };
 
@@ -146,6 +213,37 @@ const GoalDetailScreen: React.FC = () => {
     }
   };
 
+  // 내가 만든 목표일 때 바로 참여하는 함수
+  const handleDirectJoin = async () => {
+    try {
+      await createJoinRequest({
+        variables: {
+          input: {
+            goalId: goal.goalId,
+            message: '', // 메시지 없이 참여
+          },
+        },
+      });
+      Alert.alert('🎉', '목표에 참여했어요!');
+      // 목표 상세 페이지 리로드
+      if (typeof refetch === 'function') {
+        await refetch();
+      }
+    } catch (e: any) {
+      let msg = '참여에 실패했어요.';
+      if (e?.graphQLErrors?.[0]?.message) {
+        msg = e.graphQLErrors[0].message;
+      } else if (e?.message) {
+        msg = e.message;
+      }
+      Alert.alert('참여 실패', msg);
+    }
+  };
+
+  // 내가 만든 목표인지 확인
+  const isMyGoal =
+    goal.createdBy && currentUserId && goal.createdBy === currentUserId;
+
   return (
     <View style={{flex: 1}}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -171,7 +269,7 @@ const GoalDetailScreen: React.FC = () => {
             <Text style={styles.infoValue}>{getModeLabel(goal.mode)}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>👑 생성자</Text>
+            <Text style={styles.infoLabel}>👑 만든 사람</Text>
             <Text style={styles.infoValue}>{goal.creatorNickname || '-'}</Text>
           </View>
           <View style={styles.infoRow}>
@@ -181,7 +279,7 @@ const GoalDetailScreen: React.FC = () => {
             </Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>📅 생성일</Text>
+            <Text style={styles.infoLabel}>📅 만든 날</Text>
             <Text style={styles.infoValue}>{formatDate(goal.createdAt)}</Text>
           </View>
         </View>
@@ -214,50 +312,82 @@ const GoalDetailScreen: React.FC = () => {
               <Text style={styles.modalTitle}>👬 참가자 현황</Text>
               {selectedParticipant ? (
                 <>
-                  <View style={styles.avatarRow}>
-                    <Image
-                      source={
-                        selectedParticipant.profileImage
-                          ? {uri: selectedParticipant.profileImage}
-                          : require('../../assets/default-profile.jpg')
+                  <TouchableOpacity
+                    style={styles.profileClickable}
+                    onPress={() => {
+                      setModalVisible(false);
+                      // 나의 계정인지 확인
+                      if (selectedParticipant.userId === currentUserId) {
+                        // 나의 계정이면 Main 탭의 Profile로 이동
+                        navigation.navigate('Main', {screen: 'Profile'});
+                      } else {
+                        // 타인의 계정이면 UserProfile 스크린으로 이동
+                        navigation.navigate('UserProfile', {
+                          user: {
+                            id: selectedParticipant.userId,
+                            userId: selectedParticipant.userId,
+                            nickname:
+                              selectedParticipant.nickname || '알 수 없음',
+                            email: selectedParticipant.email || '',
+                            profileImage: selectedParticipant.profileImage,
+                          },
+                        });
                       }
-                      style={styles.avatarImage}
-                    />
-                  </View>
-                  <Text style={styles.modalLabel}>
-                    닉네임:{' '}
-                    <Text style={{color: '#FF6B9D', fontWeight: 'bold'}}>
-                      {selectedParticipant.nickname || '-'}
-                    </Text>
-                  </Text>
-
-                  <View style={styles.stickerRow}>
-                    <Text style={styles.stickerCountText}>
-                      현재 스티커:{' '}
-                      <Text style={{color: '#FFD700', fontWeight: 'bold'}}>
-                        {selectedParticipant.currentStickerCount ?? 0}개
+                    }}>
+                    <View style={styles.avatarRow}>
+                      <Image
+                        source={
+                          selectedParticipant.profileImage
+                            ? {uri: selectedParticipant.profileImage}
+                            : require('../../assets/default-profile.jpg')
+                        }
+                        style={styles.avatarImage}
+                      />
+                    </View>
+                    <Text style={styles.modalLabel}>
+                      닉네임:{' '}
+                      <Text style={{color: '#FF6B9D', fontWeight: 'bold'}}>
+                        {selectedParticipant.nickname || '-'}
                       </Text>
                     </Text>
-                  </View>
+                  </TouchableOpacity>
 
-                  {/* 스티커 부여 현황(동그란 아이콘으로 시각화) */}
-                  <View style={styles.stickerIconRow}>
-                    {Array.from({length: goal.stickerCount}).map((_, idx) => (
-                      <Text
-                        key={idx}
-                        style={{
-                          fontSize: 32,
-                          marginHorizontal: 2,
-                          opacity:
-                            idx < (selectedParticipant.currentStickerCount ?? 0)
-                              ? 1
-                              : 0.3,
-                        }}>
-                        {idx < (selectedParticipant.currentStickerCount ?? 0)
-                          ? '🌟'
-                          : '⭐️'}
-                      </Text>
-                    ))}
+                  {/* 스티커 부여 현황(한 줄에 최대 5개씩, 3줄이 넘으면 스크롤) */}
+                  <View style={styles.stickerContainer}>
+                    <Text style={styles.stickerTitle}>스티커 현황</Text>
+                    <View style={styles.stickerScrollContainer}>
+                      <ScrollView
+                        style={styles.stickerScrollView}
+                        showsVerticalScrollIndicator={true}
+                        nestedScrollEnabled={true}
+                        indicatorStyle="white">
+                        <View style={styles.stickerGrid}>
+                          {Array.from({length: goal.stickerCount}).map(
+                            (_, idx) => (
+                              <View key={idx} style={styles.stickerItem}>
+                                <Text
+                                  style={[
+                                    styles.stickerIcon,
+                                    {
+                                      opacity:
+                                        idx <
+                                        (selectedParticipant.currentStickerCount ??
+                                          0)
+                                          ? 1
+                                          : 0.3,
+                                    },
+                                  ]}>
+                                  {idx <
+                                  (selectedParticipant.currentStickerCount ?? 0)
+                                    ? '🌟'
+                                    : '⭐️'}
+                                </Text>
+                              </View>
+                            ),
+                          )}
+                        </View>
+                      </ScrollView>
+                    </View>
                   </View>
                   {/* goal 생성자일 때만 스티커 부여 UI 노출, 단 목표 달성 시에는 노출 X */}
                   {goal.createdBy &&
@@ -268,7 +398,7 @@ const GoalDetailScreen: React.FC = () => {
                       goal.stickerCount && (
                       <View style={styles.giveStickerBox}>
                         <Text style={styles.giveStickerLabel}>
-                          ⭐ 스티커 부여
+                          ⭐ 스티커 붙이기
                         </Text>
                         <View style={styles.giveStickerRow}>
                           <TextInput
@@ -305,14 +435,14 @@ const GoalDetailScreen: React.FC = () => {
                                 });
                                 Alert.alert(
                                   '🎉',
-                                  `${giveStickerCount}개 스티커를 부여했어요!`,
+                                  `${giveStickerCount}개 스티커를 붙였어요!`,
                                 );
                                 setGiveStickerCount('1');
                                 setModalVisible(false);
                                 if (typeof refetch === 'function')
                                   await refetch();
                               } catch (e: any) {
-                                let msg = '스티커 부여에 실패했어요.';
+                                let msg = '스티커 붙이기에 실패했어요.';
                                 if (e?.graphQLErrors?.[0]?.message)
                                   msg = e.graphQLErrors[0].message;
                                 else if (e?.message) msg = e.message;
@@ -321,7 +451,7 @@ const GoalDetailScreen: React.FC = () => {
                             }}
                             disabled={giveStickerLoading}>
                             <Text style={styles.giveStickerBtnText}>
-                              {giveStickerLoading ? '부여 중...' : '부여'}
+                              {giveStickerLoading ? '⭐️...' : '🌟'}
                             </Text>
                           </TouchableOpacity>
                         </View>
@@ -352,13 +482,17 @@ const GoalDetailScreen: React.FC = () => {
         </Modal>
       </ScrollView>
       {/* 목표 참여 요청 플로팅 버튼 - personal 모드가 아닐 때만 표시 */}
-      {goal.mode !== 'personal' && (
+      {goal.mode !== 'personal' && !isUserParticipating && (
         <TouchableOpacity
           style={styles.fabJoin}
-          onPress={handleJoinRequest}
+          onPress={isMyGoal ? handleDirectJoin : handleJoinRequest}
           disabled={joinLoading}>
           <Text style={styles.fabJoinText}>
-            {joinLoading ? '요청 중...' : '🥇 참여 하기'}
+            {joinLoading
+              ? '요청 중...'
+              : isMyGoal
+              ? '🥇 바로 참여'
+              : '🥇 참여 하기'}
           </Text>
         </TouchableOpacity>
       )}
@@ -552,7 +686,7 @@ const styles = StyleSheet.create({
   },
   modalLabel: {
     fontSize: 16,
-    marginBottom: 12,
+    padding: 12,
     color: '#8E44AD',
     fontWeight: '600',
   },
@@ -642,7 +776,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#FFE5F0',
     borderRadius: 12,
-    padding: 12,
+    padding: 8,
     fontSize: 18,
     marginRight: 12,
     textAlign: 'center',
@@ -675,6 +809,45 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  stickerContainer: {
+    marginTop: 16,
+    width: '100%',
+    backgroundColor: '#FFF8FA',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#FFE5F0',
+  },
+  stickerTitle: {
+    fontSize: 16,
+    color: '#FF6B9D',
+    fontWeight: 'bold',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  stickerScrollView: {
+    maxHeight: 150,
+  },
+  stickerGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stickerItem: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 2,
+  },
+  stickerIcon: {
+    fontSize: 28,
+  },
+  stickerScrollContainer: {
+    position: 'relative',
+  },
+
   celebrateBox: {
     alignItems: 'center',
     marginTop: 24,
@@ -727,6 +900,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#FF6B9D',
     fontWeight: 'bold',
+  },
+  profileClickable: {
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderRadius: 12,
+    backgroundColor: '#FFF8FA',
+    borderWidth: 2,
+    borderColor: '#FFE5F0',
+    marginBottom: 16,
   },
 });
 

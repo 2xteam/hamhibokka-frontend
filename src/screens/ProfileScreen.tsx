@@ -229,7 +229,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
             <Text style={styles.friendsSectionTitle}>👬 친구 관리</Text>
           </View>
           <Text style={styles.friendsSectionSubtitle}>
-            💫 총 {users.length}개의 팔로우 데이터가 있어요!
+            💫 총 {users.length}명의 친구가 있어요!
           </Text>
 
           {followsLoading ? (
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.primary,
     paddingHorizontal: 20,
-    paddingTop: 50,
+    paddingTop: 36,
     paddingBottom: 16,
     borderBottomWidth: 3,
     borderBottomColor: colors.primaryLight,

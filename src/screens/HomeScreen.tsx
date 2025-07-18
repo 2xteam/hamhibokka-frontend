@@ -57,12 +57,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
       (invitation: any) => invitation.status === 'pending',
     )?.length || 0;
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    // TODO: 데이터 새로고침 로직
-    setTimeout(() => {
+    try {
+      // 모든 데이터 새로고침
+      await Promise.all([refetchInvitations()]);
+    } catch (error) {
+      console.error('Refresh failed:', error);
+    } finally {
       setRefreshing(false);
-    }, 1000);
+    }
   };
 
   const handleNotificationPress = () => {
@@ -128,8 +132,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 50,
-    paddingBottom: 20,
+    paddingTop: 30,
+    paddingBottom: 10,
     backgroundColor: colors.primary,
     borderBottomWidth: 3,
     borderBottomColor: colors.primaryLight,

@@ -1,5 +1,6 @@
 import {useQuery} from '@apollo/client';
-import React from 'react';
+import {useFocusEffect} from '@react-navigation/native';
+import React, {useCallback} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {GET_MY_PARTICIPATED_GOALS} from '../../queries/goal';
 import {colors} from '../../styles/colors';
@@ -27,11 +28,19 @@ interface FollowFeedSectionProps {
 }
 
 const FollowFeedSection: React.FC<FollowFeedSectionProps> = ({navigation}) => {
-  const {data: participatedGoalsData, loading} = useQuery(
-    GET_MY_PARTICIPATED_GOALS,
-    {
-      fetchPolicy: 'cache-and-network',
-    },
+  const {
+    data: participatedGoalsData,
+    loading,
+    refetch: refetchParticipatedGoals,
+  } = useQuery(GET_MY_PARTICIPATED_GOALS, {
+    fetchPolicy: 'cache-and-network',
+  });
+
+  // 화면이 포커스될 때마다 데이터 새로고침
+  useFocusEffect(
+    useCallback(() => {
+      refetchParticipatedGoals();
+    }, [refetchParticipatedGoals]),
   );
 
   const participatedGoals = participatedGoalsData?.getMyParticipatedGoals || [];
@@ -43,7 +52,7 @@ const FollowFeedSection: React.FC<FollowFeedSectionProps> = ({navigation}) => {
   if (loading) {
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>👬 팔로우 목표</Text>
+        <Text style={styles.sectionTitle}>👬 팔로우한 목표</Text>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>참여한 목표를 불러오는 중...</Text>
         </View>
@@ -54,7 +63,7 @@ const FollowFeedSection: React.FC<FollowFeedSectionProps> = ({navigation}) => {
   if (participatedGoals.length === 0) {
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>👬 팔로우 목표</Text>
+        <Text style={styles.sectionTitle}>👬 팔로우한 목표</Text>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>아직 참여한 목표가 없어요! 🥺</Text>
           <Text style={styles.emptySubtext}>
@@ -68,7 +77,7 @@ const FollowFeedSection: React.FC<FollowFeedSectionProps> = ({navigation}) => {
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>👬 팔로우 목표</Text>
+        <Text style={styles.sectionTitle}>👬 팔로우한 목표</Text>
         <TouchableOpacity
           onPress={() =>
             navigation.navigate('Goals', {screen: 'MyParticipated'})
