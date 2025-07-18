@@ -1,6 +1,7 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {TAB_LABELS} from '../constants';
 import ExploreTabScreen from '../screens/ExploreTabScreen';
 import GoalTabScreen from '../screens/GoalTabScreen';
 import HomeScreen from '../screens/HomeScreen';
@@ -73,21 +74,21 @@ const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({
         },
         headerShown: false,
       })}>
-      <Tab.Screen name="Home" options={{tabBarLabel: '홈'}}>
+      <Tab.Screen name="Home" options={{tabBarLabel: TAB_LABELS.HOME}}>
         {() => <HomeScreen user={user} />}
       </Tab.Screen>
 
       <Tab.Screen
         name="Goals"
         component={GoalTabScreen}
-        options={{tabBarLabel: '목표 관리'}}
+        options={{tabBarLabel: TAB_LABELS.GOALS}}
       />
 
-      <Tab.Screen name="Explore" options={{tabBarLabel: '탐색'}}>
+      <Tab.Screen name="Explore" options={{tabBarLabel: TAB_LABELS.EXPLORE}}>
         {() => <ExploreTabScreen />}
       </Tab.Screen>
 
-      <Tab.Screen name="Profile" options={{tabBarLabel: '프로필'}}>
+      <Tab.Screen name="Profile" options={{tabBarLabel: TAB_LABELS.PROFILE}}>
         {() => <ProfileScreen user={user} onLogout={onLogout} />}
       </Tab.Screen>
     </Tab.Navigator>

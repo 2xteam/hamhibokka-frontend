@@ -20,6 +20,18 @@ import {
   View,
 } from 'react-native';
 import {
+  BUTTON_TEXTS,
+  COLORS,
+  DEFAULT_VALUES,
+  EMOJIS,
+  FOLLOW_STATUS,
+  GOAL_MODE_LABELS,
+  GOAL_MODES,
+  GOAL_STATUS,
+  GOAL_STATUS_LABELS,
+  NUMBERS,
+} from '../constants';
+import {
   CREATE_GOAL_JOIN_REQUEST,
   GET_GOAL,
   RECEIVE_STICKER,
@@ -41,15 +53,21 @@ function formatDate(dateStr?: string) {
 }
 
 function getModeLabel(mode?: string) {
-  if (mode === 'personal') return '개인';
-  if (mode === 'challenger_recruitment') return '챌린저 모집';
-  return mode || '-';
+  if (mode === GOAL_MODES.PERSONAL)
+    return GOAL_MODE_LABELS[GOAL_MODES.PERSONAL];
+  if (mode === GOAL_MODES.CHALLENGER_RECRUITMENT)
+    return GOAL_MODE_LABELS[GOAL_MODES.CHALLENGER_RECRUITMENT];
+  return '목표';
 }
+
 function getStatusLabel(status?: string) {
-  if (status === 'active') return '진행 중';
-  if (status === 'completed') return '완료';
-  if (status === 'archived') return '보관됨';
-  return status || '-';
+  if (status === GOAL_STATUS.ACTIVE)
+    return GOAL_STATUS_LABELS[GOAL_STATUS.ACTIVE];
+  if (status === GOAL_STATUS.COMPLETED)
+    return GOAL_STATUS_LABELS[GOAL_STATUS.COMPLETED];
+  if (status === GOAL_STATUS.ARCHIVED)
+    return GOAL_STATUS_LABELS[GOAL_STATUS.ARCHIVED];
+  return '알 수 없음';
 }
 
 const GoalDetailScreen: React.FC = () => {
@@ -64,7 +82,9 @@ const GoalDetailScreen: React.FC = () => {
   );
   const [joinMessage, setJoinMessage] = useState('');
   const [joinModalVisible, setJoinModalVisible] = useState(false);
-  const [giveStickerCount, setGiveStickerCount] = useState('1');
+  const [giveStickerCount, setGiveStickerCount] = useState<string>(
+    DEFAULT_VALUES.STICKER_COUNT,
+  );
   const [receiveSticker, {loading: giveStickerLoading}] =
     useMutation(RECEIVE_STICKER);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -117,9 +137,9 @@ const GoalDetailScreen: React.FC = () => {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#FF6B9D" />
+        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
         <Text style={styles.loadingText}>
-          목표 정보를 불러오는 중이에요! ✨
+          목표 정보를 불러오는 중이에요! {EMOJIS.SUCCESS}
         </Text>
       </View>
     );
@@ -127,7 +147,9 @@ const GoalDetailScreen: React.FC = () => {
   if (error || !data?.getGoal) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>목표 정보를 불러올 수 없어요 😢</Text>
+        <Text style={styles.errorText}>
+          목표 정보를 불러올 수 없어요 {EMOJIS.ERROR}
+        </Text>
       </View>
     );
   }
@@ -153,13 +175,14 @@ const GoalDetailScreen: React.FC = () => {
     // 팔로우 상태 확인
     const followStatus = followData?.checkFollowStatus?.followStatus;
     const isFollowing =
-      followStatus === 'approved' || followStatus === 'mutual';
+      followStatus === FOLLOW_STATUS.APPROVED ||
+      followStatus === FOLLOW_STATUS.MUTUAL;
 
     // 팔로우 상태가 아니면 친구 요청 안내
     if (!isFollowing) {
       Alert.alert('친구가 아니에요 😊', '먼저 친구 요청을 해보세요!', [
         {
-          text: '취소',
+          text: BUTTON_TEXTS.CANCEL,
           style: 'cancel',
         },
         {
@@ -195,7 +218,7 @@ const GoalDetailScreen: React.FC = () => {
       });
       setJoinModalVisible(false);
       setJoinMessage('');
-      Alert.alert('🎉', '참여 요청이 완료되었어요!');
+      Alert.alert(EMOJIS.SUCCESS, '참여 요청이 완료되었어요!');
     } catch (e: any) {
       // 에러 메시지 추출
       let msg = '참여 요청에 실패했어요.';
@@ -206,7 +229,7 @@ const GoalDetailScreen: React.FC = () => {
       }
       Alert.alert('참여 요청 실패', msg, [
         {
-          text: '확인',
+          text: BUTTON_TEXTS.CONFIRM,
           onPress: () => setJoinModalVisible(false),
         },
       ]);
@@ -224,18 +247,15 @@ const GoalDetailScreen: React.FC = () => {
           },
         },
       });
-      Alert.alert('🎉', '목표에 참여했어요!');
+      Alert.alert(EMOJIS.SUCCESS, '목표에 참여했어요!');
       // 목표 상세 페이지 리로드
       if (typeof refetch === 'function') {
         await refetch();
       }
     } catch (e: any) {
       let msg = '참여에 실패했어요.';
-      if (e?.graphQLErrors?.[0]?.message) {
-        msg = e.graphQLErrors[0].message;
-      } else if (e?.message) {
-        msg = e.message;
-      }
+      if (e?.graphQLErrors?.[0]?.message) msg = e.graphQLErrors[0].message;
+      else if (e?.message) msg = e.message;
       Alert.alert('참여 실패', msg);
     }
   };
@@ -249,7 +269,9 @@ const GoalDetailScreen: React.FC = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* 제목/설명 */}
         <View style={styles.headerSection}>
-          <Text style={styles.title}>🥇 {goal.title}</Text>
+          <Text style={styles.title}>
+            {EMOJIS.GOAL} {goal.title}
+          </Text>
           <Text style={styles.description}>
             {goal.description || '설명이 없어요 😊'}
           </Text>
@@ -257,7 +279,7 @@ const GoalDetailScreen: React.FC = () => {
         {/* 주요 정보 */}
         <View style={styles.cardSection}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>⭐ 스티커 목표</Text>
+            <Text style={styles.infoLabel}>{EMOJIS.STICKER} 스티커 목표</Text>
             <Text style={styles.infoValue}>{goal.stickerCount}개</Text>
           </View>
           <View style={styles.infoRow}>
@@ -269,11 +291,11 @@ const GoalDetailScreen: React.FC = () => {
             <Text style={styles.infoValue}>{getModeLabel(goal.mode)}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>👑 만든 사람</Text>
+            <Text style={styles.infoLabel}>{EMOJIS.USER} 만든 사람</Text>
             <Text style={styles.infoValue}>{goal.creatorNickname || '-'}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>🤝 참가자 수</Text>
+            <Text style={styles.infoLabel}>{EMOJIS.GROUP} 참가자 수</Text>
             <Text style={styles.infoValue}>
               {goal.participants?.length ?? 0}명
             </Text>
@@ -285,7 +307,7 @@ const GoalDetailScreen: React.FC = () => {
         </View>
         {/* 참가자 목록 */}
         <View style={styles.cardSection}>
-          <Text style={styles.sectionTitle}>🤝 참가자 목록</Text>
+          <Text style={styles.sectionTitle}>{EMOJIS.GROUP} 참가자 목록</Text>
           {goal.participants && goal.participants.length > 0 ? (
             goal.participants.map((p: any, idx: number) => (
               <TouchableOpacity
@@ -293,12 +315,14 @@ const GoalDetailScreen: React.FC = () => {
                 style={styles.participantItem}
                 onPress={() => handleParticipantPress(p)}>
                 <Text style={styles.participantName}>
-                  👬 {p.nickname || p.id || '이름없음'}
+                  {EMOJIS.PARTICIPANT} {p.nickname || p.id || '이름없음'}
                 </Text>
               </TouchableOpacity>
             ))
           ) : (
-            <Text style={styles.emptyText}>아직 참가자가 없어요 😊</Text>
+            <Text style={styles.emptyText}>
+              아직 참가자가 없어요 {EMOJIS.ERROR}
+            </Text>
           )}
         </View>
         {/* 참가자 현황 모달 */}
@@ -309,7 +333,7 @@ const GoalDetailScreen: React.FC = () => {
           onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContentChild}>
-              <Text style={styles.modalTitle}>👬 참가자 현황</Text>
+              <Text style={styles.modalTitle}>{EMOJIS.GROUP} 참가자 현황</Text>
               {selectedParticipant ? (
                 <>
                   <TouchableOpacity
@@ -346,7 +370,7 @@ const GoalDetailScreen: React.FC = () => {
                     </View>
                     <Text style={styles.modalLabel}>
                       닉네임:{' '}
-                      <Text style={{color: '#FF6B9D', fontWeight: 'bold'}}>
+                      <Text style={{color: COLORS.PRIMARY, fontWeight: 'bold'}}>
                         {selectedParticipant.nickname || '-'}
                       </Text>
                     </Text>
@@ -354,7 +378,7 @@ const GoalDetailScreen: React.FC = () => {
 
                   {/* 스티커 부여 현황(한 줄에 최대 5개씩, 3줄이 넘으면 스크롤) */}
                   <View style={styles.stickerContainer}>
-                    <Text style={styles.stickerTitle}>스티커 현황</Text>
+                    <Text style={styles.stickerTitle}>받은 스티커</Text>
                     <View style={styles.stickerScrollContainer}>
                       <ScrollView
                         style={styles.stickerScrollView}
@@ -379,8 +403,8 @@ const GoalDetailScreen: React.FC = () => {
                                   ]}>
                                   {idx <
                                   (selectedParticipant.currentStickerCount ?? 0)
-                                    ? '🌟'
-                                    : '⭐️'}
+                                    ? EMOJIS.COMPLETED_STICKER
+                                    : EMOJIS.STICKER}
                                 </Text>
                               </View>
                             ),
@@ -398,7 +422,7 @@ const GoalDetailScreen: React.FC = () => {
                       goal.stickerCount && (
                       <View style={styles.giveStickerBox}>
                         <Text style={styles.giveStickerLabel}>
-                          ⭐ 스티커 붙이기
+                          {EMOJIS.STICKER} 스티커 붙이기
                         </Text>
                         <View style={styles.giveStickerRow}>
                           <TextInput
@@ -434,10 +458,12 @@ const GoalDetailScreen: React.FC = () => {
                                   },
                                 });
                                 Alert.alert(
-                                  '🎉',
+                                  EMOJIS.SUCCESS,
                                   `${giveStickerCount}개 스티커를 붙였어요!`,
                                 );
-                                setGiveStickerCount('1');
+                                setGiveStickerCount(
+                                  DEFAULT_VALUES.STICKER_COUNT,
+                                );
                                 setModalVisible(false);
                                 if (typeof refetch === 'function')
                                   await refetch();
@@ -451,7 +477,9 @@ const GoalDetailScreen: React.FC = () => {
                             }}
                             disabled={giveStickerLoading}>
                             <Text style={styles.giveStickerBtnText}>
-                              {giveStickerLoading ? '⭐️...' : '🌟'}
+                              {giveStickerLoading
+                                ? '⭐️...'
+                                : EMOJIS.COMPLETED_STICKER}
                             </Text>
                           </TouchableOpacity>
                         </View>
@@ -475,14 +503,14 @@ const GoalDetailScreen: React.FC = () => {
               <TouchableOpacity
                 style={styles.modalCloseBtn}
                 onPress={() => setModalVisible(false)}>
-                <Text style={styles.modalCloseText}>닫기</Text>
+                <Text style={styles.modalCloseText}>{BUTTON_TEXTS.CLOSE}</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
       </ScrollView>
       {/* 목표 참여 요청 플로팅 버튼 - personal 모드가 아닐 때만 표시 */}
-      {goal.mode !== 'personal' && !isUserParticipating && (
+      {goal.mode !== GOAL_MODES.PERSONAL && !isUserParticipating && (
         <TouchableOpacity
           style={styles.fabJoin}
           onPress={isMyGoal ? handleDirectJoin : handleJoinRequest}
@@ -510,7 +538,7 @@ const GoalDetailScreen: React.FC = () => {
               placeholder="참여 메시지를 입력하세요 (선택)"
               value={joinMessage}
               onChangeText={setJoinMessage}
-              maxLength={100}
+              maxLength={NUMBERS.MAX_MESSAGE_LENGTH}
             />
             <View style={{flexDirection: 'row', marginTop: 16}}>
               <TouchableOpacity
@@ -519,14 +547,14 @@ const GoalDetailScreen: React.FC = () => {
                   {backgroundColor: '#BDC3C7', marginRight: 8},
                 ]}
                 onPress={() => setJoinModalVisible(false)}>
-                <Text style={styles.modalCloseText}>취소</Text>
+                <Text style={styles.modalCloseText}>{BUTTON_TEXTS.CANCEL}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.modalCloseBtn}
                 onPress={handleJoinConfirm}
                 disabled={joinLoading}>
                 <Text style={styles.modalCloseText}>
-                  {joinLoading ? '요청 중...' : '확인'}
+                  {joinLoading ? '요청 중...' : BUTTON_TEXTS.CONFIRM}
                 </Text>
               </TouchableOpacity>
             </View>

@@ -8,7 +8,6 @@ import {
 } from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
-  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -17,6 +16,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  BUTTON_TEXTS,
+  EMPTY_MESSAGES,
+  FOLLOW_STATUS,
+  FOLLOW_STATUS_LABELS,
+  LOADING_MESSAGES,
+} from '../constants';
 import {GET_GOALS_BY_USER_ID} from '../queries/goal';
 import {
   CHECK_FOLLOW_STATUS,
@@ -111,7 +117,7 @@ const UserProfileScreen: React.FC = () => {
   // 팔로우 생성 뮤테이션
   const [createFollow] = useMutation(CREATE_FOLLOW, {
     onCompleted: data => {
-      setFollowStatus('pending'); // 대기중 상태로 설정
+      setFollowStatus(FOLLOW_STATUS.PENDING); // 대기중 상태로 설정
       setIsLoading(false);
       // 팔로우 요청 상태 새로고침
       refetchFollowRequests();
@@ -145,14 +151,16 @@ const UserProfileScreen: React.FC = () => {
     (request: any) =>
       request.followerId === currentUserId &&
       request.followingId === user.userId &&
-      request.status === 'pending',
+      request.status === FOLLOW_STATUS.PENDING,
   );
 
   // 실제 친구 상태 확인
   const actualFollowStatus = followStatusData?.checkFollowStatus?.followStatus;
 
   // 팔로우 상태 결정 (요청이 pending이면 대기중, 아니면 실제 친구 상태)
-  const displayFollowStatus = pendingRequest ? 'pending' : actualFollowStatus;
+  const displayFollowStatus = pendingRequest
+    ? FOLLOW_STATUS.PENDING
+    : actualFollowStatus;
 
   const goals: Goal[] = goalsData?.getGoalsByUserId || [];
 
@@ -188,7 +196,7 @@ const UserProfileScreen: React.FC = () => {
             onPress={handleFollowToggle}
             disabled={isLoading}>
             <Text style={styles.followButtonText}>
-              {isLoading ? '처리 중...' : '팔로우'}
+              {isLoading ? BUTTON_TEXTS.PROCESSING : BUTTON_TEXTS.FOLLOW}
             </Text>
           </TouchableOpacity>
         )}
@@ -198,18 +206,19 @@ const UserProfileScreen: React.FC = () => {
           <View
             style={[
               styles.followedStatus,
-              (displayFollowStatus === 'pending' ||
-                followStatus === 'pending') &&
+              (displayFollowStatus === FOLLOW_STATUS.PENDING ||
+                followStatus === FOLLOW_STATUS.PENDING) &&
                 styles.pendingStatus,
             ]}>
             <Text style={styles.followedStatusText}>
-              {displayFollowStatus === 'pending' || followStatus === 'pending'
-                ? '대기중'
-                : displayFollowStatus === 'approved'
-                ? '맞팔중'
-                : displayFollowStatus === 'mutual'
-                ? '맞팔중'
-                : '팔로우 중'}
+              {displayFollowStatus === FOLLOW_STATUS.PENDING ||
+              followStatus === FOLLOW_STATUS.PENDING
+                ? FOLLOW_STATUS_LABELS[FOLLOW_STATUS.PENDING]
+                : displayFollowStatus === FOLLOW_STATUS.APPROVED
+                ? FOLLOW_STATUS_LABELS[FOLLOW_STATUS.APPROVED]
+                : displayFollowStatus === FOLLOW_STATUS.MUTUAL
+                ? FOLLOW_STATUS_LABELS[FOLLOW_STATUS.MUTUAL]
+                : BUTTON_TEXTS.FOLLOWING}
             </Text>
           </View>
         )}
@@ -220,7 +229,15 @@ const UserProfileScreen: React.FC = () => {
             {isOwnProfile ? '내 목표' : `${user.nickname}의 목표`}
           </Text>
           {goalsLoading ? (
-            <ActivityIndicator style={styles.goalsLoading} />
+            <View style={styles.loadingContainer}>
+              <Text style={styles.loadingText}>
+                {LOADING_MESSAGES.LOADING_GOALS}
+              </Text>
+            </View>
+          ) : goals.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>{EMPTY_MESSAGES.NO_GOALS}</Text>
+            </View>
           ) : (
             <GoalList
               goals={goals}
@@ -336,6 +353,27 @@ const styles = StyleSheet.create({
   },
   goalsList: {
     paddingBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: '#FF6B9D',
+    fontWeight: 'bold',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  emptyText: {
+    fontSize: 18,
+    color: '#8E44AD',
+    fontWeight: 'bold',
   },
 });
 

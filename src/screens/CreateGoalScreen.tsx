@@ -9,21 +9,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {
+  GOAL_MODE_LABELS,
+  GOAL_MODES,
+  GOAL_VISIBILITY,
+  GOAL_VISIBILITY_LABELS,
+} from '../constants';
 import {CREATE_GOAL} from '../queries/goal';
-
-// GoalMode enum 추가
-export enum GoalMode {
-  PERSONAL = 'personal',
-  COMPETITION = 'competition',
-  CHALLENGER_RECRUITMENT = 'challenger_recruitment',
-}
-
-// Visibility enum 추가
-export enum Visibility {
-  PUBLIC = 'public',
-  PRIVATE = 'private',
-  FOLLOWERS = 'followers',
-}
 
 const CreateGoalScreen: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -31,9 +23,13 @@ const CreateGoalScreen: React.FC = () => {
   const [description, setDescription] = useState('');
   const [stickerCount, setStickerCount] = useState('');
   // mode 상태 추가, 기본값은 PERSONAL
-  const [mode, setMode] = useState<GoalMode>(GoalMode.PERSONAL);
+  const [mode, setMode] = useState<
+    (typeof GOAL_MODES)[keyof typeof GOAL_MODES]
+  >(GOAL_MODES.PERSONAL);
   // visibility 상태 추가, 기본값은 PUBLIC
-  const [visibility, setVisibility] = useState<Visibility>(Visibility.PUBLIC);
+  const [visibility, setVisibility] = useState<
+    (typeof GOAL_VISIBILITY)[keyof typeof GOAL_VISIBILITY]
+  >(GOAL_VISIBILITY.PUBLIC);
   const [createGoal, {loading}] = useMutation(CREATE_GOAL);
 
   const handleSave = async () => {
@@ -110,16 +106,16 @@ const CreateGoalScreen: React.FC = () => {
           <TouchableOpacity
             style={[
               styles.modeButton,
-              mode === GoalMode.PERSONAL && styles.modeButtonSelected,
+              mode === GOAL_MODES.PERSONAL && styles.modeButtonSelected,
             ]}
-            onPress={() => setMode(GoalMode.PERSONAL)}>
+            onPress={() => setMode(GOAL_MODES.PERSONAL)}>
             <Text
               style={
-                mode === GoalMode.PERSONAL
+                mode === GOAL_MODES.PERSONAL
                   ? styles.modeButtonTextSelected
                   : styles.modeButtonText
               }>
-              개인
+              {GOAL_MODE_LABELS[GOAL_MODES.PERSONAL]}
             </Text>
           </TouchableOpacity>
           {/* <TouchableOpacity
@@ -140,17 +136,17 @@ const CreateGoalScreen: React.FC = () => {
           <TouchableOpacity
             style={[
               styles.modeButton,
-              mode === GoalMode.CHALLENGER_RECRUITMENT &&
+              mode === GOAL_MODES.CHALLENGER_RECRUITMENT &&
                 styles.modeButtonSelected,
             ]}
-            onPress={() => setMode(GoalMode.CHALLENGER_RECRUITMENT)}>
+            onPress={() => setMode(GOAL_MODES.CHALLENGER_RECRUITMENT)}>
             <Text
               style={
-                mode === GoalMode.CHALLENGER_RECRUITMENT
+                mode === GOAL_MODES.CHALLENGER_RECRUITMENT
                   ? styles.modeButtonTextSelected
                   : styles.modeButtonText
               }>
-              챌린저
+              {GOAL_MODE_LABELS[GOAL_MODES.CHALLENGER_RECRUITMENT]}
             </Text>
           </TouchableOpacity>
         </View>
@@ -171,47 +167,50 @@ const CreateGoalScreen: React.FC = () => {
           <TouchableOpacity
             style={[
               styles.modeButton,
-              visibility === Visibility.PUBLIC && styles.modeButtonSelected,
+              visibility === GOAL_VISIBILITY.PUBLIC &&
+                styles.modeButtonSelected,
             ]}
-            onPress={() => setVisibility(Visibility.PUBLIC)}>
+            onPress={() => setVisibility(GOAL_VISIBILITY.PUBLIC)}>
             <Text
               style={
-                visibility === Visibility.PUBLIC
+                visibility === GOAL_VISIBILITY.PUBLIC
                   ? styles.modeButtonTextSelected
                   : styles.modeButtonText
               }>
-              공개
+              {GOAL_VISIBILITY_LABELS[GOAL_VISIBILITY.PUBLIC]}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
               styles.modeButton,
-              visibility === Visibility.FOLLOWERS && styles.modeButtonSelected,
+              visibility === GOAL_VISIBILITY.FOLLOWERS &&
+                styles.modeButtonSelected,
             ]}
-            onPress={() => setVisibility(Visibility.FOLLOWERS)}>
+            onPress={() => setVisibility(GOAL_VISIBILITY.FOLLOWERS)}>
             <Text
               style={
-                visibility === Visibility.FOLLOWERS
+                visibility === GOAL_VISIBILITY.FOLLOWERS
                   ? styles.modeButtonTextSelected
                   : styles.modeButtonText
               }>
-              팔로워
+              {GOAL_VISIBILITY_LABELS[GOAL_VISIBILITY.FOLLOWERS]}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
               styles.modeButton,
-              visibility === Visibility.PRIVATE && styles.modeButtonSelected,
+              visibility === GOAL_VISIBILITY.PRIVATE &&
+                styles.modeButtonSelected,
             ]}
-            onPress={() => setVisibility(Visibility.PRIVATE)}>
+            onPress={() => setVisibility(GOAL_VISIBILITY.PRIVATE)}>
             <Text
               style={
-                visibility === Visibility.PRIVATE
+                visibility === GOAL_VISIBILITY.PRIVATE
                   ? styles.modeButtonTextSelected
                   : styles.modeButtonText
               }>
-              비공개
+              {GOAL_VISIBILITY_LABELS[GOAL_VISIBILITY.PRIVATE]}
             </Text>
           </TouchableOpacity>
         </View>

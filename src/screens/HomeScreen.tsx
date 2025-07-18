@@ -10,8 +10,9 @@ import {
   View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {COLORS, EMOJIS} from '../constants';
 import {GET_INVITATIONS} from '../queries/goal';
-import {colors} from '../styles/colors';
+
 import ChallengeSection from './components/ChallengeSection';
 import FloatingAddGoalButton from './components/FloatingAddGoalButton';
 import FollowFeedSection from './components/FollowFeedSection';
@@ -80,7 +81,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
         <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
           <View>
             <Text style={styles.userName}>{user?.nickname}님</Text>
-            <Text style={styles.greeting}>안녕하세요! 👋</Text>
+            <Text style={styles.greeting}>안녕하세요! {EMOJIS.WAVE}</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
@@ -89,7 +90,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
           <MaterialIcons
             name="notifications"
             size={24}
-            color={colors.primary}
+            color={COLORS.PRIMARY}
           />
           {pendingCount > 0 && (
             <View style={styles.notificationBadge}>
@@ -125,7 +126,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: COLORS.LIGHT_GRAY,
   },
   header: {
     flexDirection: 'row',
@@ -134,10 +135,10 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 30,
     paddingBottom: 10,
-    backgroundColor: colors.primary,
+    backgroundColor: COLORS.PRIMARY,
     borderBottomWidth: 3,
-    borderBottomColor: colors.primaryLight,
-    shadowColor: colors.primary,
+    borderBottomColor: COLORS.PRIMARY_LIGHT,
+    shadowColor: COLORS.PRIMARY,
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -145,47 +146,47 @@ export const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 16,
-    color: colors.white,
+    color: COLORS.WHITE,
     fontWeight: '600',
   },
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: colors.white,
+    color: COLORS.WHITE,
     marginTop: 2,
-    textShadowColor: colors.primaryDark,
+    textShadowColor: COLORS.PRIMARY_DARK,
     textShadowOffset: {width: 1, height: 1},
     textShadowRadius: 2,
   },
   notificationButton: {
     position: 'relative',
     padding: 12,
-    backgroundColor: colors.white,
+    backgroundColor: COLORS.WHITE,
     borderRadius: 25,
-    shadowColor: colors.primary,
+    shadowColor: COLORS.PRIMARY,
     shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 5,
     borderWidth: 2,
-    borderColor: colors.primaryLight,
+    borderColor: COLORS.PRIMARY_LIGHT,
   },
   notificationBadge: {
     position: 'absolute',
     top: 6,
     right: 6,
-    backgroundColor: colors.error,
+    backgroundColor: COLORS.ERROR,
     borderRadius: 12,
     minWidth: 20,
     height: 20,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: colors.white,
+    borderColor: COLORS.WHITE,
   },
   notificationCount: {
     fontSize: 12,
-    color: colors.white,
+    color: COLORS.WHITE,
     fontWeight: 'bold',
   },
   scrollView: {

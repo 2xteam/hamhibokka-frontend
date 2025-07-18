@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {BUTTON_TEXTS, COLORS, EMOJIS, LOADING_MESSAGES} from '../constants';
 import {APPROVE_FOLLOW, GET_FOLLOWS} from '../queries/user';
 import {colors} from '../styles/colors';
 import UserList, {User} from './components/UserList';
@@ -175,9 +176,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
 
   const handleApproveFollowById = (followId: string) => {
     Alert.alert('팔로우 승인', '이 사용자의 팔로우 요청을 승인하시겠습니까?', [
-      {text: '취소', style: 'cancel'},
+      {text: BUTTON_TEXTS.CANCEL, style: 'cancel'},
       {
-        text: '승인',
+        text: BUTTON_TEXTS.APPROVE,
         onPress: () => {
           approveFollow({variables: {followId}});
         },
@@ -187,7 +188,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
 
   const handleLogout = () => {
     Alert.alert('로그아웃', '정말 로그아웃 하시겠습니까?', [
-      {text: '취소', style: 'cancel'},
+      {text: BUTTON_TEXTS.CANCEL, style: 'cancel'},
       {text: '로그아웃', style: 'destructive', onPress: onLogout},
     ]);
   };
@@ -219,29 +220,37 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
             />
             <View style={styles.profileImageBorder} />
           </View>
-          <Text style={styles.nickname}>🌟 {user?.nickname}</Text>
-          <Text style={styles.email}>📧 {user?.email}</Text>
+          <Text style={styles.nickname}>
+            {EMOJIS.SUCCESS} {user?.nickname}
+          </Text>
+          <Text style={styles.email}>
+            {EMOJIS.USER} {user?.email}
+          </Text>
         </View>
 
         {/* 친구 관리 섹션 */}
         <View style={styles.friendsSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.friendsSectionTitle}>👬 친구 관리</Text>
+            <Text style={styles.friendsSectionTitle}>
+              {EMOJIS.GROUP} 친구 관리
+            </Text>
           </View>
           <Text style={styles.friendsSectionSubtitle}>
-            💫 총 {users.length}명의 친구가 있어요!
+            {EMOJIS.SUCCESS} 총 {users.length}명의 친구가 있어요!
           </Text>
 
           {followsLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={colors.primary} />
-              <Text style={styles.loadingText}>친구 목록을 불러오는 중...</Text>
+              <ActivityIndicator size="large" color={COLORS.PRIMARY} />
+              <Text style={styles.loadingText}>
+                {LOADING_MESSAGES.LOADING_FOLLOWERS}
+              </Text>
             </View>
           ) : (
             <UserList
               users={users}
               onPressUser={handleUserPress}
-              emptyText="아직 친구가 없어요! 🥺"
+              emptyText="아직 친구가 없어요! {EMOJIS.ERROR}"
               contentContainerStyle={styles.friendsList}
               showFollowStatus={false}
               showApproveButton={true}
