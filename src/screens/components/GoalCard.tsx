@@ -1,6 +1,7 @@
 import React from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {Button} from '../../components/common';
 import {colors} from '../../styles/colors';
 
 interface Goal {
@@ -37,39 +38,28 @@ const GoalCard: React.FC<GoalCardProps> = ({
   showJoinButton = false,
   showDuration = false,
 }) => {
-  const getGoalEmoji = (title: string) => {
-    const lowerTitle = title.toLowerCase();
-    if (lowerTitle.includes('운동') || lowerTitle.includes('스포츠'))
-      return '🏃‍♂️';
-    if (lowerTitle.includes('공부') || lowerTitle.includes('학습')) return '📚';
-    if (lowerTitle.includes('독서') || lowerTitle.includes('책')) return '📖';
-    if (lowerTitle.includes('그림') || lowerTitle.includes('미술')) return '🎨';
-    if (lowerTitle.includes('음악') || lowerTitle.includes('악기')) return '🎵';
-    if (lowerTitle.includes('요리') || lowerTitle.includes('음식')) return '👨‍🍳';
-    if (lowerTitle.includes('청소') || lowerTitle.includes('정리')) return '🧹';
-    if (lowerTitle.includes('게임')) return '🎮';
-    if (lowerTitle.includes('산책') || lowerTitle.includes('걷기')) return '🚶‍♂️';
-    return '🥇';
-  };
-
+  const participantCount = goal.participants?.length || 0;
   const participant = goal.participants?.find(
     (p: any) => p.userId === goal.createdBy,
   );
   const progress = participant
-    ? (participant.currentStickerCount / goal.stickerCount) * 100
+    ? Math.round((participant.currentStickerCount / goal.stickerCount) * 100)
     : 0;
 
-  const participantCount = goal.participants?.length || 0;
   const daysLeft = goal.createdAt
-    ? Math.max(
-        0,
-        30 -
-          Math.floor(
-            (Date.now() - new Date(goal.createdAt).getTime()) /
-              (1000 * 60 * 60 * 24),
-          ),
+    ? Math.ceil(
+        (new Date(goal.createdAt).getTime() +
+          30 * 24 * 60 * 60 * 1000 -
+          new Date().getTime()) /
+          (1000 * 60 * 60 * 24),
       )
-    : 30;
+    : 0;
+
+  const getGoalEmoji = (title: string) => {
+    const emojis = ['🥇', '🏆', '⭐', '🎯', '💪', '🚀', '🌟', '✨'];
+    const index = title.length % emojis.length;
+    return emojis[index];
+  };
 
   return (
     <TouchableOpacity style={styles.feedItem} onPress={() => onPress(goal)}>
@@ -119,9 +109,12 @@ const GoalCard: React.FC<GoalCardProps> = ({
             <Text style={styles.duration}>{daysLeft}일 남음</Text>
           )}
           {showJoinButton && (
-            <TouchableOpacity style={styles.joinButton}>
-              <Text style={styles.joinButtonText}>참여하기</Text>
-            </TouchableOpacity>
+            <Button
+              title="참여하기"
+              onPress={() => onPress(goal)}
+              variant="primary"
+              size="small"
+            />
           )}
         </View>
       )}
@@ -236,24 +229,7 @@ const styles = StyleSheet.create({
     color: colors.error,
     fontWeight: '600',
   },
-  joinButton: {
-    backgroundColor: colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    shadowColor: colors.primary,
-    shadowOffset: {width: 0, height: 3},
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 4,
-    borderWidth: 2,
-    borderColor: colors.primaryLight,
-  },
-  joinButtonText: {
-    fontSize: 14,
-    color: colors.white,
-    fontWeight: '600',
-  },
+
   participantCountContainer: {
     flexDirection: 'row',
     alignItems: 'center',

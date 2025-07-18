@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
-  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -12,7 +11,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {BUTTON_TEXTS, COLORS, EMOJIS, LOADING_MESSAGES} from '../constants';
+import {Loading} from '../components/common';
+import {BUTTON_TEXTS, EMOJIS} from '../constants';
 import {APPROVE_FOLLOW, GET_FOLLOWS} from '../queries/user';
 import {colors} from '../styles/colors';
 import UserList, {User} from './components/UserList';
@@ -240,12 +240,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
           </Text>
 
           {followsLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={COLORS.PRIMARY} />
-              <Text style={styles.loadingText}>
-                {LOADING_MESSAGES.LOADING_FOLLOWERS}
-              </Text>
-            </View>
+            <Loading />
           ) : (
             <UserList
               users={users}
@@ -405,16 +400,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.primary,
   },
-  loadingContainer: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '600',
-  },
+
   friendsList: {
     paddingHorizontal: 0,
   },

@@ -8,7 +8,6 @@ import {
 } from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
-  ActivityIndicator,
   Alert,
   Image,
   Modal,
@@ -19,6 +18,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {Loading} from '../components/common';
 import {
   BUTTON_TEXTS,
   COLORS,
@@ -136,12 +136,7 @@ const GoalDetailScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
-        <Text style={styles.loadingText}>
-          목표 정보를 불러오는 중이에요! {EMOJIS.SUCCESS}
-        </Text>
-      </View>
+      <Loading variant="fullscreen" message="목표 정보를 불러오는 중이에요!" />
     );
   }
   if (error || !data?.getGoal) {
