@@ -2,7 +2,8 @@ import {useQuery} from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
+import {Loading} from '../components/common';
 import {GET_MY_PARTICIPATED_GOALS} from '../queries/goal';
 import FloatingAddGoalButton from './components/FloatingAddGoalButton';
 import GoalList, {Goal} from './components/GoalList';
@@ -40,9 +41,10 @@ const ParticipatedGoalsScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#FF6B9D" />
-      </View>
+      <Loading
+        variant="fullscreen"
+        message="참여한 목표를 불러오는 중이에요!"
+      />
     );
   }
   if (error) {

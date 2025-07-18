@@ -122,11 +122,14 @@ const GoalList: React.FC<GoalListProps> = ({
       p => p.userId === currentUserId,
     );
     const isCompleted =
-      myParticipant && myParticipant.currentStickerCount >= item.stickerCount;
+      myParticipant &&
+      item.stickerCount &&
+      item.stickerCount > 0 &&
+      myParticipant.currentStickerCount >= item.stickerCount;
 
     return (
       <TouchableOpacity
-        style={[styles.goalItem, isCompleted && styles.completedGoalItem]}
+        style={[styles.goalItem, isCompleted ? styles.completedGoalItem : null]}
         onPress={() => onPressGoal && onPressGoal(item)}>
         {/* 완료 오버레이 아이콘 */}
         {isCompleted && (
@@ -166,10 +169,14 @@ const GoalList: React.FC<GoalListProps> = ({
               const currentUser = item.participants.find(
                 (p: any) =>
                   p.userId === item.createdBy ||
-                  p.currentStickerCount >= item.stickerCount,
+                  (item.stickerCount &&
+                    item.stickerCount > 0 &&
+                    p.currentStickerCount >= item.stickerCount),
               );
               if (
                 currentUser &&
+                item.stickerCount &&
+                item.stickerCount > 0 &&
                 currentUser.currentStickerCount >= item.stickerCount
               ) {
                 return (
@@ -189,7 +196,9 @@ const GoalList: React.FC<GoalListProps> = ({
         <View style={styles.goalInfoRow}>
           <View style={styles.stickerContainer}>
             <Text style={styles.stickerEmoji}>⭐</Text>
-            <Text style={styles.stickerCount}>{item.stickerCount}개 목표</Text>
+            <Text style={styles.stickerCount}>
+              {item.stickerCount || 0}개 목표
+            </Text>
           </View>
           {item.creatorNickname && (
             <View style={styles.creatorContainer}>
@@ -219,9 +228,11 @@ const GoalList: React.FC<GoalListProps> = ({
                   <Text style={styles.participantStickers}>
                     ⭐ {participant.currentStickerCount}개 수집
                   </Text>
-                  {participant.currentStickerCount >= item.stickerCount && (
-                    <Text style={styles.completedEmoji}>🏆</Text>
-                  )}
+                  {item.stickerCount &&
+                    item.stickerCount > 0 &&
+                    participant.currentStickerCount >= item.stickerCount && (
+                      <Text style={styles.completedEmoji}>🏆</Text>
+                    )}
                 </View>
               </View>
             ))}

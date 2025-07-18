@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -12,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {Loading} from '../components/common';
 import {SEARCH_USERS_BY_NICKNAME} from '../queries/user';
 import {colors} from '../styles/colors';
 
@@ -97,12 +97,7 @@ const FriendSearchScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {loading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>친구를 찾는 중...</Text>
-        </View>
-      )}
+      {loading && <Loading message="친구를 찾는 중..." />}
 
       {!loading && !touched && (
         <View style={styles.welcomeSection}>
@@ -219,16 +214,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  loadingContainer: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '600',
-  },
+
   userItem: {
     flexDirection: 'row',
     alignItems: 'center',

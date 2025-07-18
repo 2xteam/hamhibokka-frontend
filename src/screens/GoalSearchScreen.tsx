@@ -2,13 +2,13 @@ import {useLazyQuery} from '@apollo/client';
 import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
-  ActivityIndicator,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import {Loading} from '../components/common';
 import {SEARCH_GOALS_BY_TITLE} from '../queries/goal';
 import {colors} from '../styles/colors';
 import GoalList, {Goal} from './components/GoalList';
@@ -52,12 +52,7 @@ const GoalSearchScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {loading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>목표를 찾는 중...</Text>
-        </View>
-      )}
+      {loading && <Loading message="목표를 찾는 중..." />}
 
       {!loading && !touched && (
         <View style={styles.welcomeSection}>
@@ -145,16 +140,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  loadingContainer: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '600',
-  },
+
   welcomeSection: {
     alignItems: 'center',
     marginTop: 20,

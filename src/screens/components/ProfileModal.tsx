@@ -2,7 +2,6 @@ import {useMutation, useQuery} from '@apollo/client';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
-  ActivityIndicator,
   Alert,
   Image,
   Modal,
@@ -11,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {Loading} from '../../components/common';
 import {GET_GOALS_BY_USER_ID} from '../../queries/goal';
 import {CREATE_FOLLOW} from '../../queries/user';
 import GoalList, {Goal} from './GoalList';
@@ -198,7 +198,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
               {isOwnProfile ? '내 목표' : `${user?.nickname}의 목표`}
             </Text>
             {goalsLoading ? (
-              <ActivityIndicator style={styles.goalsLoading} />
+              <Loading />
             ) : (
               <GoalList
                 goals={goals}
@@ -345,9 +345,7 @@ const styles = StyleSheet.create({
     color: '#2C3E50',
     marginBottom: 12,
   },
-  goalsLoading: {
-    marginTop: 10,
-  },
+
   goalsList: {
     paddingHorizontal: 0,
   },

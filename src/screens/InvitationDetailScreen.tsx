@@ -2,14 +2,8 @@ import {useMutation, useQuery} from '@apollo/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  Alert,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Alert, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Loading} from '../components/common';
 import {GET_INVITATION, UPDATE_GOAL_INVITATION} from '../queries/goal';
 import {colors} from '../styles/colors';
 
@@ -88,10 +82,7 @@ const InvitationDetailScreen: React.FC = () => {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>상세 정보를 불러오는 중...</Text>
-      </View>
+      <Loading variant="fullscreen" message="상세 정보를 불러오는 중..." />
     );
   }
   if (error || !data?.getInvitation) {
@@ -278,12 +269,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.background,
   },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: colors.primary,
-    fontWeight: '600',
-  },
+
   errorText: {
     fontSize: 16,
     color: colors.error,

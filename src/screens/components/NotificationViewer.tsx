@@ -3,7 +3,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Modal,
   StyleSheet,
@@ -12,6 +11,7 @@ import {
   View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import {Loading} from '../../components/common';
 import {GET_INVITATIONS} from '../../queries/goal';
 
 interface Invitation {
@@ -193,9 +193,7 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
           </View>
 
           {loading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#FF6B9D" />
-            </View>
+            <Loading message="초대 요청을 불러오는 중..." />
           ) : (
             <FlatList
               data={[]}
@@ -246,11 +244,7 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 4,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
   listContainer: {
     padding: 20,
   },
