@@ -15,14 +15,14 @@
     "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@/queries/*": ["./src/queries/*"],
-      // "@/components/*": ["src/components/*"],
-      // "@/screens/*": ["src/screens/*"],
-      // "@/types/*": ["src/types/*"],
-      // "@/utils/*": ["src/utils/*"],
-      // "@/hooks/*": ["src/hooks/*"],
-      // "@/state/*": ["src/state/*"],
-      // "@/services/*": ["src/services/*"]
+      "@/queries/*": ["./src/queries/*"]
     }
-  }
+  },
+  "include": ["src/**/*", "App.tsx", "index.js"],
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js"
+  ]
 }

@@ -57,7 +57,7 @@ const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({
           borderTopWidth: 0,
           paddingBottom: 12,
           paddingTop: 12,
-          height: 100,
+          height: 90,
           shadowColor: '#FF6B9D',
           shadowOffset: {width: 0, height: -4},
           shadowOpacity: 0.15,

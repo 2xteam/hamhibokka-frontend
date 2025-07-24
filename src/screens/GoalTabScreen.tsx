@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   topColorArea: {
-    height: 44,
+    height: 24,
     backgroundColor: colors.primary,
   },
   tabContainer: {

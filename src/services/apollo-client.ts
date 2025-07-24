@@ -1,29 +1,43 @@
-
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
+import {ApolloClient, InMemoryCache, createHttpLink} from '@apollo/client';
+import {setContext} from '@apollo/client/link/context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // HTTP 링크 설정 (백엔드 서버 주소)
 const httpLink = createHttpLink({
-  uri: 'http://10.0.2.2:3000/graphql', // Android 에뮬레이터용 local
-  // uri: 'http://ec2-13-55-123-201.ap-southeast-2.compute.amazonaws.com:3000/graphql', // 프로덕션환경
+  // uri: 'http://10.0.2.2:3000/graphql', // Android 에뮬레이터용 local
+  uri: 'http://ec2-13-55-123-201.ap-southeast-2.compute.amazonaws.com:3000/graphql', // 프로덕션환경
+  // iOS에서 네트워크 요청을 위한 추가 설정
+  fetchOptions: {
+    mode: 'cors',
+  },
+  // iOS 시뮬레이터에서 네트워크 요청을 위한 헤더 설정
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
 });
 
 // 인증 헤더 설정
-const authLink = setContext(async (_, { headers }) => {
+const authLink = setContext(async (_, {headers}) => {
   try {
     const token = await AsyncStorage.getItem('@hamhibokka_token');
-    
+
     return {
       headers: {
         ...headers,
         authorization: token ? `Bearer ${token}` : '',
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
       },
     };
   } catch (error) {
     console.error('Error getting token from AsyncStorage:', error);
     return {
-      headers,
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
     };
   }
 });
