@@ -55,9 +55,12 @@ const GoalCard: React.FC<GoalCardProps> = ({
   const participant = goal.participants?.find(
     (p: any) => p.userId === goal.createdBy,
   );
-  const progress = participant
-    ? (participant.currentStickerCount / goal.stickerCount) * 100
-    : 0;
+
+  // progress 계산 시 stickerCount가 0이거나 undefined인 경우 처리
+  const progress =
+    participant && goal.stickerCount && goal.stickerCount > 0
+      ? Math.round((participant.currentStickerCount / goal.stickerCount) * 100)
+      : 0;
 
   const participantCount = goal.participants?.length || 0;
   const daysLeft = goal.createdAt
@@ -105,10 +108,16 @@ const GoalCard: React.FC<GoalCardProps> = ({
       {showProgress && (
         <View style={styles.feedProgress}>
           <View style={styles.progressBar}>
-            <View style={[styles.progressFill, {width: `${progress}%`}]} />
+            <View
+              style={[
+                styles.progressFill,
+                {width: `${Math.max(0, Math.min(100, progress))}%`},
+              ]}
+            />
           </View>
           <Text style={styles.progressText}>
-            {participant?.currentStickerCount || 0}/{goal.stickerCount} 스티커
+            {participant?.currentStickerCount || 0}/{goal.stickerCount || 0}{' '}
+            스티커
           </Text>
         </View>
       )}
