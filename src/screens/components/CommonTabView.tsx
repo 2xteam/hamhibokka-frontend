@@ -1,6 +1,7 @@
-import React, {ReactNode, useState} from 'react';
-import {Dimensions, Text, TextStyle, View, ViewStyle} from 'react-native';
+import React, {useState} from 'react';
+import {Dimensions, View, ViewStyle} from 'react-native';
 import {SceneMap, TabBar, TabView} from 'react-native-tab-view';
+import {colors} from '../../styles/colors';
 
 export interface TabRoute {
   key: string;
@@ -9,10 +10,9 @@ export interface TabRoute {
 
 interface CommonTabViewProps {
   routes: TabRoute[];
-  scenes: {[key: string]: React.ComponentType<any> | (() => ReactNode)};
+  scenes: {[key: string]: React.ComponentType<any>};
   initialIndex?: number;
   tabBarStyle?: ViewStyle;
-  tabBarLabelStyle?: TextStyle;
   tabBarIndicatorStyle?: ViewStyle;
   tabBarActiveTintColor?: string;
   tabBarInactiveTintColor?: string;
@@ -25,10 +25,9 @@ const CommonTabView: React.FC<CommonTabViewProps> = ({
   scenes,
   initialIndex = 0,
   tabBarStyle,
-  tabBarLabelStyle,
   tabBarIndicatorStyle,
-  tabBarActiveTintColor = '#FF6B9D',
-  tabBarInactiveTintColor = '#2C3E50',
+  tabBarActiveTintColor = colors.components.tabView.active,
+  tabBarInactiveTintColor = colors.components.tabView.inactive,
 }) => {
   const [index, setIndex] = useState(initialIndex);
 
@@ -45,26 +44,16 @@ const CommonTabView: React.FC<CommonTabViewProps> = ({
           <TabBar
             {...props}
             indicatorStyle={
-              tabBarIndicatorStyle || {backgroundColor: '#FF6B9D'}
+              tabBarIndicatorStyle || {
+                backgroundColor: colors.components.tabView.indicator,
+              }
             }
             style={[
               {backgroundColor: '#fff', height: 48, elevation: 2, zIndex: 10},
               tabBarStyle,
             ]}
-            renderLabel={({route, focused}) => (
-              <Text
-                style={[
-                  {fontWeight: 'bold', fontSize: 15},
-                  tabBarLabelStyle,
-                  {
-                    color: focused
-                      ? tabBarActiveTintColor
-                      : tabBarInactiveTintColor,
-                  },
-                ]}>
-                {route.title}
-              </Text>
-            )}
+            activeColor={tabBarActiveTintColor}
+            inactiveColor={tabBarInactiveTintColor}
           />
         )}
       />

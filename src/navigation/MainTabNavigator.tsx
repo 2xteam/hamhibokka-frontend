@@ -5,6 +5,7 @@ import ExploreTabScreen from '../screens/ExploreTabScreen';
 import GoalTabScreen from '../screens/GoalTabScreen';
 import HomeScreen from '../screens/HomeScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import {colors} from '../styles/colors';
 
 const Tab = createBottomTabNavigator();
 
@@ -50,15 +51,15 @@ const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({
             <Icon name={iconName} size={focused ? 28 : 24} color={color} />
           );
         },
-        tabBarActiveTintColor: '#FF6B9D',
-        tabBarInactiveTintColor: '#FFB3D1',
+        tabBarActiveTintColor: colors.components.navigation.active,
+        tabBarInactiveTintColor: colors.components.navigation.inactive,
         tabBarStyle: {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 0,
           paddingBottom: 12,
           paddingTop: 12,
           height: 90,
-          shadowColor: '#FF6B9D',
+          shadowColor: colors.components.navigation.shadow,
           shadowOffset: {width: 0, height: -4},
           shadowOpacity: 0.15,
           shadowRadius: 8,

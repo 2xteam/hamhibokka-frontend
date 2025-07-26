@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {colors} from '../../styles/colors';
 
 export interface Goal {
   id: string;
@@ -106,13 +107,13 @@ const GoalList: React.FC<GoalListProps> = ({
   const getStatusColor = (status?: string) => {
     switch (status) {
       case 'active':
-        return '#27AE60';
+        return colors.primary;
       case 'completed':
-        return '#E74C3C';
+        return colors.success;
       case 'archived':
-        return '#95A5A6';
+        return colors.lighter;
       default:
-        return '#FF6B9D';
+        return colors.primary;
     }
   };
 
@@ -214,7 +215,7 @@ const GoalList: React.FC<GoalListProps> = ({
               <Text style={styles.participantsEmoji}>👬</Text>
               <Text style={styles.participantsTitle}>
                 참가자{' '}
-                <Text style={{color: '#FF6B9D'}}>
+                <Text style={{color: colors.primary}}>
                   ({item.participants.length}명)
                 </Text>
               </Text>
@@ -299,24 +300,24 @@ const GoalList: React.FC<GoalListProps> = ({
 
 const styles = StyleSheet.create({
   goalItem: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.components.goalList.background,
     borderRadius: 20,
     padding: 24,
     marginBottom: 16,
-    shadowColor: '#FF6B9D',
+    shadowColor: colors.components.goalList.shadow,
     shadowOffset: {width: 0, height: 6},
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 8,
     borderWidth: 2,
-    borderColor: '#FFE5F0',
+    borderColor: colors.components.goalList.border,
     position: 'relative',
   },
   completedGoalItem: {
-    backgroundColor: '#E6FFE6',
-    borderColor: '#27AE60',
+    backgroundColor: colors.components.goalList.completed.background,
+    borderColor: colors.components.goalList.completed.border,
     borderWidth: 3,
-    shadowColor: '#27AE60',
+    shadowColor: colors.components.goalList.completed.shadow,
     shadowOpacity: 0.2,
   },
   completedOverlay: {
@@ -324,13 +325,13 @@ const styles = StyleSheet.create({
     top: 10,
     right: 16,
     zIndex: 10,
-    backgroundColor: '#27AE60',
+    backgroundColor: colors.components.goalList.completed.badge.background,
     borderRadius: 20,
     width: 40,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#27AE60',
+    shadowColor: colors.components.goalList.completed.badge.background,
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -348,12 +349,12 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#FFE5F0',
+    backgroundColor: colors.components.goalList.header.icon.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
     borderWidth: 2,
-    borderColor: '#FFB6D5',
+    borderColor: colors.components.goalList.header.icon.border,
   },
   goalEmoji: {
     fontSize: 28,
@@ -364,7 +365,7 @@ const styles = StyleSheet.create({
   goalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF6B9D',
+    color: colors.components.goalList.header.title,
     marginBottom: 4,
   },
   goalMeta: {
@@ -377,48 +378,48 @@ const styles = StyleSheet.create({
   },
   modeText: {
     fontSize: 14,
-    color: '#8E44AD',
+    color: colors.components.goalList.header.mode,
     fontWeight: '600',
   },
   participantBadge: {
-    backgroundColor: '#FF8FA3',
+    backgroundColor: colors.components.goalList.badge.participant.background,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     marginLeft: 8,
-    shadowColor: '#FF6B9D',
+    shadowColor: colors.components.goalList.badge.participant.shadow,
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 2,
   },
   participantBadgeText: {
-    color: '#FFFFFF',
+    color: colors.components.goalList.badge.participant.text,
     fontWeight: 'bold',
     fontSize: 13,
   },
   completedBadge: {
-    backgroundColor: '#27AE60',
+    backgroundColor: colors.components.goalList.completed.badge.background,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     marginLeft: 8,
-    shadowColor: '#27AE60',
+    shadowColor: colors.components.goalList.completed.badge.background,
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 3,
     borderWidth: 1,
-    borderColor: '#2ECC71',
+    borderColor: colors.components.goalList.completed.badge.border,
   },
   completedBadgeText: {
-    color: '#FFFFFF',
+    color: colors.components.goalList.completed.badge.text,
     fontSize: 12,
     fontWeight: 'bold',
   },
   goalDesc: {
     fontSize: 15,
-    color: '#8E44AD',
+    color: colors.components.goalList.header.mode,
     marginBottom: 16,
     lineHeight: 22,
   },
@@ -429,7 +430,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#FFF8FA',
+    backgroundColor: colors.components.goalList.info.background,
     borderRadius: 12,
   },
   stickerContainer: {
@@ -442,7 +443,7 @@ const styles = StyleSheet.create({
   },
   stickerCount: {
     fontSize: 15,
-    color: '#FF6B9D',
+    color: colors.components.goalList.info.sticker,
     fontWeight: 'bold',
   },
   creatorContainer: {
@@ -455,16 +456,16 @@ const styles = StyleSheet.create({
   },
   creator: {
     fontSize: 15,
-    color: '#8E44AD',
+    color: colors.components.goalList.info.creator,
     fontWeight: 'bold',
   },
   participantsSection: {
     marginTop: 10,
-    backgroundColor: '#FFF8FA',
+    backgroundColor: colors.components.goalList.participants.background,
     borderRadius: 16,
     padding: 16,
     borderWidth: 2,
-    borderColor: '#FFE5F0',
+    borderColor: colors.components.goalList.participants.border,
   },
   participantsHeader: {
     flexDirection: 'row',
@@ -478,7 +479,7 @@ const styles = StyleSheet.create({
   participantsTitle: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#FF6B9D',
+    color: colors.components.goalList.participants.title,
   },
   participantInfo: {
     flexDirection: 'row',
@@ -491,12 +492,12 @@ const styles = StyleSheet.create({
   },
   participantName: {
     fontSize: 14,
-    color: '#8E44AD',
+    color: colors.components.goalList.participants.name,
     fontWeight: '600',
   },
   participantStickers: {
     fontSize: 13,
-    color: '#FF6B9D',
+    color: colors.components.goalList.participants.sticker,
     fontWeight: 'bold',
   },
   participantStickerInfo: {
@@ -509,7 +510,7 @@ const styles = StyleSheet.create({
   },
   moreParticipants: {
     fontSize: 13,
-    color: '#8E44AD',
+    color: colors.components.goalList.participants.more,
     marginTop: 6,
     fontStyle: 'italic',
     textAlign: 'center',
@@ -519,17 +520,17 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   emptyCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.components.goalList.empty.background,
     borderRadius: 20,
     padding: 30,
     alignItems: 'center',
-    shadowColor: '#FF6B9D',
+    shadowColor: colors.components.goalList.empty.shadow,
     shadowOffset: {width: 0, height: 6},
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 8,
     borderWidth: 2,
-    borderColor: '#FFE5F0',
+    borderColor: colors.components.goalList.empty.border,
   },
   emptyEmoji: {
     fontSize: 40,
@@ -538,18 +539,18 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FF6B9D',
+    color: colors.components.goalList.empty.title,
     marginBottom: 4,
   },
   emptyText: {
     fontSize: 16,
-    color: '#BDC3C7',
+    color: colors.components.goalList.empty.text,
     textAlign: 'center',
     marginBottom: 4,
   },
   emptySubtext: {
     fontSize: 13,
-    color: '#8E44AD',
+    color: colors.components.goalList.empty.subtext,
     textAlign: 'center',
   },
   emptyDecoration: {

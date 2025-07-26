@@ -140,17 +140,17 @@ const GoalCard: React.FC<GoalCardProps> = ({
 
 const styles = StyleSheet.create({
   feedItem: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.components.goalCard.background,
     borderRadius: 20,
     padding: 20,
     marginBottom: 16,
-    shadowColor: colors.primary,
+    shadowColor: colors.components.goalCard.shadow,
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.15,
     shadowRadius: 8,
     elevation: 6,
     borderWidth: 2,
-    borderColor: colors.primaryLight,
+    borderColor: colors.components.goalCard.border,
   },
   feedHeader: {
     flexDirection: 'row',
@@ -167,12 +167,12 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.components.goalCard.avatar.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
     borderWidth: 2,
-    borderColor: colors.primaryLight,
+    borderColor: colors.components.goalCard.avatar.border,
   },
   avatarText: {
     fontSize: 20,
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   feedUserName: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.primary,
+    color: colors.components.goalCard.title,
     marginBottom: 4,
   },
   feedTime: {
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   },
   feedGoalTitle: {
     fontSize: 16,
-    color: colors.medium,
+    color: colors.components.goalCard.description,
     lineHeight: 22,
     marginBottom: 16,
   },
@@ -220,14 +220,14 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 10,
-    backgroundColor: colors.progressBackground,
+    backgroundColor: colors.components.goalCard.progress.background,
     borderRadius: 5,
     marginRight: 12,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.progressFill,
+    backgroundColor: colors.components.goalCard.progress.fill,
     borderRadius: 5,
   },
   progressText: {
@@ -246,11 +246,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   joinButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.components.goalCard.button.background,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
-    shadowColor: colors.primary,
+    shadowColor: colors.components.goalCard.button.shadow,
     shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.3,
     shadowRadius: 6,
@@ -260,13 +260,13 @@ const styles = StyleSheet.create({
   },
   joinButtonText: {
     fontSize: 14,
-    color: colors.white,
+    color: colors.components.goalCard.button.text,
     fontWeight: '600',
   },
   participantCountContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primary,
+    backgroundColor: colors.components.goalCard.participant.background,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   },
   participantCountText: {
     fontSize: 14,
-    color: colors.white,
+    color: colors.components.goalCard.participant.text,
     marginLeft: 6,
     fontWeight: '600',
   },

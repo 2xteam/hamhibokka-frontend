@@ -25,6 +25,7 @@ import {
   RECEIVE_STICKER,
 } from '../queries/goal';
 import {CHECK_FOLLOW_STATUS} from '../queries/user';
+import {colors} from '../styles/colors';
 
 interface GoalDetailParams {
   id: string;
@@ -117,7 +118,7 @@ const GoalDetailScreen: React.FC = () => {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#FF6B9D" />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>
           목표 정보를 불러오는 중이에요! ✨
         </Text>
@@ -346,7 +347,7 @@ const GoalDetailScreen: React.FC = () => {
                     </View>
                     <Text style={styles.modalLabel}>
                       닉네임:{' '}
-                      <Text style={{color: '#FF6B9D', fontWeight: 'bold'}}>
+                      <Text style={{color: colors.primary, fontWeight: 'bold'}}>
                         {selectedParticipant.nickname || '-'}
                       </Text>
                     </Text>
@@ -516,7 +517,11 @@ const GoalDetailScreen: React.FC = () => {
               <TouchableOpacity
                 style={[
                   styles.modalCloseBtn,
-                  {backgroundColor: '#BDC3C7', marginRight: 8},
+                  {
+                    backgroundColor:
+                      colors.components.goalDetail.modal.button.cancel,
+                    marginRight: 8,
+                  },
                 ]}
                 onPress={() => setJoinModalVisible(false)}>
                 <Text style={styles.modalCloseText}>취소</Text>
@@ -540,32 +545,32 @@ const GoalDetailScreen: React.FC = () => {
 const styles = StyleSheet.create({
   scrollContainer: {
     padding: 24,
-    backgroundColor: '#FFF5F7',
+    backgroundColor: colors.components.goalDetail.background,
   },
   centered: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFF5F7',
+    backgroundColor: colors.components.goalDetail.background,
   },
   loadingText: {
     fontSize: 18,
-    color: '#FF6B9D',
+    color: colors.primary,
     marginTop: 16,
     fontWeight: '600',
   },
   errorText: {
     fontSize: 18,
-    color: '#FF6B9D',
+    color: colors.primary,
     textAlign: 'center',
   },
   headerSection: {
     marginBottom: 24,
     alignItems: 'center',
-    backgroundColor: '#FFE5F0',
+    backgroundColor: colors.components.goalDetail.header.background,
     borderRadius: 20,
     padding: 20,
-    shadowColor: '#FF6B9D',
+    shadowColor: colors.components.goalDetail.header.shadow,
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -574,28 +579,28 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FF6B9D',
+    color: colors.components.goalDetail.header.title,
     marginBottom: 8,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#8E44AD',
+    color: colors.components.goalDetail.header.description,
     textAlign: 'center',
     lineHeight: 22,
   },
   cardSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.components.goalDetail.card.background,
     borderRadius: 20,
     padding: 24,
     marginBottom: 20,
-    shadowColor: '#FF6B9D',
+    shadowColor: colors.components.goalDetail.card.shadow,
     shadowOffset: {width: 0, height: 6},
     shadowOpacity: 0.15,
     shadowRadius: 12,
     elevation: 8,
     borderWidth: 2,
-    borderColor: '#FFE5F0',
+    borderColor: colors.components.goalDetail.card.border,
   },
   infoRow: {
     flexDirection: 'row',
@@ -604,37 +609,38 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#FFF8FA',
+    backgroundColor: colors.components.goalDetail.info.background,
     borderRadius: 12,
   },
   infoLabel: {
     fontSize: 16,
-    color: '#8E44AD',
+    color: colors.components.goalDetail.info.label,
     fontWeight: '600',
   },
   infoValue: {
     fontSize: 18,
-    color: '#FF6B9D',
+    color: colors.components.goalDetail.info.value,
     fontWeight: 'bold',
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF6B9D',
+    color: colors.components.goalDetail.section.title,
     marginBottom: 16,
   },
   participantItem: {
     paddingVertical: 16,
     paddingHorizontal: 16,
     borderBottomWidth: 2,
-    borderBottomColor: '#FFE5F0',
-    backgroundColor: '#FFF8FA',
+    borderBottomColor: colors.components.goalDetail.section.participant.border,
+    backgroundColor:
+      colors.components.goalDetail.section.participant.background,
     borderRadius: 12,
     marginBottom: 8,
   },
   participantName: {
     fontSize: 16,
-    color: '#8E44AD',
+    color: colors.components.goalDetail.section.participant.text,
     fontWeight: '600',
   },
   emptyText: {
@@ -646,64 +652,64 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(255,107,157,0.3)',
+    backgroundColor: colors.components.goalDetail.modal.overlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.components.goalDetail.modal.background,
     borderRadius: 24,
     padding: 28,
     width: 320,
     alignItems: 'center',
-    shadowColor: '#FF6B9D',
+    shadowColor: colors.components.goalDetail.modal.shadow,
     shadowOffset: {width: 0, height: 8},
     shadowOpacity: 0.25,
     shadowRadius: 16,
     elevation: 12,
     borderWidth: 3,
-    borderColor: '#FFE5F0',
+    borderColor: colors.components.goalDetail.modal.border,
   },
   modalContentChild: {
-    backgroundColor: '#FFF8FA',
+    backgroundColor: colors.components.goalDetail.modal.background,
     borderRadius: 28,
     padding: 32,
     width: 340,
     alignItems: 'center',
-    shadowColor: '#FF6B9D',
+    shadowColor: colors.components.goalDetail.modal.shadow,
     shadowOffset: {width: 0, height: 8},
     shadowOpacity: 0.25,
     shadowRadius: 16,
     elevation: 12,
     borderWidth: 4,
-    borderColor: '#FFE5F0',
+    borderColor: colors.components.goalDetail.modal.border,
   },
   modalTitle: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#FF6B9D',
+    color: colors.components.goalDetail.modal.title,
   },
   modalLabel: {
     fontSize: 16,
     padding: 12,
-    color: '#8E44AD',
+    color: colors.components.goalDetail.info.label,
     fontWeight: '600',
   },
   modalCloseBtn: {
     marginTop: 24,
-    backgroundColor: '#FF6B9D',
+    backgroundColor: colors.components.goalDetail.modal.button.background,
     borderRadius: 16,
     paddingVertical: 12,
     paddingHorizontal: 28,
-    shadowColor: '#FF6B9D',
+    shadowColor: colors.components.goalDetail.modal.shadow,
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
   },
   modalCloseText: {
-    color: '#FFFFFF',
+    color: colors.components.goalDetail.modal.button.text,
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -711,13 +717,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 24,
     bottom: 24,
-    backgroundColor: '#FF6B9D',
+    backgroundColor: colors.components.goalDetail.modal.button.background,
     borderRadius: 32,
     width: 200,
     height: 64,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#FF6B9D',
+    shadowColor: colors.components.goalDetail.modal.shadow,
     shadowOffset: {width: 0, height: 8},
     shadowOpacity: 0.4,
     shadowRadius: 12,
@@ -726,20 +732,20 @@ const styles = StyleSheet.create({
     borderColor: '#FFFFFF',
   },
   fabJoinText: {
-    color: '#FFFFFF',
+    color: colors.components.goalDetail.modal.button.text,
     fontWeight: 'bold',
     fontSize: 18,
   },
   input: {
     width: '100%',
     borderWidth: 3,
-    borderColor: '#FFE5F0',
+    borderColor: colors.components.goalDetail.input.border,
     borderRadius: 16,
     padding: 16,
     fontSize: 16,
-    backgroundColor: '#FFF8FA',
+    backgroundColor: colors.components.goalDetail.input.background,
     marginTop: 12,
-    color: '#8E44AD',
+    color: colors.components.goalDetail.input.text,
   },
   stickerRow: {
     marginTop: 12,
@@ -748,20 +754,20 @@ const styles = StyleSheet.create({
   },
   stickerCountText: {
     fontSize: 16,
-    color: '#8E44AD',
+    color: colors.components.goalDetail.info.label,
     fontWeight: '600',
   },
   giveStickerBox: {
     marginTop: 20,
     alignItems: 'center',
     width: '100%',
-    backgroundColor: '#FFF8FA',
+    backgroundColor: colors.components.goalDetail.sticker.background,
     borderRadius: 16,
     padding: 16,
   },
   giveStickerLabel: {
     fontSize: 18,
-    color: '#FF6B9D',
+    color: colors.components.goalDetail.sticker.title,
     fontWeight: 'bold',
     marginBottom: 8,
   },
@@ -774,30 +780,30 @@ const styles = StyleSheet.create({
     width: 56,
     height: 44,
     borderWidth: 3,
-    borderColor: '#FFE5F0',
+    borderColor: colors.components.goalDetail.input.border,
     borderRadius: 12,
     padding: 8,
     fontSize: 18,
     marginRight: 12,
     textAlign: 'center',
     backgroundColor: '#FFFFFF',
-    color: '#8E44AD',
+    color: colors.components.goalDetail.input.text,
   },
   giveStickerBtn: {
-    backgroundColor: '#FF6B9D',
+    backgroundColor: colors.components.goalDetail.sticker.button.background,
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FF6B9D',
+    shadowColor: colors.components.goalDetail.sticker.button.shadow,
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
   },
   giveStickerBtnText: {
-    color: '#FFFFFF',
+    color: colors.components.goalDetail.sticker.button.text,
     fontWeight: 'bold',
     fontSize: 16,
   },
@@ -812,15 +818,15 @@ const styles = StyleSheet.create({
   stickerContainer: {
     marginTop: 16,
     width: '100%',
-    backgroundColor: '#FFF8FA',
+    backgroundColor: colors.components.goalDetail.sticker.background,
     borderRadius: 16,
     padding: 16,
     borderWidth: 2,
-    borderColor: '#FFE5F0',
+    borderColor: colors.components.goalDetail.sticker.border,
   },
   stickerTitle: {
     fontSize: 16,
-    color: '#FF6B9D',
+    color: colors.components.goalDetail.sticker.title,
     fontWeight: 'bold',
     marginBottom: 12,
     textAlign: 'center',
@@ -851,11 +857,11 @@ const styles = StyleSheet.create({
   celebrateBox: {
     alignItems: 'center',
     marginTop: 24,
-    backgroundColor: '#FFE5F0',
+    backgroundColor: colors.components.goalDetail.header.background,
     borderRadius: 20,
     padding: 16,
     borderWidth: 2,
-    borderColor: '#FF6B9D',
+    borderColor: colors.primary,
   },
   celebrateEmoji: {
     fontSize: 48,
@@ -863,13 +869,13 @@ const styles = StyleSheet.create({
   },
   celebrateTitle: {
     fontSize: 22,
-    color: '#FF6B9D',
+    color: colors.primary,
     fontWeight: 'bold',
     marginBottom: 4,
   },
   celebrateText: {
     fontSize: 16,
-    color: '#8E44AD',
+    color: colors.components.goalDetail.info.label,
     fontWeight: '600',
   },
   avatarRow: {
@@ -880,17 +886,17 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
     borderWidth: 3,
-    borderColor: '#FFD1DC',
+    borderColor: colors.components.goalDetail.avatar.border,
   },
   avatarFallback: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#FFE5F0',
+    backgroundColor: colors.components.goalDetail.avatar.background,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
-    borderColor: '#FFD1DC',
+    borderColor: colors.components.goalDetail.avatar.border,
   },
   avatarEmoji: {
     fontSize: 24,
@@ -898,16 +904,16 @@ const styles = StyleSheet.create({
   },
   avatarText: {
     fontSize: 18,
-    color: '#FF6B9D',
+    color: colors.components.goalDetail.avatar.text,
     fontWeight: 'bold',
   },
   profileClickable: {
     alignItems: 'center',
     paddingVertical: 8,
     borderRadius: 12,
-    backgroundColor: '#FFF8FA',
+    backgroundColor: colors.components.goalDetail.input.background,
     borderWidth: 2,
-    borderColor: '#FFE5F0',
+    borderColor: colors.components.goalDetail.input.border,
     marginBottom: 16,
   },
 });
