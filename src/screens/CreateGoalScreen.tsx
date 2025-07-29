@@ -102,7 +102,7 @@ const CreateGoalScreen: React.FC = () => {
             marginBottom: 8,
             fontWeight: 'bold',
             fontSize: 16,
-            color: '#FF6B9D',
+            color: '#4ECDC4',
           }}>
           모드 선택
         </Text>
@@ -163,7 +163,7 @@ const CreateGoalScreen: React.FC = () => {
             marginBottom: 8,
             fontWeight: 'bold',
             fontSize: 16,
-            color: '#FF6B9D',
+            color: '#4ECDC4',
           }}>
           공개 범위
         </Text>
@@ -231,14 +231,14 @@ const CreateGoalScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF5F7',
+    backgroundColor: '#F0F8F8', // 민트 계열 배경
     padding: 24,
     justifyContent: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#FF6B9D',
+    color: '#4ECDC4', // 민트 계열 제목
     marginBottom: 32,
     alignSelf: 'center',
   },
@@ -249,16 +249,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 16,
     borderWidth: 2,
-    borderColor: '#FFE5F0',
-    color: '#8E44AD',
+    borderColor: '#B2DFDB', // 민트 계열 테두리
+    color: '#2C3E50', // 진한 회색 텍스트
   },
   saveButton: {
-    backgroundColor: '#FF6B9D',
+    backgroundColor: '#4ECDC4', // 민트 계열 버튼
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
     marginTop: 8,
-    shadowColor: '#FF6B9D',
+    shadowColor: '#26A69A', // 민트 계열 그림자
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -276,21 +276,21 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#FFE5F0',
+    borderColor: '#B2DFDB', // 민트 계열 테두리
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
-    shadowColor: '#FF6B9D',
+    shadowColor: '#4ECDC4', // 민트 계열 그림자
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
   modeButtonSelected: {
-    backgroundColor: '#FF6B9D',
-    borderColor: '#FF6B9D',
+    backgroundColor: '#4ECDC4', // 민트 계열 선택된 버튼
+    borderColor: '#4ECDC4',
   },
   modeButtonText: {
-    color: '#8E44AD',
+    color: '#2C3E50', // 진한 회색 텍스트
     fontWeight: 'bold',
   },
   modeButtonTextSelected: {
