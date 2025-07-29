@@ -399,7 +399,7 @@ const GoalDetailScreen: React.FC = () => {
                       goal.stickerCount && (
                       <View style={styles.giveStickerBox}>
                         <Text style={styles.giveStickerLabel}>
-                          ⭐ 스티커 붙이기
+                          ⭐ 스티커 관리
                         </Text>
                         <View style={styles.giveStickerRow}>
                           <TextInput
@@ -455,6 +455,55 @@ const GoalDetailScreen: React.FC = () => {
                               {giveStickerLoading ? '⭐️...' : '🌟'}
                             </Text>
                           </TouchableOpacity>
+                          {/* 스티커 빼기 버튼 - 참여자의 스티커가 0보다 클 때만 표시 */}
+                          {selectedParticipant.currentStickerCount > 0 && (
+                            <TouchableOpacity
+                              style={styles.removeStickerBtn}
+                              onPress={async () => {
+                                const current =
+                                  selectedParticipant.currentStickerCount ?? 0;
+                                const remove = Number(giveStickerCount) || 1;
+                                if (remove > current) {
+                                  Alert.alert(
+                                    '스티커 부족',
+                                    '가지고 있는 스티커보다 많이 뺄 수 없어요!',
+                                  );
+                                  return;
+                                }
+                                try {
+                                  await receiveSticker({
+                                    variables: {
+                                      input: {
+                                        goalId: goal.goalId,
+                                        toUserId:
+                                          selectedParticipant.userId ||
+                                          selectedParticipant.id,
+                                        stickerCount: -remove, // 음수 값으로 스티커 빼기
+                                      },
+                                    },
+                                  });
+                                  Alert.alert(
+                                    '🗑️',
+                                    `${giveStickerCount}개 스티커를 뺐어요!`,
+                                  );
+                                  setGiveStickerCount('1');
+                                  setModalVisible(false);
+                                  if (typeof refetch === 'function')
+                                    await refetch();
+                                } catch (e: any) {
+                                  let msg = '스티커 빼기에 실패했어요.';
+                                  if (e?.graphQLErrors?.[0]?.message)
+                                    msg = e.graphQLErrors[0].message;
+                                  else if (e?.message) msg = e.message;
+                                  Alert.alert('실패', msg);
+                                }
+                              }}
+                              disabled={giveStickerLoading}>
+                              <Text style={styles.removeStickerBtnText}>
+                                {giveStickerLoading ? '🗑️...' : '🗑️'}
+                              </Text>
+                            </TouchableOpacity>
+                          )}
                         </View>
                       </View>
                     )}
@@ -801,6 +850,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
+    marginRight: 12, // 버튼 사이 간격 추가
   },
   giveStickerBtnText: {
     color: colors.components.goalDetail.sticker.button.text,
@@ -915,6 +965,56 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: colors.components.goalDetail.input.border,
     marginBottom: 16,
+  },
+  removeStickerBox: {
+    marginTop: 20,
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: colors.components.goalDetail.sticker.background,
+    borderRadius: 16,
+    padding: 16,
+  },
+  removeStickerLabel: {
+    fontSize: 18,
+    color: colors.components.goalDetail.sticker.title,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  removeStickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  removeStickerInput: {
+    width: 56,
+    height: 44,
+    borderWidth: 3,
+    borderColor: colors.components.goalDetail.input.border,
+    borderRadius: 12,
+    padding: 8,
+    fontSize: 18,
+    marginRight: 12,
+    textAlign: 'center',
+    backgroundColor: '#FFFFFF',
+    color: colors.components.goalDetail.input.text,
+  },
+  removeStickerBtn: {
+    backgroundColor: '#F48FB1', // 연한 분홍색 배경
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#F06292', // 연한 분홍색 그림자
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  removeStickerBtnText: {
+    color: '#FFFFFF', // 흰색 텍스트
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 
