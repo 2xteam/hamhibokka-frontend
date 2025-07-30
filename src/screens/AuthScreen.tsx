@@ -206,7 +206,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF5F7',
+    backgroundColor: '#F0F8F7',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -221,13 +221,13 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 42,
     fontWeight: 'bold',
-    color: '#FF6B9D',
+    color: '#4ECDC4',
     marginBottom: 12,
     letterSpacing: -1.5,
   },
   subtitle: {
     fontSize: 16,
-    color: '#8E44AD',
+    color: '#34495E',
     textAlign: 'center',
     lineHeight: 22,
     fontWeight: '500',
@@ -241,26 +241,26 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#8E44AD',
+    color: '#34495E',
     marginBottom: 8,
   },
   textInput: {
     borderWidth: 2,
-    borderColor: '#FFE5F0',
+    borderColor: '#E8F5F3',
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
     backgroundColor: '#FFFFFF',
-    color: '#8E44AD',
+    color: '#34495E',
   },
   authButton: {
-    backgroundColor: '#FF6B9D',
+    backgroundColor: '#4ECDC4',
     borderRadius: 16,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 12,
-    shadowColor: '#FF6B9D',
+    shadowColor: '#4ECDC4',
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -282,10 +282,10 @@ const styles = StyleSheet.create({
   },
   switchButtonText: {
     fontSize: 14,
-    color: '#8E44AD',
+    color: '#34495E',
   },
   switchButtonHighlight: {
-    color: '#FF6B9D',
+    color: '#4ECDC4',
     fontWeight: '600',
   },
 });

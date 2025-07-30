@@ -6,7 +6,9 @@ import {
   ActivityIndicator,
   Alert,
   Image,
-  ScrollView,
+  Platform,
+  SafeAreaView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -51,6 +53,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
   const navigation = useNavigation<any>();
   const [followsList, setFollowsList] = useState<Follow[]>([]);
   const [actualCurrentUserId, setActualCurrentUserId] = useState<string>('');
+
+  // StatusBar 설정
+  useEffect(() => {
+    StatusBar.setBarStyle('light-content');
+    if (Platform.OS === 'android') {
+      StatusBar.setTranslucent(true);
+      StatusBar.setBackgroundColor(colors.primary, true);
+    }
+  }, []);
 
   // 현재 사용자 ID 가져오기
   useEffect(() => {
@@ -196,60 +207,66 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
 
   return (
     <View style={styles.container}>
-      {/* 헤더 */}
-      <View style={styles.header}>
-        <View style={styles.headerSpacer} />
-        <Text style={styles.headerTitle}>내 프로필</Text>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>로그아웃</Text>
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* 프로필 정보 */}
-        <View style={styles.profileSection}>
-          <View style={styles.profileImageContainer}>
-            <Image
-              source={
-                user?.profileImage
-                  ? {uri: user.profileImage}
-                  : require('../../assets/default-profile.jpg')
-              }
-              style={styles.profileImage}
-            />
-            <View style={styles.profileImageBorder} />
-          </View>
-          <Text style={styles.nickname}>🌟 {user?.nickname}</Text>
-          <Text style={styles.email}>📧 {user?.email}</Text>
+      {/* SafeArea 위쪽 영역을 같은 색상으로 덮기 */}
+      <View style={styles.statusBarArea} />
+      <SafeAreaView style={styles.safeArea}>
+        {/* 헤더 */}
+        <View style={styles.header}>
+          <View style={styles.headerSpacer} />
+          <Text style={styles.headerTitle}>내 프로필</Text>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>로그아웃</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* 친구 관리 섹션 */}
-        <View style={styles.friendsSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.friendsSectionTitle}>👬 친구 관리</Text>
-          </View>
-          <Text style={styles.friendsSectionSubtitle}>
-            💫 총 {users.length}명의 친구가 있어요!
-          </Text>
-
-          {followsLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={colors.primary} />
-              <Text style={styles.loadingText}>친구 목록을 불러오는 중...</Text>
+        <View style={styles.content}>
+          {/* 프로필 정보 */}
+          <View style={styles.profileSection}>
+            <View style={styles.profileImageContainer}>
+              <Image
+                source={
+                  user?.profileImage
+                    ? {uri: user.profileImage}
+                    : require('../../assets/default-profile.jpg')
+                }
+                style={styles.profileImage}
+              />
+              <View style={styles.profileImageBorder} />
             </View>
-          ) : (
-            <UserList
-              users={users}
-              onPressUser={handleUserPress}
-              emptyText="아직 친구가 없어요! 🥺"
-              contentContainerStyle={styles.friendsList}
-              showFollowStatus={false}
-              showApproveButton={true}
-              onApproveFollow={handleApproveFollow}
-            />
-          )}
+            <Text style={styles.nickname}>🌟 {user?.nickname}</Text>
+            <Text style={styles.email}>📧 {user?.email}</Text>
+          </View>
+
+          {/* 친구 관리 섹션 */}
+          <View style={styles.friendsSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.friendsSectionTitle}>👬 친구 관리</Text>
+            </View>
+            <Text style={styles.friendsSectionSubtitle}>
+              💫 총 {users.length}명의 친구가 있어요!
+            </Text>
+
+            {followsLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={styles.loadingText}>
+                  친구 목록을 불러오는 중...
+                </Text>
+              </View>
+            ) : (
+              <UserList
+                users={users}
+                onPressUser={handleUserPress}
+                emptyText="아직 친구가 없어요! 🥺"
+                contentContainerStyle={styles.friendsList}
+                showFollowStatus={false}
+                showApproveButton={true}
+                onApproveFollow={handleApproveFollow}
+              />
+            )}
+          </View>
         </View>
-      </ScrollView>
+      </SafeAreaView>
     </View>
   );
 };
@@ -259,14 +276,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  statusBarArea: {
+    height: 62, // SafeAreaView의 상단 여백을 채우기 위해 높이 설정
+    backgroundColor: colors.primary,
+  },
+  safeArea: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.primary,
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 16,
+    paddingTop: 2,
+    paddingBottom: 10,
     borderBottomWidth: 3,
     borderBottomColor: colors.primaryLight,
     shadowColor: colors.primary,
@@ -279,7 +303,7 @@ const styles = StyleSheet.create({
     width: 60,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 24, // 22에서 24로 증가
     fontWeight: 'bold',
     color: colors.white,
     textShadowColor: colors.primaryDark,
@@ -300,7 +324,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primaryLight,
   },
   logoutButtonText: {
-    fontSize: 16,
+    fontSize: 18, // 16에서 18로 증가
     color: colors.primary,
     fontWeight: 'bold',
   },
@@ -346,14 +370,14 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
   },
   nickname: {
-    fontSize: 24,
+    fontSize: 26, // 24에서 26으로 증가
     fontWeight: 'bold',
     color: colors.primary,
     marginBottom: 8,
     textAlign: 'center',
   },
   email: {
-    fontSize: 16,
+    fontSize: 18, // 16에서 18로 증가
     color: colors.medium,
     fontWeight: '600',
     marginBottom: 20,
@@ -369,7 +393,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   friendsSectionTitle: {
-    fontSize: 22,
+    fontSize: 24, // 22에서 24로 증가
     fontWeight: 'bold',
     color: colors.primary,
     marginRight: 12,
@@ -384,7 +408,7 @@ const styles = StyleSheet.create({
   },
 
   friendsSectionSubtitle: {
-    fontSize: 14,
+    fontSize: 16, // 14에서 16으로 증가
     color: colors.medium,
     marginBottom: 20,
     fontWeight: '600',
@@ -402,7 +426,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 16,
+    fontSize: 18, // 16에서 18로 증가
     color: colors.primary,
     fontWeight: '600',
   },

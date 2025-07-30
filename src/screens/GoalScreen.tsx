@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 26, // 24에서 26으로 증가
     fontWeight: 'bold',
     color: '#2C3E50',
     marginBottom: 24,
@@ -82,18 +82,18 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   goalTitle: {
-    fontSize: 18,
+    fontSize: 20, // 18에서 20으로 증가
     fontWeight: 'bold',
     color: '#2C3E50',
     marginBottom: 8,
   },
   goalDesc: {
-    fontSize: 14,
+    fontSize: 16, // 14에서 16으로 증가
     color: '#7F8C8D',
     marginBottom: 8,
   },
   stickerCount: {
-    fontSize: 13,
+    fontSize: 14, // 13에서 14로 증가
     color: '#F39C12',
     fontWeight: 'bold',
   },

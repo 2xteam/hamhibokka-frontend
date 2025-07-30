@@ -26,7 +26,6 @@ export enum Visibility {
 }
 
 const CreateGoalScreen: React.FC = () => {
-  const navigation = useNavigation<any>();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [stickerCount, setStickerCount] = useState('');
@@ -34,7 +33,9 @@ const CreateGoalScreen: React.FC = () => {
   const [mode, setMode] = useState<GoalMode>(GoalMode.PERSONAL);
   // visibility 상태 추가, 기본값은 PUBLIC
   const [visibility, setVisibility] = useState<Visibility>(Visibility.PUBLIC);
-  const [createGoal, {loading}] = useMutation(CREATE_GOAL);
+  const [loading, setLoading] = useState(false);
+  const navigation = useNavigation<any>();
+  const [createGoal] = useMutation(CREATE_GOAL);
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -74,7 +75,7 @@ const CreateGoalScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🥇 새 목표 만들기</Text>
+      <Text style={styles.title}>새 목표 만들기</Text>
       <TextInput
         style={styles.input}
         placeholder="목표명을 입력하세요"
@@ -122,21 +123,6 @@ const CreateGoalScreen: React.FC = () => {
               개인
             </Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={[
-              styles.modeButton,
-              mode === GoalMode.COMPETITION && styles.modeButtonSelected,
-            ]}
-            onPress={() => setMode(GoalMode.COMPETITION)}>
-            <Text
-              style={
-                mode === GoalMode.COMPETITION
-                  ? styles.modeButtonTextSelected
-                  : styles.modeButtonText
-              }>
-              경쟁
-            </Text>
-          </TouchableOpacity> */}
           <TouchableOpacity
             style={[
               styles.modeButton,
@@ -236,7 +222,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 32, // 28에서 32로 증가
     fontWeight: 'bold',
     color: '#4ECDC4', // 민트 계열 제목
     marginBottom: 32,
@@ -246,7 +232,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 16,
-    fontSize: 16,
+    fontSize: 18, // 16에서 18로 증가
     marginBottom: 16,
     borderWidth: 2,
     borderColor: '#B2DFDB', // 민트 계열 테두리
@@ -266,7 +252,7 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 20, // 18에서 20으로 증가
     fontWeight: 'bold',
   },
   // mode 버튼 스타일 추가
@@ -292,10 +278,12 @@ const styles = StyleSheet.create({
   modeButtonText: {
     color: '#2C3E50', // 진한 회색 텍스트
     fontWeight: 'bold',
+    fontSize: 16, // 기본 텍스트 크기 추가
   },
   modeButtonTextSelected: {
     color: '#FFFFFF',
     fontWeight: 'bold',
+    fontSize: 16, // 기본 텍스트 크기 추가
   },
 });
 

@@ -31,6 +31,33 @@ interface User {
   profileImage?: string;
 }
 
+// 공통 헤더 스타일 정의
+const commonHeaderStyle = {
+  backgroundColor: colors.primary,
+  elevation: 0,
+  shadowOpacity: 0,
+  borderBottomWidth: 0,
+  height: 120,
+};
+
+const commonHeaderTitleStyle = {
+  fontWeight: 'bold' as const,
+  fontSize: 24,
+  color: colors.white,
+};
+
+// 헤더가 있는 화면을 위한 공통 옵션 생성 함수
+const createHeaderOptions =
+  (title: string) =>
+  ({navigation}: any) => ({
+    headerShown: true,
+    title,
+    headerStyle: commonHeaderStyle,
+    headerTintColor: colors.white,
+    headerTitleStyle: commonHeaderTitleStyle,
+    headerLeft: () => <CustomBackButton onPress={() => navigation.goBack()} />,
+  });
+
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -97,18 +124,9 @@ const App: React.FC = () => {
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
-            headerStyle: {
-              backgroundColor: colors.primary,
-              elevation: 0,
-              shadowOpacity: 0,
-              borderBottomWidth: 0,
-            },
+            headerStyle: commonHeaderStyle,
             headerTintColor: colors.white,
-            headerTitleStyle: {
-              fontWeight: 'bold',
-              fontSize: 18,
-              color: colors.white,
-            },
+            headerTitleStyle: commonHeaderTitleStyle,
           }}>
           {isAuthenticated ? (
             <>
@@ -118,94 +136,22 @@ const App: React.FC = () => {
               <Stack.Screen
                 name="CreateGoal"
                 component={CreateGoalScreen}
-                options={({navigation}) => ({
-                  headerShown: true,
-                  title: '✨ 새 목표 만들기',
-                  headerStyle: {
-                    backgroundColor: colors.primary,
-                    elevation: 0,
-                    shadowOpacity: 0,
-                    borderBottomWidth: 0,
-                  },
-                  headerTintColor: colors.white,
-                  headerTitleStyle: {
-                    fontWeight: 'bold',
-                    fontSize: 18,
-                    color: colors.white,
-                  },
-                  headerLeft: () => (
-                    <CustomBackButton onPress={() => navigation.goBack()} />
-                  ),
-                })}
+                options={createHeaderOptions('✨ 새 목표 만들기')}
               />
               <Stack.Screen
                 name="GoalDetail"
                 component={GoalDetailScreen}
-                options={({navigation}) => ({
-                  headerShown: true,
-                  title: '🥇 목표 상세',
-                  headerStyle: {
-                    backgroundColor: colors.primary,
-                    elevation: 0,
-                    shadowOpacity: 0,
-                    borderBottomWidth: 0,
-                  },
-                  headerTintColor: colors.white,
-                  headerTitleStyle: {
-                    fontWeight: 'bold',
-                    fontSize: 18,
-                    color: colors.white,
-                  },
-                  headerLeft: () => (
-                    <CustomBackButton onPress={() => navigation.goBack()} />
-                  ),
-                })}
+                options={createHeaderOptions('🥇 목표 상세')}
               />
               <Stack.Screen
                 name="InvitationDetail"
                 component={InvitationDetailScreen}
-                options={({navigation}) => ({
-                  headerShown: true,
-                  title: '📨 목표 요청 상세',
-                  headerStyle: {
-                    backgroundColor: colors.primary,
-                    elevation: 0,
-                    shadowOpacity: 0,
-                    borderBottomWidth: 0,
-                  },
-                  headerTintColor: colors.white,
-                  headerTitleStyle: {
-                    fontWeight: 'bold',
-                    fontSize: 18,
-                    color: colors.white,
-                  },
-                  headerLeft: () => (
-                    <CustomBackButton onPress={() => navigation.goBack()} />
-                  ),
-                })}
+                options={createHeaderOptions('📨 목표 요청 상세')}
               />
               <Stack.Screen
                 name="UserProfile"
                 component={UserProfileScreen}
-                options={({navigation}) => ({
-                  headerShown: true,
-                  title: '🤖 프로필',
-                  headerStyle: {
-                    backgroundColor: colors.primary,
-                    elevation: 0,
-                    shadowOpacity: 0,
-                    borderBottomWidth: 0,
-                  },
-                  headerTintColor: colors.white,
-                  headerTitleStyle: {
-                    fontWeight: 'bold',
-                    fontSize: 18,
-                    color: colors.white,
-                  },
-                  headerLeft: () => (
-                    <CustomBackButton onPress={() => navigation.goBack()} />
-                  ),
-                })}
+                options={createHeaderOptions('🤖 프로필')}
               />
             </>
           ) : (
