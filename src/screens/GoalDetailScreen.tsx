@@ -54,18 +54,18 @@ function getStatusLabel(status?: string) {
 }
 
 const GoalDetailScreen: React.FC = () => {
-  const route = useRoute<RouteProp<Record<string, GoalDetailParams>, string>>();
+  const route = useRoute<RouteProp<{GoalDetail: GoalDetailParams}>>();
   const navigation = useNavigation<any>();
-  const {id, from} = route.params || {};
+  const {id, from} = route.params;
   const {data, loading, error, refetch} = useQuery(GET_GOAL, {variables: {id}});
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
+  const [giveStickerCount, setGiveStickerCount] = useState('1');
+  const [joinMessage, setJoinMessage] = useState('참가 요청해요!');
+  const [joinModalVisible, setJoinModalVisible] = useState(false);
   const [createJoinRequest, {loading: joinLoading}] = useMutation(
     CREATE_GOAL_JOIN_REQUEST,
   );
-  const [joinMessage, setJoinMessage] = useState('');
-  const [joinModalVisible, setJoinModalVisible] = useState(false);
-  const [giveStickerCount, setGiveStickerCount] = useState('1');
   const [receiveSticker, {loading: giveStickerLoading}] =
     useMutation(RECEIVE_STICKER);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
@@ -246,8 +246,11 @@ const GoalDetailScreen: React.FC = () => {
     goal.createdBy && currentUserId && goal.createdBy === currentUserId;
 
   return (
-    <View style={{flex: 1}}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollViewContent}
+        showsVerticalScrollIndicator={false}>
         {/* 제목/설명 */}
         <View style={styles.headerSection}>
           <Text style={styles.title}>🥇 {goal.title}</Text>
@@ -592,9 +595,16 @@ const GoalDetailScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    padding: 24,
+  container: {
+    flex: 1,
     backgroundColor: colors.components.goalDetail.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   centered: {
     flex: 1,
@@ -802,7 +812,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stickerCountText: {
-    fontSize: 16,
+    fontSize: 18, // 16에서 18로 증가
     color: colors.components.goalDetail.info.label,
     fontWeight: '600',
   },
@@ -815,7 +825,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   giveStickerLabel: {
-    fontSize: 18,
+    fontSize: 20, // 18에서 20으로 증가
     color: colors.components.goalDetail.sticker.title,
     fontWeight: 'bold',
     marginBottom: 8,
@@ -832,7 +842,7 @@ const styles = StyleSheet.create({
     borderColor: colors.components.goalDetail.input.border,
     borderRadius: 12,
     padding: 8,
-    fontSize: 18,
+    fontSize: 20, // 18에서 20으로 증가
     marginRight: 12,
     textAlign: 'center',
     backgroundColor: '#FFFFFF',
@@ -855,7 +865,7 @@ const styles = StyleSheet.create({
   giveStickerBtnText: {
     color: colors.components.goalDetail.sticker.button.text,
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18, // 16에서 18로 증가
   },
   stickerIconRow: {
     marginTop: 10,
@@ -875,7 +885,7 @@ const styles = StyleSheet.create({
     borderColor: colors.components.goalDetail.sticker.border,
   },
   stickerTitle: {
-    fontSize: 16,
+    fontSize: 18, // 16에서 18로 증가
     color: colors.components.goalDetail.sticker.title,
     fontWeight: 'bold',
     marginBottom: 12,

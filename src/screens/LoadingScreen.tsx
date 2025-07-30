@@ -20,7 +20,7 @@ const LoadingScreen: React.FC = () => {
       </View>
 
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#FF6B9D" />
+        <ActivityIndicator size="large" color="#4ECDC4" />
         <Text style={styles.loadingText}>잠깐만 기다려주세요... 💫</Text>
       </View>
     </View>
@@ -30,7 +30,7 @@ const LoadingScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF5F7',
+    backgroundColor: '#F0F8F8', // 민트 계열 배경
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
@@ -42,13 +42,13 @@ const styles = StyleSheet.create({
   appName: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#FF6B9D',
+    color: '#4ECDC4', // 민트 계열 제목
     marginBottom: 8,
     letterSpacing: -1,
   },
   subtitle: {
     fontSize: 16,
-    color: '#8E44AD',
+    color: '#2C3E50', // 진한 회색 텍스트
     textAlign: 'center',
     lineHeight: 22,
     fontWeight: '500',
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: '#8E44AD',
+    color: '#2C3E50', // 진한 회색 텍스트
     marginTop: 16,
     fontWeight: '500',
   },

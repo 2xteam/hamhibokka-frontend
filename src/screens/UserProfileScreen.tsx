@@ -6,12 +6,11 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
   Image,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -37,9 +36,9 @@ interface UserProfileParams {
 }
 
 const UserProfileScreen: React.FC = () => {
-  const navigation = useNavigation<any>();
   const route =
     useRoute<RouteProp<Record<string, UserProfileParams>, string>>();
+  const navigation = useNavigation<any>();
   const {user} = route.params;
 
   const [followStatus, setFollowStatus] = useState(user.followStatus || '');
@@ -47,7 +46,7 @@ const UserProfileScreen: React.FC = () => {
   const [currentUserId, setCurrentUserId] = useState<string>('');
 
   // 현재 사용자 ID 가져오기
-  useEffect(() => {
+  React.useEffect(() => {
     const getCurrentUser = async () => {
       try {
         const userData = await AsyncStorage.getItem('@hamhibokka_user');
@@ -166,7 +165,7 @@ const UserProfileScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.content}>
+      <View style={styles.content}>
         {/* 프로필 정보 */}
         <View style={styles.profileSection}>
           <Image
@@ -230,7 +229,7 @@ const UserProfileScreen: React.FC = () => {
             />
           )}
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -238,11 +237,12 @@ const UserProfileScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF5F7',
+    backgroundColor: '#F0F8F8', // 민트 계열 배경
   },
   content: {
     flex: 1,
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
   },
   profileSection: {
     alignItems: 'center',
@@ -250,43 +250,43 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 24,
-    shadowColor: '#FF6B9D',
+    shadowColor: '#4ECDC4', // 민트 계열 그림자
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
     borderWidth: 2,
-    borderColor: '#FFE5F0',
+    borderColor: '#B2DFDB', // 민트 계열 테두리
   },
   profileImage: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#FFE5F0',
+    backgroundColor: '#B2DFDB', // 민트 계열 배경
     marginBottom: 16,
     borderWidth: 3,
-    borderColor: '#FFD1DC',
+    borderColor: '#4ECDC4', // 민트 계열 테두리
   },
   nickname: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#FF6B9D',
+    color: '#4ECDC4', // 민트 계열 제목
     marginBottom: 4,
   },
   email: {
     fontSize: 14,
-    color: '#8E44AD',
+    color: '#2C3E50', // 진한 회색 텍스트
     fontWeight: '500',
   },
   followButton: {
-    backgroundColor: '#FF6B9D',
+    backgroundColor: '#4ECDC4', // 민트 계열 버튼
     paddingHorizontal: 32,
     paddingVertical: 12,
     borderRadius: 16,
     width: '100%',
     alignItems: 'center',
     marginBottom: 24,
-    shadowColor: '#FF6B9D',
+    shadowColor: '#26A69A', // 민트 계열 그림자
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   followedStatus: {
-    backgroundColor: '#27AE60',
+    backgroundColor: '#27AE60', // 초록색 유지 (팔로우 상태)
     paddingHorizontal: 32,
     paddingVertical: 12,
     borderRadius: 16,
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   goalsSectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF6B9D',
+    color: '#4ECDC4', // 민트 계열 제목
     marginBottom: 12,
   },
   goalsLoading: {

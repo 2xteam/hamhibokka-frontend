@@ -1,9 +1,12 @@
 import {useQuery} from '@apollo/client';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
+  Platform,
   RefreshControl,
+  SafeAreaView,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -35,6 +38,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
   const [notificationViewerVisible, setNotificationViewerVisible] =
     useState(false);
   const navigation = useNavigation<any>();
+
+  // StatusBar 설정
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      StatusBar.setTranslucent(true);
+      StatusBar.setBackgroundColor(colors.primary, true);
+    }
+    StatusBar.setBarStyle('light-content', true);
+  }, []);
 
   // 초대 요청 조회
   const {data: invitationsData, refetch: refetchInvitations} = useQuery(
@@ -75,49 +87,54 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
 
   return (
     <View style={styles.container}>
-      {/* 헤더 */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
-          <View>
-            <Text style={styles.userName}>{user?.nickname}님</Text>
-            <Text style={styles.greeting}>안녕하세요! 👋</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.notificationButton}
-          onPress={handleNotificationPress}>
-          <MaterialIcons
-            name="notifications"
-            size={24}
-            color={colors.primary}
-          />
-          {pendingCount > 0 && (
-            <View style={styles.notificationBadge}>
-              <Text style={styles.notificationCount}>{pendingCount}</Text>
+      {/* 상태바 설정 */}
+      {/* SafeArea 위쪽 영역을 같은 색상으로 덮기 */}
+      <View style={styles.statusBarArea} />
+      <SafeAreaView style={styles.safeArea}>
+        {/* 헤더 */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
+            <View>
+              <Text style={styles.userName}>{user?.nickname}님</Text>
+              <Text style={styles.greeting}>안녕하세요! 👋</Text>
             </View>
-          )}
-        </TouchableOpacity>
-      </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.notificationButton}
+            onPress={handleNotificationPress}>
+            <MaterialIcons
+              name="notifications"
+              size={24}
+              color={colors.primary}
+            />
+            {pendingCount > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationCount}>{pendingCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        showsVerticalScrollIndicator={false}>
-        <MyCreatedGoalsSection navigation={navigation} />
-        <FollowFeedSection navigation={navigation} />
-        <ChallengeSection navigation={navigation} />
-      </ScrollView>
+        <ScrollView
+          style={styles.scrollView}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          showsVerticalScrollIndicator={false}>
+          <MyCreatedGoalsSection navigation={navigation} />
+          <FollowFeedSection navigation={navigation} />
+          <ChallengeSection navigation={navigation} />
+        </ScrollView>
 
-      {/* 플로팅 액션 버튼 */}
-      <FloatingAddGoalButton />
+        {/* 플로팅 액션 버튼 */}
+        <FloatingAddGoalButton />
 
-      {/* 알림 뷰어 */}
-      <NotificationViewer
-        visible={notificationViewerVisible}
-        onClose={() => setNotificationViewerVisible(false)}
-      />
+        {/* 알림 뷰어 */}
+        <NotificationViewer
+          visible={notificationViewerVisible}
+          onClose={() => setNotificationViewerVisible(false)}
+        />
+      </SafeAreaView>
     </View>
   );
 };
@@ -127,13 +144,20 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  statusBarArea: {
+    height: 62, // SafeAreaView의 상단 여백을 채우기 위한 높이
+    backgroundColor: colors.primary,
+  },
+  safeArea: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 10,
+    marginTop: -2,
+    paddingBottom: 4,
     backgroundColor: colors.primary,
     borderBottomWidth: 3,
     borderBottomColor: colors.primaryLight,
@@ -144,12 +168,12 @@ export const styles = StyleSheet.create({
     elevation: 8,
   },
   greeting: {
-    fontSize: 16,
+    fontSize: 18, // 16에서 18로 증가
     color: colors.white,
     fontWeight: '600',
   },
   userName: {
-    fontSize: 24,
+    fontSize: 28, // 24에서 28로 증가
     fontWeight: 'bold',
     color: colors.white,
     marginTop: 2,
@@ -203,13 +227,13 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 22, // 20에서 22로 증가
     marginBottom: 10,
     fontWeight: 'bold',
     color: '#FF6B9D',
   },
   seeAllText: {
-    fontSize: 14,
+    fontSize: 16, // 14에서 16으로 증가
     color: '#FF6B9D',
     fontWeight: '600',
   },
