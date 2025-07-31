@@ -77,6 +77,44 @@ export const CREATE_GOAL = gql`
   }
 `;
 
+export const DELETE_GOAL = gql`
+  mutation DeleteGoal($id: String!) {
+    deleteGoal(id: $id)
+  }
+`;
+
+export const LEAVE_GOAL = gql`
+  mutation LeaveGoal($input: LeaveGoalInput!) {
+    leaveGoal(input: $input) {
+      id
+      goalId
+      title
+      description
+      stickerCount
+      mode
+      visibility
+      status
+      createdBy
+      creatorNickname
+      autoApprove
+      createdAt
+      updatedAt
+      isParticipant
+      participants {
+        userId
+        nickname
+        status
+        currentStickerCount
+        joinedAt
+        stickerReceivedLogs {
+          date
+          count
+        }
+      }
+    }
+  }
+`;
+
 export const CREATE_GOAL_JOIN_REQUEST = gql`
   mutation CreateGoalJoinRequest($input: CreateGoalJoinRequestInput!) {
     createGoalJoinRequest(input: $input) {

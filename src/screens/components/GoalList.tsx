@@ -117,6 +117,8 @@ const GoalList: React.FC<GoalListProps> = ({
     }
   };
 
+  // 목표 삭제 함수
+
   const renderItem = ({item}: {item: Goal}) => {
     // 내가 참여한 목표에서 완료 상태 확인
     const myParticipant = item.participants?.find(
@@ -127,6 +129,10 @@ const GoalList: React.FC<GoalListProps> = ({
       item.stickerCount &&
       item.stickerCount > 0 &&
       myParticipant.currentStickerCount >= item.stickerCount;
+
+    // 본인이 생성한 목표인지 확인
+    const isMyGoal =
+      item.createdBy && currentUserId && item.createdBy === currentUserId;
 
     return (
       <TouchableOpacity
@@ -516,6 +522,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
   },
+
   emptyContainer: {
     alignItems: 'center',
     marginTop: 40,

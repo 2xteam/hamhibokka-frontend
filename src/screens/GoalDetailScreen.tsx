@@ -21,7 +21,9 @@ import {
 } from 'react-native';
 import {
   CREATE_GOAL_JOIN_REQUEST,
+  DELETE_GOAL,
   GET_GOAL,
+  LEAVE_GOAL,
   RECEIVE_STICKER,
 } from '../queries/goal';
 import {CHECK_FOLLOW_STATUS} from '../queries/user';
@@ -57,7 +59,10 @@ const GoalDetailScreen: React.FC = () => {
   const route = useRoute<RouteProp<{GoalDetail: GoalDetailParams}>>();
   const navigation = useNavigation<any>();
   const {id, from} = route.params;
-  const {data, loading, error, refetch} = useQuery(GET_GOAL, {variables: {id}});
+  const {data, loading, error, refetch} = useQuery(GET_GOAL, {
+    variables: {id},
+    fetchPolicy: 'network-only', // 항상 네트워크에서 최신 데이터 가져오기
+  });
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [giveStickerCount, setGiveStickerCount] = useState('1');
@@ -65,9 +70,22 @@ const GoalDetailScreen: React.FC = () => {
   const [joinModalVisible, setJoinModalVisible] = useState(false);
   const [createJoinRequest, {loading: joinLoading}] = useMutation(
     CREATE_GOAL_JOIN_REQUEST,
+    {
+      onCompleted: () => {
+        // 목표 데이터 새로고침
+        refetch();
+      },
+    },
   );
   const [receiveSticker, {loading: giveStickerLoading}] =
     useMutation(RECEIVE_STICKER);
+  const [deleteGoal, {loading: deleteLoading}] = useMutation(DELETE_GOAL);
+  const [leaveGoal, {loading: leaveLoading}] = useMutation(LEAVE_GOAL, {
+    onCompleted: () => {
+      // 목표 데이터 새로고침
+      refetch();
+    },
+  });
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   // 팔로우 상태 확인 쿼리 - 항상 호출 (조건부 렌더링 이전)
@@ -82,13 +100,16 @@ const GoalDetailScreen: React.FC = () => {
     },
   );
 
-  // 화면이 포커스될 때마다 팔로우 상태 새로고침
+  // 화면이 포커스될 때마다 데이터 새로고침
   useFocusEffect(
     React.useCallback(() => {
+      // 목표 데이터 새로고침
+      refetch();
+      // 팔로우 상태 새로고침
       if (currentUserId && data?.getGoal?.createdBy) {
         refetchFollowStatus();
       }
-    }, [currentUserId, data?.getGoal?.createdBy, refetchFollowStatus]),
+    }, [refetch, currentUserId, data?.getGoal?.createdBy, refetchFollowStatus]),
   );
 
   React.useEffect(() => {
@@ -244,6 +265,129 @@ const GoalDetailScreen: React.FC = () => {
   // 내가 만든 목표인지 확인
   const isMyGoal =
     goal.createdBy && currentUserId && goal.createdBy === currentUserId;
+
+  // 목표 삭제 함수
+  const handleDeleteGoal = () => {
+    // 참여자 수 확인
+    const participants = goal.participants || [];
+    const otherParticipants = participants.filter(
+      (participant: any) => participant.userId !== currentUserId,
+    );
+
+    // 다른 참여자가 있는 경우 삭제 불가
+    if (otherParticipants.length > 0) {
+      Alert.alert(
+        '삭제 불가',
+        '다른 참여자가 있어서 목표를 삭제할 수 없어요.\n모든 참여자가 나간 후에 삭제해주세요.',
+        [
+          {
+            text: '확인',
+            style: 'default',
+          },
+        ],
+      );
+      return;
+    }
+
+    // 본인만 참여한 경우 또는 참여자가 없는 경우 삭제 가능
+    Alert.alert(
+      '목표 삭제',
+      '정말로 이 목표를 삭제하시겠어요?\n삭제하면 복구할 수 없어요.',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '삭제',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteGoal({
+                variables: {
+                  id: goal.id,
+                },
+              });
+              Alert.alert('삭제 완료', '목표가 삭제되었어요.', [
+                {
+                  text: '확인',
+                  onPress: () => {
+                    // 목표 목록으로 돌아가기
+                    navigation.navigate('Main', {screen: 'Goals'});
+                  },
+                },
+              ]);
+            } catch (e: any) {
+              let msg = '목표 삭제에 실패했어요.';
+              if (e?.graphQLErrors?.[0]?.message) {
+                msg = e.graphQLErrors[0].message;
+              } else if (e?.message) {
+                msg = e.message;
+              }
+              Alert.alert('삭제 실패', msg);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  // 목표 참여 취소 함수
+  const handleLeaveGoal = () => {
+    // 현재 사용자의 참여자 정보 찾기
+    const currentParticipant = goal.participants?.find(
+      (participant: any) => participant.userId === currentUserId,
+    );
+
+    if (!currentParticipant) {
+      Alert.alert('오류', '참여자 정보를 찾을 수 없어요.');
+      return;
+    }
+
+    Alert.alert(
+      '목표 참여 취소',
+      `"${goal.title}" 목표에서 나가시겠어요?\n나가면 다시 참여해야 해요.`,
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '나가기',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await leaveGoal({
+                variables: {
+                  input: {
+                    goalId: goal.goalId,
+                    participantId: currentUserId, // 현재 사용자 ID를 participantId로 사용
+                  },
+                },
+              });
+              Alert.alert('참여 취소 완료', '목표에서 나갔어요.', [
+                {
+                  text: '확인',
+                  onPress: () => {
+                    // 목표 목록으로 돌아가기
+                    navigation.navigate('Main', {screen: 'Goals'});
+                  },
+                },
+              ]);
+            } catch (e: any) {
+              let msg = '목표 참여 취소에 실패했어요.';
+              if (e?.graphQLErrors?.[0]?.message) {
+                msg = e.graphQLErrors[0].message;
+              } else if (e?.message) {
+                msg = e.message;
+              }
+              Alert.alert('참여 취소 실패', msg);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -534,18 +678,43 @@ const GoalDetailScreen: React.FC = () => {
           </View>
         </Modal>
       </ScrollView>
-      {/* 목표 참여 요청 플로팅 버튼 - personal 모드가 아닐 때만 표시 */}
-      {goal.mode !== 'personal' && !isUserParticipating && (
+      {/* 목표 참여/나가기 플로팅 버튼 - personal 모드가 아닐 때만 표시 */}
+      {goal.mode !== 'personal' && (
+        <>
+          {/* 참여하기 버튼 - 참여하지 않은 경우 (본인이 생성한 목표 제외) */}
+          {!goal.isParticipant && !isMyGoal && (
+            <TouchableOpacity
+              style={styles.fabJoin}
+              onPress={handleJoinRequest}
+              disabled={joinLoading}>
+              <Text style={styles.fabJoinText}>
+                {joinLoading ? '요청 중...' : '🥇 참여 하기'}
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {/* 나가기 버튼 - 참여 중인 경우 (본인, 타인 상관없이) */}
+          {goal.isParticipant && (
+            <TouchableOpacity
+              style={styles.fabLeave}
+              onPress={handleLeaveGoal}
+              disabled={leaveLoading}>
+              <Text style={styles.fabLeaveText}>
+                {leaveLoading ? '나가는 중...' : '🚪 나가기'}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
+
+      {/* 목표 삭제 버튼 - 본인이 생성한 목표일 때만 표시 */}
+      {isMyGoal && (
         <TouchableOpacity
-          style={styles.fabJoin}
-          onPress={isMyGoal ? handleDirectJoin : handleJoinRequest}
-          disabled={joinLoading}>
-          <Text style={styles.fabJoinText}>
-            {joinLoading
-              ? '요청 중...'
-              : isMyGoal
-              ? '🥇 바로 참여'
-              : '🥇 참여 하기'}
+          style={styles.fabDelete}
+          onPress={handleDeleteGoal}
+          disabled={deleteLoading}>
+          <Text style={styles.fabDeleteText}>
+            {deleteLoading ? '삭제 중...' : '🗑️ 삭제'}
           </Text>
         </TouchableOpacity>
       )}
@@ -794,6 +963,52 @@ const styles = StyleSheet.create({
     color: colors.components.goalDetail.modal.button.text,
     fontWeight: 'bold',
     fontSize: 18,
+  },
+  fabDelete: {
+    position: 'absolute',
+    left: 24,
+    bottom: 24,
+    backgroundColor: '#FF6B6B',
+    borderRadius: 32,
+    width: 120,
+    height: 64,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#FF5252',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 12,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+  },
+  fabDeleteText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  fabLeave: {
+    position: 'absolute',
+    right: 24,
+    bottom: 24,
+    backgroundColor: '#FF9800',
+    borderRadius: 32,
+    width: 120,
+    height: 64,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#F57C00',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 12,
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+  },
+  fabLeaveText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   input: {
     width: '100%',

@@ -5,6 +5,7 @@ import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -105,6 +106,7 @@ const InvitationDetailScreen: React.FC = () => {
   const goal = inv.goal || {};
   const canApprove =
     goal.createdBy && currentUserId && goal.createdBy === currentUserId;
+  console.log(goal.createdBy, currentUserId);
   const isApproved = inv.status === 'accepted';
   const getModeEmoji = (mode?: string) => {
     switch (mode) {
@@ -133,135 +135,140 @@ const InvitationDetailScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* 목표 정보 카드 */}
-      <View style={styles.cardSection}>
-        <View style={styles.goalHeaderRow}>
-          <Text style={styles.goalIcon}>🥇</Text>
-          <Text style={styles.goalTitle}>{goal.title || '-'}</Text>
-        </View>
-        <Text style={styles.goalDesc}>{goal.description || '설명 없음'}</Text>
-        <View style={styles.goalInfoRow}>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoIcon}>🏆</Text>
-            <Text style={styles.goalInfo}>
-              스티커 목표:{' '}
-              <Text style={styles.goalInfoValue}>
-                {goal.stickerCount ?? '-'}
-              </Text>
-              개
-            </Text>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* 목표 정보 카드 */}
+        <View style={styles.cardSection}>
+          <View style={styles.goalHeaderRow}>
+            <Text style={styles.goalIcon}>🥇</Text>
+            <Text style={styles.goalTitle}>{goal.title || '-'}</Text>
           </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoIcon}>🕹️</Text>
-            <Text style={styles.goalInfo}>
-              모드:{' '}
-              <Text style={styles.goalInfoValue}>
-                {getModeEmoji(goal.mode)} {getModeLabel(goal.mode)}
-              </Text>
-            </Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoIcon}>📅</Text>
-            <Text style={styles.goalInfo}>
-              만든 날:{' '}
-              <Text style={styles.goalInfoValue}>
-                {goal.createdAt
-                  ? new Date(goal.createdAt).toLocaleDateString()
-                  : '-'}
-              </Text>
-            </Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoIcon}>📊</Text>
-            <Text style={styles.goalInfo}>
-              상태:{' '}
-              <View
-                style={[
-                  styles.statusBadge,
-                  statusColor(goal.status),
-                  {flexDirection: 'row', alignItems: 'center'},
-                ]}>
-                <Text style={styles.statusBadgeText}>
-                  {getStatusText(goal.status)}
+          <Text style={styles.goalDesc}>{goal.description || '설명 없음'}</Text>
+          <View style={styles.goalInfoRow}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoIcon}>🏆</Text>
+              <Text style={styles.goalInfo}>
+                스티커 목표:{' '}
+                <Text style={styles.goalInfoValue}>
+                  {goal.stickerCount ?? '-'}
                 </Text>
-              </View>
-            </Text>
-          </View>
-        </View>
-      </View>
-      {/* 초대/요청 정보 카드 */}
-      <View style={styles.cardSection}>
-        <View style={styles.invHeaderRow}>
-          <Text style={styles.invIcon}>
-            {inv.type === 'invite' ? '📨' : '📤'}
-          </Text>
-          <Text style={styles.invTypeText}>
-            {inv.type === 'invite' ? '초대' : '요청'}
-          </Text>
-          <View style={[styles.statusBadge, statusColor(inv.status)]}>
-            <Text style={styles.statusBadgeText}>
-              {getStatusText(inv.status)}
-            </Text>
-          </View>
-        </View>
-        <Text style={styles.invMessageLabel}>💬 메시지</Text>
-        <Text style={styles.invMessage}>{inv.message || '메시지 없음'}</Text>
-        <View style={styles.invInfoContainer}>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoIcon}>📅</Text>
-            <Text style={styles.invInfo}>
-              요청한 날:{' '}
-              <Text style={styles.invInfoValue}>
-                {new Date(inv.createdAt).toLocaleString()}
+                개
               </Text>
-            </Text>
-          </View>
-          <View style={styles.infoItem}>
-            <Text style={styles.infoIcon}>⏰</Text>
-            <Text style={styles.invInfo}>
-              응답한 날:{' '}
-              <Text style={styles.invInfoValue}>
-                {inv.respondedAt
-                  ? new Date(inv.respondedAt).toLocaleString()
-                  : '-'}
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoIcon}>🕹️</Text>
+              <Text style={styles.goalInfo}>
+                모드:{' '}
+                <Text style={styles.goalInfoValue}>
+                  {getModeEmoji(goal.mode)} {getModeLabel(goal.mode)}
+                </Text>
               </Text>
-            </Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoIcon}>📅</Text>
+              <Text style={styles.goalInfo}>
+                만든 날:{' '}
+                <Text style={styles.goalInfoValue}>
+                  {goal.createdAt
+                    ? new Date(goal.createdAt).toLocaleDateString()
+                    : '-'}
+                </Text>
+              </Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoIcon}>📊</Text>
+              <Text style={styles.goalInfo}>
+                상태:{' '}
+                <View
+                  style={[
+                    styles.statusBadge,
+                    statusColor(goal.status),
+                    {flexDirection: 'row', alignItems: 'center'},
+                  ]}>
+                  <Text style={styles.statusBadgeText}>
+                    {getStatusText(goal.status)}
+                  </Text>
+                </View>
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
-      {canApprove && (
-        <View style={styles.approveContainer}>
-          <TouchableOpacity
-            style={[styles.approveBtn, isApproved && styles.approveBtnDisabled]}
-            onPress={async () => {
-              try {
-                await updateGoalInvitation({
-                  variables: {
-                    id: inv.invitationId,
-                    input: {status: 'accepted'},
-                  },
-                });
-                await refetch();
-                Alert.alert('승인 완료', '✅ 요청이 승인되었습니다!');
-              } catch (e: any) {
-                let msg = '승인에 실패했습니다.';
-                if (e?.graphQLErrors?.[0]?.message)
-                  msg = e.graphQLErrors[0].message;
-                else if (e?.message) msg = e.message;
-                Alert.alert('승인 실패', msg);
-              }
-            }}
-            disabled={approveLoading || isApproved}>
-            <Text style={styles.approveBtnText}>
-              {isApproved
-                ? '✅ 승인 완료'
-                : approveLoading
-                ? '⏳ 승인 중...'
-                : '👍 요청 승인'}
+        {/* 초대/요청 정보 카드 */}
+        <View style={styles.cardSection}>
+          <View style={styles.invHeaderRow}>
+            <Text style={styles.invIcon}>
+              {inv.type === 'invite' ? '📨' : '📤'}
             </Text>
-          </TouchableOpacity>
+            <Text style={styles.invTypeText}>
+              {inv.type === 'invite' ? '초대' : '요청'}
+            </Text>
+            <View style={[styles.statusBadge, statusColor(inv.status)]}>
+              <Text style={styles.statusBadgeText}>
+                {getStatusText(inv.status)}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.invMessageLabel}>💬 메시지</Text>
+          <Text style={styles.invMessage}>{inv.message || '메시지 없음'}</Text>
+          <View style={styles.invInfoContainer}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoIcon}>📅</Text>
+              <Text style={styles.invInfo}>
+                요청한 날:{' '}
+                <Text style={styles.invInfoValue}>
+                  {new Date(inv.createdAt).toLocaleString()}
+                </Text>
+              </Text>
+            </View>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoIcon}>⏰</Text>
+              <Text style={styles.invInfo}>
+                응답한 날:{' '}
+                <Text style={styles.invInfoValue}>
+                  {inv.respondedAt
+                    ? new Date(inv.respondedAt).toLocaleString()
+                    : '-'}
+                </Text>
+              </Text>
+            </View>
+          </View>
         </View>
-      )}
+        {canApprove && (
+          <View style={styles.approveContainer}>
+            <TouchableOpacity
+              style={[
+                styles.approveBtn,
+                isApproved && styles.approveBtnDisabled,
+              ]}
+              onPress={async () => {
+                try {
+                  await updateGoalInvitation({
+                    variables: {
+                      id: inv.invitationId,
+                      input: {status: 'accepted'},
+                    },
+                  });
+                  await refetch();
+                  Alert.alert('승인 완료', '✅ 요청이 승인되었습니다!');
+                } catch (e: any) {
+                  let msg = '승인에 실패했습니다.';
+                  if (e?.graphQLErrors?.[0]?.message)
+                    msg = e.graphQLErrors[0].message;
+                  else if (e?.message) msg = e.message;
+                  Alert.alert('승인 실패', msg);
+                }
+              }}
+              disabled={approveLoading || isApproved}>
+              <Text style={styles.approveBtnText}>
+                {isApproved
+                  ? '✅ 승인 완료'
+                  : approveLoading
+                  ? '⏳ 승인 중...'
+                  : '👍 요청 승인'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -420,7 +427,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   approveContainer: {
-    marginTop: 16,
     alignItems: 'center',
   },
   approveBtn: {
@@ -429,7 +435,6 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 48,
     alignItems: 'center',
-    marginTop: 16,
     shadowColor: colors.success,
     shadowOffset: {width: 0, height: 6},
     shadowOpacity: 0.3,

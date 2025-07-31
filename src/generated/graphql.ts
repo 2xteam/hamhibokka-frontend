@@ -121,6 +121,11 @@ export type GoalParticipant = {
   userId: Scalars['String']['output'];
 };
 
+export type LeaveGoalInput = {
+  goalId: Scalars['String']['input'];
+  participantId: Scalars['String']['input'];
+};
+
 export type LoginInput = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
@@ -141,6 +146,7 @@ export type Mutation = {
   deleteSticker: Scalars['Boolean']['output'];
   deleteStickerImage: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
+  leaveGoal: Goal;
   login: AuthPayload;
   receiveSticker: Goal;
   register: AuthPayload;
@@ -214,6 +220,11 @@ export type MutationDeleteStickerImageArgs = {
 
 export type MutationDeleteUserArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type MutationLeaveGoalArgs = {
+  input: LeaveGoalInput;
 };
 
 
@@ -423,6 +434,20 @@ export type CreateGoalMutationVariables = Exact<{
 
 
 export type CreateGoalMutation = { __typename?: 'Mutation', createGoal: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, visibility?: string | null } };
+
+export type DeleteGoalMutationVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type DeleteGoalMutation = { __typename?: 'Mutation', deleteGoal: boolean };
+
+export type LeaveGoalMutationVariables = Exact<{
+  input: LeaveGoalInput;
+}>;
+
+
+export type LeaveGoalMutation = { __typename?: 'Mutation', leaveGoal: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } };
 
 export type CreateGoalJoinRequestMutationVariables = Exact<{
   input: CreateGoalJoinRequestInput;
@@ -718,6 +743,94 @@ export function useCreateGoalMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateGoalMutationHookResult = ReturnType<typeof useCreateGoalMutation>;
 export type CreateGoalMutationResult = Apollo.MutationResult<CreateGoalMutation>;
 export type CreateGoalMutationOptions = Apollo.BaseMutationOptions<CreateGoalMutation, CreateGoalMutationVariables>;
+export const DeleteGoalDocument = gql`
+    mutation DeleteGoal($id: String!) {
+  deleteGoal(id: $id)
+}
+    `;
+export type DeleteGoalMutationFn = Apollo.MutationFunction<DeleteGoalMutation, DeleteGoalMutationVariables>;
+
+/**
+ * __useDeleteGoalMutation__
+ *
+ * To run a mutation, you first call `useDeleteGoalMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteGoalMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteGoalMutation, { data, loading, error }] = useDeleteGoalMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteGoalMutation(baseOptions?: Apollo.MutationHookOptions<DeleteGoalMutation, DeleteGoalMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteGoalMutation, DeleteGoalMutationVariables>(DeleteGoalDocument, options);
+      }
+export type DeleteGoalMutationHookResult = ReturnType<typeof useDeleteGoalMutation>;
+export type DeleteGoalMutationResult = Apollo.MutationResult<DeleteGoalMutation>;
+export type DeleteGoalMutationOptions = Apollo.BaseMutationOptions<DeleteGoalMutation, DeleteGoalMutationVariables>;
+export const LeaveGoalDocument = gql`
+    mutation LeaveGoal($input: LeaveGoalInput!) {
+  leaveGoal(input: $input) {
+    id
+    goalId
+    title
+    description
+    stickerCount
+    mode
+    visibility
+    status
+    createdBy
+    creatorNickname
+    autoApprove
+    createdAt
+    updatedAt
+    isParticipant
+    participants {
+      userId
+      nickname
+      status
+      currentStickerCount
+      joinedAt
+      stickerReceivedLogs {
+        date
+        count
+      }
+    }
+  }
+}
+    `;
+export type LeaveGoalMutationFn = Apollo.MutationFunction<LeaveGoalMutation, LeaveGoalMutationVariables>;
+
+/**
+ * __useLeaveGoalMutation__
+ *
+ * To run a mutation, you first call `useLeaveGoalMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLeaveGoalMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [leaveGoalMutation, { data, loading, error }] = useLeaveGoalMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useLeaveGoalMutation(baseOptions?: Apollo.MutationHookOptions<LeaveGoalMutation, LeaveGoalMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LeaveGoalMutation, LeaveGoalMutationVariables>(LeaveGoalDocument, options);
+      }
+export type LeaveGoalMutationHookResult = ReturnType<typeof useLeaveGoalMutation>;
+export type LeaveGoalMutationResult = Apollo.MutationResult<LeaveGoalMutation>;
+export type LeaveGoalMutationOptions = Apollo.BaseMutationOptions<LeaveGoalMutation, LeaveGoalMutationVariables>;
 export const CreateGoalJoinRequestDocument = gql`
     mutation CreateGoalJoinRequest($input: CreateGoalJoinRequestInput!) {
   createGoalJoinRequest(input: $input) {
