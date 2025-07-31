@@ -8,6 +8,7 @@ import {
   Image,
   Platform,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -219,7 +220,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
           </TouchableOpacity>
         </View>
 
-        <View style={styles.content}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}>
           {/* 프로필 정보 */}
           <View style={styles.profileSection}>
             <View style={styles.profileImageContainer}>
@@ -265,7 +269,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
               />
             )}
           </View>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -328,8 +332,10 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: 'bold',
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
     padding: 20,
   },
   profileSection: {

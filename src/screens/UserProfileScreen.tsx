@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -165,7 +166,10 @@ const UserProfileScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
         {/* 프로필 정보 */}
         <View style={styles.profileSection}>
           <Image
@@ -229,7 +233,7 @@ const UserProfileScreen: React.FC = () => {
             />
           )}
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -239,8 +243,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F0F8F8', // 민트 계열 배경
   },
-  content: {
+  scrollView: {
     flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: 20,
     paddingVertical: 20,
   },
