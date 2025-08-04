@@ -4,6 +4,34 @@ This is a new [**React Native**](https://reactnative.dev) project, bootstrapped 
 
 > **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
 
+## API Configuration
+
+이 프로젝트는 API 서버 설정을 `src/config/api.ts` 파일에서 관리합니다.
+
+### 환경 설정
+
+`src/config/api.ts` 파일에서 `CURRENT_ENV` 값을 변경하여 개발/프로덕션 환경을 선택할 수 있습니다:
+
+```typescript
+// 개발 환경
+export const CURRENT_ENV = 'DEV';
+
+// 프로덕션 환경
+export const CURRENT_ENV = 'PROD';
+```
+
+### 지원되는 환경
+
+- **DEV**: `http://localhost:3000` (개발 환경)
+- **PROD**: `https://hamhibokka-backend-gnbgh2gxabbea0fy.koreacentral-01.azurewebsites.net` (프로덕션 환경)
+
+### API Endpoints
+
+- **GraphQL**: `${BASE_URL}/graphql`
+- **프로필 이미지 업로드**: `${BASE_URL}/upload/profile-image`
+
+환경을 변경한 후에는 앱을 재시작해야 합니다.
+
 ## Step 1: Start Metro
 
 First, you will need to run **Metro**, the JavaScript build tool for React Native.

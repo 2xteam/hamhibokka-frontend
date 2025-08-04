@@ -130,3 +130,22 @@ export const GET_FOLLOW_REQUESTS = gql`
     }
   }
 `;
+
+export const UPDATE_PROFILE_IMAGE = gql`
+  mutation UpdateProfileImage($input: UpdateProfileImageInput!) {
+    updateProfileImage(input: $input) {
+      id
+      userId
+      email
+      nickname
+      profileImage
+      followStatus
+    }
+  }
+`;
+
+export const GET_MY_PROFILE_IMAGE = gql`
+  query GetMyProfileImage {
+    getMyProfileImage
+  }
+`;

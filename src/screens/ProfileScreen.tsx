@@ -5,17 +5,24 @@ import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   Image,
   Platform,
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {APPROVE_FOLLOW, GET_FOLLOWS} from '../queries/user';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {getUploadProfileImageUrl} from '../config/api';
+import {
+  APPROVE_FOLLOW,
+  GET_FOLLOWS,
+  GET_MY_PROFILE_IMAGE,
+  UPDATE_PROFILE_IMAGE,
+} from '../queries/user';
 import {colors} from '../styles/colors';
 import UserList, {User} from './components/UserList';
 
@@ -54,6 +61,35 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
   const navigation = useNavigation<any>();
   const [followsList, setFollowsList] = useState<Follow[]>([]);
   const [actualCurrentUserId, setActualCurrentUserId] = useState<string>('');
+  const [uploading, setUploading] = useState(false);
+  const [localProfileImage, setLocalProfileImage] = useState<
+    string | undefined
+  >(user?.profileImage);
+
+  // AsyncStorage 프로필 이미지 업데이트 함수
+  const updateAsyncStorageProfileImage = async (newProfileImage: string) => {
+    try {
+      const userData = await AsyncStorage.getItem('@hamhibokka_user');
+      if (userData) {
+        const currentUser = JSON.parse(userData);
+        const updatedUser = {
+          ...currentUser,
+          profileImage: newProfileImage,
+        };
+        await AsyncStorage.setItem(
+          '@hamhibokka_user',
+          JSON.stringify(updatedUser),
+        );
+      }
+    } catch (error) {
+      console.error('Failed to update AsyncStorage profile image:', error);
+    }
+  };
+
+  // user prop이 변경될 때 localProfileImage 업데이트
+  useEffect(() => {
+    setLocalProfileImage(user?.profileImage);
+  }, [user?.profileImage]);
 
   // StatusBar 설정
   useEffect(() => {
@@ -91,12 +127,32 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
     fetchPolicy: 'network-only',
   });
 
+  // 내 프로필 이미지 조회
+  const {
+    data: profileImageData,
+    loading: profileImageLoading,
+    refetch: refetchProfileImage,
+  } = useQuery(GET_MY_PROFILE_IMAGE, {
+    fetchPolicy: 'network-only',
+  });
+
   // 화면 진입 시마다 데이터 새로고침
   useFocusEffect(
     React.useCallback(() => {
       refetchFollows();
-    }, [refetchFollows]),
+      refetchProfileImage();
+    }, [refetchFollows, refetchProfileImage]),
   );
+
+  // 프로필 이미지 데이터가 있을 때 로컬 상태 업데이트
+  useEffect(() => {
+    if (profileImageData?.getMyProfileImage) {
+      setLocalProfileImage(profileImageData.getMyProfileImage);
+
+      // AsyncStorage도 업데이트
+      updateAsyncStorageProfileImage(profileImageData.getMyProfileImage);
+    }
+  }, [profileImageData?.getMyProfileImage]);
 
   // 팔로우 승인 뮤테이션
   const [approveFollow] = useMutation(APPROVE_FOLLOW, {
@@ -109,6 +165,44 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
       console.error('Approve follow error:', error);
     },
   });
+
+  // 프로필 이미지 업데이트 뮤테이션
+  const [updateProfileImage] = useMutation(UPDATE_PROFILE_IMAGE, {
+    onCompleted: data => {
+      Alert.alert('성공', '프로필 이미지가 업데이트되었습니다!');
+      // 사용자 정보 새로고침 로직이 필요하다면 여기에 추가
+    },
+    onError: error => {
+      Alert.alert('오류', '프로필 이미지 업데이트에 실패했습니다.');
+      console.error('Update profile image error:', error);
+    },
+  });
+
+  // 로컬 사용자 상태 업데이트 함수
+  const updateLocalUserProfileImage = async (newProfileImage: string) => {
+    try {
+      // 로컬 상태 즉시 업데이트
+      setLocalProfileImage(newProfileImage);
+
+      // AsyncStorage에서 현재 사용자 정보 가져오기
+      const userData = await AsyncStorage.getItem('@hamhibokka_user');
+      if (userData) {
+        const currentUser = JSON.parse(userData);
+        const updatedUser = {
+          ...currentUser,
+          profileImage: newProfileImage,
+        };
+
+        // AsyncStorage 업데이트
+        await AsyncStorage.setItem(
+          '@hamhibokka_user',
+          JSON.stringify(updatedUser),
+        );
+      }
+    } catch (error) {
+      console.error('Failed to update local user profile image:', error);
+    }
+  };
 
   // 데이터 처리 - 모든 팔로우 데이터
   useEffect(() => {
@@ -204,7 +298,162 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
     ]);
   };
 
+  // 이미지 선택 및 업로드
+  const handleImageUpload = async () => {
+    try {
+      const result = await launchImageLibrary({
+        mediaType: 'photo',
+        quality: 0.8,
+        maxWidth: 1024,
+        maxHeight: 1024,
+      });
+
+      if (result.didCancel || !result.assets || result.assets.length === 0) {
+        return;
+      }
+
+      const file = result.assets[0];
+
+      // 파일 크기 검증 (5MB)
+      if (file.fileSize && file.fileSize > 5 * 1024 * 1024) {
+        Alert.alert('오류', '파일 크기는 5MB 이하여야 합니다.');
+        return;
+      }
+
+      setUploading(true);
+      await uploadProfileImage(file);
+    } catch (error) {
+      console.error('이미지 선택 실패:', error);
+      Alert.alert('오류', '이미지 선택에 실패했습니다.');
+    }
+  };
+
+  // 프로필 이미지 업로드
+  const uploadProfileImage = async (file: any) => {
+    try {
+      // 토큰 가져오기
+      const tokenData = await AsyncStorage.getItem('@hamhibokka_token');
+      if (!tokenData) {
+        throw new Error('토큰을 찾을 수 없습니다.');
+      }
+
+      const formData = new FormData();
+      formData.append('file', {
+        uri: file.uri,
+        type: file.type || 'image/jpeg',
+        name: file.fileName || 'profile-image.jpg',
+      } as any);
+
+      // API 서버 경로 설정 (config 파일에서 가져오기)
+      const uploadUrl = getUploadProfileImageUrl();
+
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${tokenData}`,
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || '업로드에 실패했습니다.');
+      }
+
+      const result = await response.json();
+
+      // GraphQL mutation으로 프로필 이미지 업데이트
+      if (user && result.profileImage) {
+        await updateProfileImage({
+          variables: {
+            id: user.id,
+            input: {
+              profileImage: result.profileImage,
+            },
+          },
+        });
+
+        // 로컬 사용자 정보 업데이트
+        await updateLocalUserProfileImage(result.profileImage);
+      }
+    } catch (error) {
+      console.error('업로드 실패:', error);
+      Alert.alert(
+        '오류',
+        `업로드 실패: ${
+          error instanceof Error ? error.message : '알 수 없는 오류'
+        }`,
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const users = convertFollowsToUsers();
+
+  // 헤더 컴포넌트 렌더링
+  // 디버깅용: 사용자 정보 로그 출력
+  console.log('ProfileScreen user data:', user);
+
+  const renderHeader = () => (
+    <View style={styles.contentContainer}>
+      {/* 프로필 정보 */}
+      <View style={styles.profileSection}>
+        <TouchableOpacity
+          style={styles.profileImageContainer}
+          onPress={handleImageUpload}
+          disabled={uploading}>
+          <Image
+            source={
+              localProfileImage
+                ? {uri: localProfileImage}
+                : require('../../assets/default-profile.jpg')
+            }
+            style={styles.profileImage}
+          />
+          <View style={styles.profileImageBorder} />
+          {uploading && (
+            <View style={styles.uploadingOverlay}>
+              <ActivityIndicator size="small" color={colors.white} />
+            </View>
+          )}
+        </TouchableOpacity>
+        <Text style={styles.nickname}>🌟 {user?.nickname}</Text>
+        <Text style={styles.email}>📧 {user?.email}</Text>
+        <Text style={styles.uploadHint}>
+          📷 프로필 이미지를 클릭하여 변경하세요
+        </Text>
+      </View>
+
+      {/* 친구 관리 섹션 */}
+      <View style={styles.friendsSection}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.friendsSectionTitle}>👬 친구 관리</Text>
+        </View>
+        <Text style={styles.friendsSectionSubtitle}>
+          💫 총 {users.length}명의 친구가 있어요!
+        </Text>
+
+        {followsLoading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={styles.loadingText}>친구 목록을 불러오는 중...</Text>
+          </View>
+        ) : (
+          <UserList
+            users={users}
+            onPressUser={handleUserPress}
+            emptyText="아직 친구가 없어요! 🥺"
+            contentContainerStyle={styles.friendsList}
+            showFollowStatus={false}
+            showApproveButton={true}
+            onApproveFollow={handleApproveFollow}
+          />
+        )}
+      </View>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -220,56 +469,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}>
-          {/* 프로필 정보 */}
-          <View style={styles.profileSection}>
-            <View style={styles.profileImageContainer}>
-              <Image
-                source={
-                  user?.profileImage
-                    ? {uri: user.profileImage}
-                    : require('../../assets/default-profile.jpg')
-                }
-                style={styles.profileImage}
-              />
-              <View style={styles.profileImageBorder} />
-            </View>
-            <Text style={styles.nickname}>🌟 {user?.nickname}</Text>
-            <Text style={styles.email}>📧 {user?.email}</Text>
-          </View>
-
-          {/* 친구 관리 섹션 */}
-          <View style={styles.friendsSection}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.friendsSectionTitle}>👬 친구 관리</Text>
-            </View>
-            <Text style={styles.friendsSectionSubtitle}>
-              💫 총 {users.length}명의 친구가 있어요!
-            </Text>
-
-            {followsLoading ? (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color={colors.primary} />
-                <Text style={styles.loadingText}>
-                  친구 목록을 불러오는 중...
-                </Text>
-              </View>
-            ) : (
-              <UserList
-                users={users}
-                onPressUser={handleUserPress}
-                emptyText="아직 친구가 없어요! 🥺"
-                contentContainerStyle={styles.friendsList}
-                showFollowStatus={false}
-                showApproveButton={true}
-                onApproveFollow={handleApproveFollow}
-              />
-            )}
-          </View>
-        </ScrollView>
+        <FlatList
+          data={[]}
+          renderItem={() => null}
+          ListHeaderComponent={renderHeader}
+          contentContainerStyle={styles.flatListContent}
+          showsVerticalScrollIndicator={false}
+        />
       </SafeAreaView>
     </View>
   );
@@ -332,10 +538,8 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: 'bold',
   },
-  scrollView: {
+  contentContainer: {
     flex: 1,
-  },
-  scrollContent: {
     padding: 20,
   },
   profileSection: {
@@ -438,6 +642,46 @@ const styles = StyleSheet.create({
   },
   friendsList: {
     paddingHorizontal: 0,
+  },
+  flatListContent: {
+    flexGrow: 1,
+  },
+  uploadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  uploadHint: {
+    fontSize: 14,
+    color: colors.medium,
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
+  },
+  noImageContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: colors.primaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 4,
+    borderColor: colors.primary,
+  },
+  noImageText: {
+    fontSize: 32,
+    marginBottom: 4,
+  },
+  noImageSubText: {
+    fontSize: 12,
+    color: colors.medium,
+    textAlign: 'center',
   },
 });
 
