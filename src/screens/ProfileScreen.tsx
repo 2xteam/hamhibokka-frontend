@@ -16,6 +16,7 @@ import {
   View,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
+import {getUploadProfileImageUrl} from '../config/api';
 import {
   APPROVE_FOLLOW,
   GET_FOLLOWS,
@@ -343,11 +344,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
         name: file.fileName || 'profile-image.jpg',
       } as any);
 
-      // API 서버 경로 설정 (개발자가 선택 가능)
-      const apiBaseUrl = 'http://localhost:3000'; // 개발 환경
-      // const apiBaseUrl = 'https://hamhibokka-backend-gnbgh2gxabbea0fy.koreacentral-01.azurewebsites.net'; // 프로덕션 환경
+      // API 서버 경로 설정 (config 파일에서 가져오기)
+      const uploadUrl = getUploadProfileImageUrl();
 
-      const response = await fetch(`${apiBaseUrl}/upload/profile-image`, {
+      const response = await fetch(uploadUrl, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${tokenData}`,
