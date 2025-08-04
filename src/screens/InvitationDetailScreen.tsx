@@ -207,6 +207,28 @@ const InvitationDetailScreen: React.FC = () => {
               </Text>
             </View>
           </View>
+
+          {/* 발신자/수신자 정보 */}
+          <View style={styles.userInfoSection}>
+            {currentUserId === inv.fromUserId ? (
+              // 보낸 요청인 경우
+              <View style={styles.userInfoRow}>
+                <Text style={styles.userInfoLabel}>👥 받는 사람:</Text>
+                <Text style={styles.userInfoValue}>
+                  {inv.toUser?.nickname || '알 수 없음'}
+                </Text>
+              </View>
+            ) : (
+              // 받은 요청인 경우
+              <View style={styles.userInfoRow}>
+                <Text style={styles.userInfoLabel}>👤 보낸 사람:</Text>
+                <Text style={styles.userInfoValue}>
+                  {inv.fromUser?.nickname || '알 수 없음'}
+                </Text>
+              </View>
+            )}
+          </View>
+
           <Text style={styles.invMessageLabel}>💬 메시지</Text>
           <Text style={styles.invMessage}>{inv.message || '메시지 없음'}</Text>
           <View style={styles.invInfoContainer}>
@@ -425,6 +447,33 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: colors.dark,
     fontSize: 16,
+  },
+  userInfoSection: {
+    marginBottom: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: colors.primaryLight,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  userInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  userInfoLabel: {
+    fontSize: 16,
+    color: colors.medium,
+    fontWeight: '600',
+    marginRight: 12,
+    minWidth: 80,
+  },
+  userInfoValue: {
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: 'bold',
+    flex: 1,
   },
   approveContainer: {
     alignItems: 'center',

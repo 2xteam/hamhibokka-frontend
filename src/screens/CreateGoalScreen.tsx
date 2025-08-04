@@ -3,6 +3,9 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useState} from 'react';
 import {
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -74,143 +77,152 @@ const CreateGoalScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>새 목표 만들기</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="목표명을 입력하세요"
-        value={title}
-        onChangeText={setTitle}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="스티커 목표 개수"
-        value={stickerCount}
-        onChangeText={setStickerCount}
-        keyboardType="numeric"
-      />
-      <TextInput
-        style={[styles.input, {height: 100}]}
-        placeholder="설명을 입력하세요 (선택)"
-        value={description}
-        onChangeText={setDescription}
-        multiline
-      />
-      {/* mode 선택 UI */}
-      <View style={{marginBottom: 16}}>
-        <Text
-          style={{
-            marginBottom: 8,
-            fontWeight: 'bold',
-            fontSize: 16,
-            color: '#4ECDC4',
-          }}>
-          모드 선택
-        </Text>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <TouchableOpacity
-            style={[
-              styles.modeButton,
-              mode === GoalMode.PERSONAL && styles.modeButtonSelected,
-            ]}
-            onPress={() => setMode(GoalMode.PERSONAL)}>
-            <Text
-              style={
-                mode === GoalMode.PERSONAL
-                  ? styles.modeButtonTextSelected
-                  : styles.modeButtonText
-              }>
-              개인
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.modeButton,
-              mode === GoalMode.CHALLENGER_RECRUITMENT &&
-                styles.modeButtonSelected,
-            ]}
-            onPress={() => setMode(GoalMode.CHALLENGER_RECRUITMENT)}>
-            <Text
-              style={
-                mode === GoalMode.CHALLENGER_RECRUITMENT
-                  ? styles.modeButtonTextSelected
-                  : styles.modeButtonText
-              }>
-              챌린저
-            </Text>
-          </TouchableOpacity>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled">
+        <Text style={styles.title}>새 목표 만들기</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="목표명을 입력하세요"
+          value={title}
+          onChangeText={setTitle}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="스티커 목표 개수"
+          value={stickerCount}
+          onChangeText={setStickerCount}
+          keyboardType="numeric"
+        />
+        <TextInput
+          style={[styles.input, {height: 100}]}
+          placeholder="설명을 입력하세요 (선택)"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+        />
+        {/* mode 선택 UI */}
+        <View style={{marginBottom: 16}}>
+          <Text
+            style={{
+              marginBottom: 8,
+              fontWeight: 'bold',
+              fontSize: 16,
+              color: '#4ECDC4',
+            }}>
+            모드 선택
+          </Text>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <TouchableOpacity
+              style={[
+                styles.modeButton,
+                mode === GoalMode.PERSONAL && styles.modeButtonSelected,
+              ]}
+              onPress={() => setMode(GoalMode.PERSONAL)}>
+              <Text
+                style={
+                  mode === GoalMode.PERSONAL
+                    ? styles.modeButtonTextSelected
+                    : styles.modeButtonText
+                }>
+                개인
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.modeButton,
+                mode === GoalMode.CHALLENGER_RECRUITMENT &&
+                  styles.modeButtonSelected,
+              ]}
+              onPress={() => setMode(GoalMode.CHALLENGER_RECRUITMENT)}>
+              <Text
+                style={
+                  mode === GoalMode.CHALLENGER_RECRUITMENT
+                    ? styles.modeButtonTextSelected
+                    : styles.modeButtonText
+                }>
+                챌린저
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      {/* 공개 범위 선택 UI */}
-      <View style={{marginBottom: 16}}>
-        <Text
-          style={{
-            marginBottom: 8,
-            fontWeight: 'bold',
-            fontSize: 16,
-            color: '#4ECDC4',
-          }}>
-          공개 범위
-        </Text>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <TouchableOpacity
-            style={[
-              styles.modeButton,
-              visibility === Visibility.PUBLIC && styles.modeButtonSelected,
-            ]}
-            onPress={() => setVisibility(Visibility.PUBLIC)}>
-            <Text
-              style={
-                visibility === Visibility.PUBLIC
-                  ? styles.modeButtonTextSelected
-                  : styles.modeButtonText
-              }>
-              공개
-            </Text>
-          </TouchableOpacity>
+        {/* 공개 범위 선택 UI */}
+        <View style={{marginBottom: 16}}>
+          <Text
+            style={{
+              marginBottom: 8,
+              fontWeight: 'bold',
+              fontSize: 16,
+              color: '#4ECDC4',
+            }}>
+            공개 범위
+          </Text>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <TouchableOpacity
+              style={[
+                styles.modeButton,
+                visibility === Visibility.PUBLIC && styles.modeButtonSelected,
+              ]}
+              onPress={() => setVisibility(Visibility.PUBLIC)}>
+              <Text
+                style={
+                  visibility === Visibility.PUBLIC
+                    ? styles.modeButtonTextSelected
+                    : styles.modeButtonText
+                }>
+                공개
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.modeButton,
-              visibility === Visibility.FOLLOWERS && styles.modeButtonSelected,
-            ]}
-            onPress={() => setVisibility(Visibility.FOLLOWERS)}>
-            <Text
-              style={
-                visibility === Visibility.FOLLOWERS
-                  ? styles.modeButtonTextSelected
-                  : styles.modeButtonText
-              }>
-              팔로워
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.modeButton,
-              visibility === Visibility.PRIVATE && styles.modeButtonSelected,
-            ]}
-            onPress={() => setVisibility(Visibility.PRIVATE)}>
-            <Text
-              style={
-                visibility === Visibility.PRIVATE
-                  ? styles.modeButtonTextSelected
-                  : styles.modeButtonText
-              }>
-              비공개
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.modeButton,
+                visibility === Visibility.FOLLOWERS &&
+                  styles.modeButtonSelected,
+              ]}
+              onPress={() => setVisibility(Visibility.FOLLOWERS)}>
+              <Text
+                style={
+                  visibility === Visibility.FOLLOWERS
+                    ? styles.modeButtonTextSelected
+                    : styles.modeButtonText
+                }>
+                팔로워
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.modeButton,
+                visibility === Visibility.PRIVATE && styles.modeButtonSelected,
+              ]}
+              onPress={() => setVisibility(Visibility.PRIVATE)}>
+              <Text
+                style={
+                  visibility === Visibility.PRIVATE
+                    ? styles.modeButtonTextSelected
+                    : styles.modeButtonText
+                }>
+                비공개
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      <TouchableOpacity
-        style={styles.saveButton}
-        onPress={handleSave}
-        disabled={loading}>
-        <Text style={styles.saveButtonText}>
-          {loading ? '만드는 중...' : '만들기'}
-        </Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={handleSave}
+          disabled={loading}>
+          <Text style={styles.saveButtonText}>
+            {loading ? '만드는 중...' : '만들기'}
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -218,8 +230,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F0F8F8', // 민트 계열 배경
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
     padding: 24,
-    justifyContent: 'center',
+    paddingBottom: 40, // 하단 여백 추가
   },
   title: {
     fontSize: 32, // 28에서 32로 증가

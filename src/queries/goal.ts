@@ -144,6 +144,11 @@ export const GET_INVITATION = gql`
       type
       status
       message
+      respondedAt
+      createdAt
+      updatedAt
+
+      # Goal 정보 (중첩된 객체)
       goal {
         id
         goalId
@@ -154,24 +159,38 @@ export const GET_INVITATION = gql`
         visibility
         status
         createdBy
+        creatorNickname
         autoApprove
         createdAt
         updatedAt
+        isParticipant
+
+        # Goal의 참여자들
         participants {
           userId
-          nickname
           status
           currentStickerCount
           joinedAt
-          stickerReceivedLogs {
-            date
-            count
-          }
         }
       }
-      respondedAt
-      createdAt
-      updatedAt
+
+      # 보낸 사용자 정보
+      fromUser {
+        id
+        userId
+        email
+        nickname
+        profileImage
+      }
+
+      # 받는 사용자 정보
+      toUser {
+        id
+        userId
+        email
+        nickname
+        profileImage
+      }
     }
   }
 `;
@@ -193,6 +212,8 @@ export const UPDATE_GOAL_INVITATION = gql`
       respondedAt
       createdAt
       updatedAt
+
+      # Goal 정보 (중첩된 객체)
       goal {
         id
         goalId
@@ -203,20 +224,37 @@ export const UPDATE_GOAL_INVITATION = gql`
         visibility
         status
         createdBy
+        creatorNickname
         autoApprove
         createdAt
         updatedAt
+        isParticipant
+
+        # Goal의 참여자들
         participants {
           userId
-          nickname
           status
           currentStickerCount
           joinedAt
-          stickerReceivedLogs {
-            date
-            count
-          }
         }
+      }
+
+      # 보낸 사용자 정보
+      fromUser {
+        id
+        userId
+        email
+        nickname
+        profileImage
+      }
+
+      # 받는 사용자 정보
+      toUser {
+        id
+        userId
+        email
+        nickname
+        profileImage
       }
     }
   }
@@ -393,6 +431,8 @@ export const GET_INVITATIONS = gql`
       respondedAt
       createdAt
       updatedAt
+
+      # Goal 정보 (중첩된 객체)
       goal {
         id
         goalId
@@ -403,9 +443,37 @@ export const GET_INVITATIONS = gql`
         visibility
         status
         createdBy
+        creatorNickname
         autoApprove
         createdAt
         updatedAt
+        isParticipant
+
+        # Goal의 참여자들
+        participants {
+          userId
+          status
+          currentStickerCount
+          joinedAt
+        }
+      }
+
+      # 보낸 사용자 정보
+      fromUser {
+        id
+        userId
+        email
+        nickname
+        profileImage
+      }
+
+      # 받는 사용자 정보
+      toUser {
+        id
+        userId
+        email
+        nickname
+        profileImage
       }
     }
   }

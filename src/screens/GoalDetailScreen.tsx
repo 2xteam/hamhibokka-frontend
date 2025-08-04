@@ -168,6 +168,12 @@ const GoalDetailScreen: React.FC = () => {
   const handleJoinRequest = () => {
     // 자기 자신의 목표인지 확인
     if (goal.createdBy === currentUserId) {
+      // 챌린저 모집 모드일 때는 바로 참여
+      if (goal.mode === 'challenger_recruitment') {
+        handleDirectJoin();
+        return;
+      }
+      // 다른 모드일 때는 모달 띄우기
       setJoinModalVisible(true);
       return;
     }
@@ -681,8 +687,8 @@ const GoalDetailScreen: React.FC = () => {
       {/* 목표 참여/나가기 플로팅 버튼 - personal 모드가 아닐 때만 표시 */}
       {goal.mode !== 'personal' && (
         <>
-          {/* 참여하기 버튼 - 참여하지 않은 경우 (본인이 생성한 목표 제외) */}
-          {!goal.isParticipant && !isMyGoal && (
+          {/* 참여하기 버튼 - 참여하지 않은 경우 */}
+          {!goal.isParticipant && (
             <TouchableOpacity
               style={styles.fabJoin}
               onPress={handleJoinRequest}

@@ -36,9 +36,31 @@ interface Invitation {
     visibility: string;
     status: string;
     createdBy: string;
+    creatorNickname: string;
     autoApprove: boolean;
     createdAt: string;
     updatedAt: string;
+    isParticipant: boolean;
+    participants: {
+      userId: string;
+      status: string;
+      currentStickerCount: number;
+      joinedAt: string;
+    }[];
+  };
+  fromUser: {
+    id: string;
+    userId: string;
+    email: string;
+    nickname: string;
+    profileImage?: string;
+  };
+  toUser: {
+    id: string;
+    userId: string;
+    email: string;
+    nickname: string;
+    profileImage?: string;
   };
 }
 
@@ -79,7 +101,7 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
 
   // 초대 요청 조회
   const {data, loading, error, refetch} = useQuery(GET_INVITATIONS, {
-    fetchPolicy: 'network-only',
+    fetchPolicy: 'no-cache',
     skip: !visible,
   });
 
@@ -109,21 +131,63 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
     const isSent = item.fromUserId === currentUserId;
     const isReceived = item.toUserId === currentUserId;
 
+    const getStatusEmoji = (status: string) => {
+      switch (status) {
+        case 'pending':
+          return '⏰';
+        case 'accepted':
+          return '✅';
+        case 'rejected':
+          return '❌';
+        default:
+          return '❓';
+      }
+    };
+
+    const getStatusText = (status: string) => {
+      switch (status) {
+        case 'pending':
+          return '기다리는 중이에요!';
+        case 'accepted':
+          return '목표에 참여했어요! 🎉';
+        case 'rejected':
+          return '아쉽지만 거절되었어요';
+        default:
+          return '알 수 없어요';
+      }
+    };
+
     return (
       <TouchableOpacity
         style={styles.invitationItem}
         onPress={() => handleInvitationPress(item)}>
         <View style={styles.invitationHeader}>
-          <Text style={styles.invitationTitle}>
-            {isSent ? '보낸 요청' : '받은 요청'}
-          </Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.invitationEmoji}>{isSent ? '📤' : '📥'}</Text>
+            <Text style={styles.invitationTitle}>
+              {isSent
+                ? `${
+                    item.toUser?.nickname || '알 수 없는 친구'
+                  }에게 보낸 참여 요청`
+                : `${
+                    item.fromUser?.nickname || '알 수 없는 친구'
+                  }로부터 온 참여 요청`}
+            </Text>
+          </View>
           <Text style={styles.invitationTime}>
             {new Date(item.createdAt).toLocaleDateString()}
           </Text>
         </View>
-        <Text style={styles.goalTitle}>{item.goal.title}</Text>
+
+        <View style={styles.goalContainer}>
+          <Text style={styles.goalEmoji}>🏅</Text>
+          <Text style={styles.goalTitle}>{item.goal.title}</Text>
+        </View>
+
         <Text style={styles.invitationMessage}>{item.message}</Text>
+
         <View style={styles.statusContainer}>
+          <Text style={styles.statusEmoji}>{getStatusEmoji(item.status)}</Text>
           <Text
             style={[
               styles.statusText,
@@ -136,11 +200,7 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
                     : '#E74C3C',
               },
             ]}>
-            {item.status === 'pending'
-              ? '대기중'
-              : item.status === 'accepted'
-              ? '수락됨'
-              : '거절됨'}
+            {getStatusText(item.status)}
           </Text>
         </View>
       </TouchableOpacity>
@@ -164,7 +224,12 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
           ))
         ) : (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>{title}이 없어요.</Text>
+            <Text style={styles.emptyEmoji}>📭</Text>
+            <Text style={styles.emptyText}>
+              {title.includes('받은')
+                ? '아직 참여 요청이 없어요!'
+                : '아직 참여 요청을 보내지 않았어요!'}
+            </Text>
           </View>
         )}
       </View>
@@ -186,7 +251,10 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
           activeOpacity={1}
           onPress={e => e.stopPropagation()}>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>초대 요청</Text>
+            <View style={styles.headerContent}>
+              <Text style={styles.headerEmoji}>📬</Text>
+              <Text style={styles.headerTitle}>목표 참여 요청함</Text>
+            </View>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <MaterialIcons name="close" size={24} color="#2C3E50" />
             </TouchableOpacity>
@@ -194,7 +262,7 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
 
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#FF6B9D" />
+              <ActivityIndicator size="large" color="#20B2AA" />
             </View>
           ) : (
             <FlatList
@@ -202,8 +270,8 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
               renderItem={() => null}
               ListHeaderComponent={
                 <View>
-                  {renderSection('받은 요청', receivedInvitations)}
-                  {renderSection('보낸 요청', sentInvitations)}
+                  {renderSection('📥 나에게 온 참여 요청', receivedInvitations)}
+                  {renderSection('📤 내가 보낸 참여 요청', sentInvitations)}
                 </View>
               }
               contentContainerStyle={styles.listContainer}
@@ -238,10 +306,18 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E0E6ED',
   },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerEmoji: {
+    fontSize: 24,
+    marginRight: 8,
+  },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#20B2AA',
   },
   closeButton: {
     padding: 4,
@@ -265,18 +341,25 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2C3E50',
+    color: '#20B2AA',
   },
   sectionCount: {
     fontSize: 14,
-    color: '#7F8C8D',
+    color: '#20B2AA',
     marginLeft: 8,
   },
   invitationItem: {
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: '#F0FFFA',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: '#E0F8F0',
+    shadowColor: '#20B2AA',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   invitationHeader: {
     flexDirection: 'row',
@@ -284,20 +367,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 8,
   },
+  titleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  invitationEmoji: {
+    fontSize: 18,
+    marginRight: 8,
+  },
   invitationTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FF6B9D',
+    color: '#20B2AA',
   },
   invitationTime: {
     fontSize: 12,
     color: '#7F8C8D',
   },
+  goalContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  goalEmoji: {
+    fontSize: 20,
+    marginRight: 8,
+  },
   goalTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#2C3E50',
-    marginBottom: 8,
+    color: '#20B2AA',
+    flex: 1,
   },
   invitationMessage: {
     fontSize: 14,
@@ -306,7 +406,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
+  },
+  statusEmoji: {
+    fontSize: 16,
+    marginRight: 6,
   },
   statusText: {
     fontSize: 12,
@@ -314,7 +420,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#E0F8F0',
+  },
+  userInfoContainer: {
+    marginBottom: 8,
+  },
+  userInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  userInfoLabel: {
+    fontSize: 12,
+    color: '#7F8C8D',
+    fontWeight: '500',
+    marginRight: 8,
+  },
+  userInfoValue: {
+    fontSize: 14,
+    color: '#20B2AA',
+    fontWeight: '600',
   },
   emptyContainer: {
     flex: 1,
@@ -322,10 +447,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 40,
   },
+  emptyEmoji: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
   emptyText: {
     fontSize: 16,
-    color: '#BDC3C7',
+    color: '#20B2AA',
     textAlign: 'center',
+    lineHeight: 22,
   },
 });
 

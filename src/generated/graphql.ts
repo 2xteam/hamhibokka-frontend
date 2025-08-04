@@ -98,6 +98,7 @@ export type GoalInput = {
 export type GoalInvitation = {
   __typename?: 'GoalInvitation';
   createdAt: Scalars['DateTime']['output'];
+  fromUser?: Maybe<User>;
   fromUserId: Scalars['String']['output'];
   goal?: Maybe<Goal>;
   goalId: Scalars['String']['output'];
@@ -106,6 +107,7 @@ export type GoalInvitation = {
   message?: Maybe<Scalars['String']['output']>;
   respondedAt?: Maybe<Scalars['DateTime']['output']>;
   status: Scalars['String']['output'];
+  toUser?: Maybe<User>;
   toUserId: Scalars['String']['output'];
   type: Scalars['String']['output'];
   updatedAt: Scalars['DateTime']['output'];
@@ -461,7 +463,7 @@ export type GetInvitationQueryVariables = Exact<{
 }>;
 
 
-export type GetInvitationQuery = { __typename?: 'Query', getInvitation?: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } | null } | null };
+export type GetInvitationQuery = { __typename?: 'Query', getInvitation?: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, status: string, currentStickerCount: number, joinedAt: any }> | null } | null, fromUser?: { __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null, followStatus?: string | null } | null, toUser?: { __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null, followStatus?: string | null } | null } | null };
 
 export type UpdateGoalInvitationMutationVariables = Exact<{
   id: Scalars['String']['input'];
@@ -469,7 +471,7 @@ export type UpdateGoalInvitationMutationVariables = Exact<{
 }>;
 
 
-export type UpdateGoalInvitationMutation = { __typename?: 'Mutation', updateGoalInvitation: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } | null } };
+export type UpdateGoalInvitationMutation = { __typename?: 'Mutation', updateGoalInvitation: { __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, status: string, currentStickerCount: number, joinedAt: any }> | null } | null, fromUser?: { __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null, followStatus?: string | null } | null, toUser?: { __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null, followStatus?: string | null } | null } };
 
 export type ReceiveStickerMutationVariables = Exact<{
   input: ReceiveStickerInput;
@@ -505,7 +507,7 @@ export type GetFollowedUsersGoalsQuery = { __typename?: 'Query', getFollowedUser
 export type GetInvitationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetInvitationsQuery = { __typename?: 'Query', getInvitations: Array<{ __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null } | null }> };
+export type GetInvitationsQuery = { __typename?: 'Query', getInvitations: Array<{ __typename?: 'GoalInvitation', id: string, invitationId: string, goalId: string, fromUserId: string, toUserId: string, type: string, status: string, message?: string | null, respondedAt?: any | null, createdAt: any, updatedAt: any, goal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, status: string, currentStickerCount: number, joinedAt: any }> | null } | null, fromUser?: { __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null, followStatus?: string | null } | null, toUser?: { __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null, followStatus?: string | null } | null }> };
 
 export type LoginUserMutationVariables = Exact<{
   loginInput: LoginInput;
@@ -885,6 +887,9 @@ export const GetInvitationDocument = gql`
     type
     status
     message
+    respondedAt
+    createdAt
+    updatedAt
     goal {
       id
       goalId
@@ -895,24 +900,34 @@ export const GetInvitationDocument = gql`
       visibility
       status
       createdBy
+      creatorNickname
       autoApprove
       createdAt
       updatedAt
+      isParticipant
       participants {
         userId
-        nickname
         status
         currentStickerCount
         joinedAt
-        stickerReceivedLogs {
-          date
-          count
-        }
       }
     }
-    respondedAt
-    createdAt
-    updatedAt
+    fromUser {
+      id
+      userId
+      email
+      nickname
+      profileImage
+      followStatus
+    }
+    toUser {
+      id
+      userId
+      email
+      nickname
+      profileImage
+      followStatus
+    }
   }
 }
     `;
@@ -973,20 +988,33 @@ export const UpdateGoalInvitationDocument = gql`
       visibility
       status
       createdBy
+      creatorNickname
       autoApprove
       createdAt
       updatedAt
+      isParticipant
       participants {
         userId
-        nickname
         status
         currentStickerCount
         joinedAt
-        stickerReceivedLogs {
-          date
-          count
-        }
       }
+    }
+    fromUser {
+      id
+      userId
+      email
+      nickname
+      profileImage
+      followStatus
+    }
+    toUser {
+      id
+      userId
+      email
+      nickname
+      profileImage
+      followStatus
     }
   }
 }
@@ -1350,9 +1378,33 @@ export const GetInvitationsDocument = gql`
       visibility
       status
       createdBy
+      creatorNickname
       autoApprove
       createdAt
       updatedAt
+      isParticipant
+      participants {
+        userId
+        status
+        currentStickerCount
+        joinedAt
+      }
+    }
+    fromUser {
+      id
+      userId
+      email
+      nickname
+      profileImage
+      followStatus
+    }
+    toUser {
+      id
+      userId
+      email
+      nickname
+      profileImage
+      followStatus
     }
   }
 }

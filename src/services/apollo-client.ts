@@ -5,9 +5,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // HTTP 링크 설정 (백엔드 서버 주소)
 const httpLink = createHttpLink({
   // uri: 'http://127.0.0.1:3000/graphql', // iOS 시뮬레이터용 local (IP 주소 사용)
-  // uri: 'http://localhost:3000/graphql', // iOS 시뮬레이터용 local
+  uri: 'http://localhost:3000/graphql', // iOS 시뮬레이터용 local
   // uri: 'http://10.0.2.2:3000/graphql', // Android 에뮬레이터용 local
-  uri: 'https://hamhibokka-backend-gnbgh2gxabbea0fy.koreacentral-01.azurewebsites.net/graphql', // 프로덕션환경
+  // uri: 'https://hamhibokka-backend-gnbgh2gxabbea0fy.koreacentral-01.azurewebsites.net/graphql', // 프로덕션환경
   // iOS에서 네트워크 요청을 위한 추가 설정
   fetchOptions: {
     mode: 'cors',
@@ -62,7 +62,18 @@ const apolloClient = new ApolloClient({
               return incoming;
             },
           },
+          getInvitations: {
+            merge(existing = [], incoming) {
+              return incoming;
+            },
+          },
         },
+      },
+      GoalInvitation: {
+        keyFields: ['invitationId'], // invitationId를 고유 키로 사용
+      },
+      User: {
+        keyFields: ['userId'], // userId를 고유 키로 사용
       },
     },
   }),
