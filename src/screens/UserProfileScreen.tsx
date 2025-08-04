@@ -10,8 +10,8 @@ import React, {useState} from 'react';
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   Image,
-  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -164,76 +164,83 @@ const UserProfileScreen: React.FC = () => {
     });
   };
 
+  // 헤더 컴포넌트 렌더링
+  const renderHeader = () => (
+    <View style={styles.contentContainer}>
+      {/* 프로필 정보 */}
+      <View style={styles.profileSection}>
+        <Image
+          source={
+            user.profileImage
+              ? {uri: user.profileImage}
+              : require('../../assets/default-profile.jpg')
+          }
+          style={styles.profileImage}
+        />
+        <Text style={styles.nickname}>{user.nickname}</Text>
+        <Text style={styles.email}>{user.email}</Text>
+      </View>
+
+      {/* 팔로우 버튼 - 자기 자신이 아니고 팔로우 상태가 없을 때만 표시 */}
+      {!isOwnProfile && !displayFollowStatus && !followStatus && (
+        <TouchableOpacity
+          style={[styles.followButton, isLoading && styles.disabledButton]}
+          onPress={handleFollowToggle}
+          disabled={isLoading}>
+          <Text style={styles.followButtonText}>
+            {isLoading ? '처리 중...' : '팔로우'}
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      {/* 팔로우 상태 표시 */}
+      {!isOwnProfile && (displayFollowStatus || followStatus) && (
+        <View
+          style={[
+            styles.followedStatus,
+            (displayFollowStatus === 'pending' || followStatus === 'pending') &&
+              styles.pendingStatus,
+          ]}>
+          <Text style={styles.followedStatusText}>
+            {displayFollowStatus === 'pending' || followStatus === 'pending'
+              ? '대기중'
+              : displayFollowStatus === 'approved'
+              ? '맞팔중'
+              : displayFollowStatus === 'mutual'
+              ? '맞팔중'
+              : '팔로우 중'}
+          </Text>
+        </View>
+      )}
+
+      {/* 목표 리스트 섹션 */}
+      <View style={styles.goalsSection}>
+        <Text style={styles.goalsSectionTitle}>
+          {isOwnProfile ? '내 목표' : `${user.nickname}의 목표`}
+        </Text>
+        {goalsLoading ? (
+          <ActivityIndicator style={styles.goalsLoading} />
+        ) : (
+          <GoalList
+            goals={goals}
+            onPressGoal={handleGoalPress}
+            emptyText="등록된 목표가 없습니다."
+            contentContainerStyle={styles.goalsList}
+          />
+        )}
+      </View>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
-        {/* 프로필 정보 */}
-        <View style={styles.profileSection}>
-          <Image
-            source={
-              user.profileImage
-                ? {uri: user.profileImage}
-                : require('../../assets/default-profile.jpg')
-            }
-            style={styles.profileImage}
-          />
-          <Text style={styles.nickname}>{user.nickname}</Text>
-          <Text style={styles.email}>{user.email}</Text>
-        </View>
-
-        {/* 팔로우 버튼 - 자기 자신이 아니고 팔로우 상태가 없을 때만 표시 */}
-        {!isOwnProfile && !displayFollowStatus && !followStatus && (
-          <TouchableOpacity
-            style={[styles.followButton, isLoading && styles.disabledButton]}
-            onPress={handleFollowToggle}
-            disabled={isLoading}>
-            <Text style={styles.followButtonText}>
-              {isLoading ? '처리 중...' : '팔로우'}
-            </Text>
-          </TouchableOpacity>
-        )}
-
-        {/* 팔로우 상태 표시 */}
-        {!isOwnProfile && (displayFollowStatus || followStatus) && (
-          <View
-            style={[
-              styles.followedStatus,
-              (displayFollowStatus === 'pending' ||
-                followStatus === 'pending') &&
-                styles.pendingStatus,
-            ]}>
-            <Text style={styles.followedStatusText}>
-              {displayFollowStatus === 'pending' || followStatus === 'pending'
-                ? '대기중'
-                : displayFollowStatus === 'approved'
-                ? '맞팔중'
-                : displayFollowStatus === 'mutual'
-                ? '맞팔중'
-                : '팔로우 중'}
-            </Text>
-          </View>
-        )}
-
-        {/* 목표 리스트 섹션 */}
-        <View style={styles.goalsSection}>
-          <Text style={styles.goalsSectionTitle}>
-            {isOwnProfile ? '내 목표' : `${user.nickname}의 목표`}
-          </Text>
-          {goalsLoading ? (
-            <ActivityIndicator style={styles.goalsLoading} />
-          ) : (
-            <GoalList
-              goals={goals}
-              onPressGoal={handleGoalPress}
-              emptyText="등록된 목표가 없습니다."
-              contentContainerStyle={styles.goalsList}
-            />
-          )}
-        </View>
-      </ScrollView>
+      <FlatList
+        data={[]}
+        renderItem={() => null}
+        ListHeaderComponent={renderHeader}
+        contentContainerStyle={styles.flatListContent}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 };
@@ -243,10 +250,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F0F8F8', // 민트 계열 배경
   },
-  scrollView: {
+  contentContainer: {
     flex: 1,
-  },
-  scrollContent: {
     paddingHorizontal: 20,
     paddingVertical: 20,
   },
@@ -342,6 +347,9 @@ const styles = StyleSheet.create({
   },
   goalsList: {
     paddingBottom: 20,
+  },
+  flatListContent: {
+    flexGrow: 1,
   },
 });
 

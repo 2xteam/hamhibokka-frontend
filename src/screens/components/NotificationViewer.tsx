@@ -108,12 +108,12 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
   // 데이터 처리 - 보낸 요청과 받은 요청 분리
   useEffect(() => {
     if (data?.getInvitations && currentUserId) {
-      const invitations = data.getInvitations;
+      const invitations = data.getInvitations || [];
       const sent = invitations.filter(
-        (invitation: Invitation) => invitation.fromUserId === currentUserId,
+        (invitation: Invitation) => invitation?.fromUserId === currentUserId,
       );
       const received = invitations.filter(
-        (invitation: Invitation) => invitation.toUserId === currentUserId,
+        (invitation: Invitation) => invitation?.toUserId === currentUserId,
       );
       setSentInvitations(sent);
       setReceivedInvitations(received);
@@ -122,9 +122,11 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
 
   const handleInvitationPress = (invitation: Invitation) => {
     onClose(); // 뷰어 닫기
-    navigation.navigate('InvitationDetail', {
-      id: invitation.invitationId, // invitationId를 사용
-    });
+    if (invitation?.invitationId) {
+      navigation.navigate('InvitationDetail', {
+        id: invitation.invitationId,
+      });
+    }
   };
 
   const renderInvitation = ({item}: {item: Invitation}) => {
@@ -139,6 +141,8 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
           return '✅';
         case 'rejected':
           return '❌';
+        case 'unknown':
+          return '❓';
         default:
           return '❓';
       }
@@ -152,6 +156,8 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
           return '목표에 참여했어요! 🎉';
         case 'rejected':
           return '아쉽지만 거절되었어요';
+        case 'unknown':
+          return '상태를 확인할 수 없어요';
         default:
           return '알 수 없어요';
       }
@@ -181,13 +187,19 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
 
         <View style={styles.goalContainer}>
           <Text style={styles.goalEmoji}>🏅</Text>
-          <Text style={styles.goalTitle}>{item.goal.title}</Text>
+          <Text style={styles.goalTitle}>
+            {item.goal?.title || '알 수 없는 목표'}
+          </Text>
         </View>
 
-        <Text style={styles.invitationMessage}>{item.message}</Text>
+        <Text style={styles.invitationMessage}>
+          {item.message || '메시지가 없습니다.'}
+        </Text>
 
         <View style={styles.statusContainer}>
-          <Text style={styles.statusEmoji}>{getStatusEmoji(item.status)}</Text>
+          <Text style={styles.statusEmoji}>
+            {getStatusEmoji(item.status || 'unknown')}
+          </Text>
           <Text
             style={[
               styles.statusText,
@@ -200,7 +212,7 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
                     : '#E74C3C',
               },
             ]}>
-            {getStatusText(item.status)}
+            {getStatusText(item.status || 'unknown')}
           </Text>
         </View>
       </TouchableOpacity>
