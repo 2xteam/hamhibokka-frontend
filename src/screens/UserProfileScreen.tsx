@@ -12,11 +12,13 @@ import {
   Alert,
   FlatList,
   Image,
+  Modal,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import ProfileHeader from '../components/ProfileHeader';
 import {GET_GOALS_BY_USER_ID} from '../queries/goal';
 import {
   CHECK_FOLLOW_STATUS,
@@ -45,6 +47,7 @@ const UserProfileScreen: React.FC = () => {
   const [followStatus, setFollowStatus] = useState(user.followStatus || '');
   const [isLoading, setIsLoading] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [imageModalVisible, setImageModalVisible] = useState(false);
 
   // 현재 사용자 ID 가져오기
   React.useEffect(() => {
@@ -168,18 +171,13 @@ const UserProfileScreen: React.FC = () => {
   const renderHeader = () => (
     <View style={styles.contentContainer}>
       {/* 프로필 정보 */}
-      <View style={styles.profileSection}>
-        <Image
-          source={
-            user.profileImage
-              ? {uri: user.profileImage}
-              : require('../../assets/default-profile.jpg')
-          }
-          style={styles.profileImage}
-        />
-        <Text style={styles.nickname}>{user.nickname}</Text>
-        <Text style={styles.email}>{user.email}</Text>
-      </View>
+      <ProfileHeader
+        nickname={user.nickname}
+        email={user.email}
+        profileImage={user.profileImage}
+        showCameraButton={false}
+        isOwnProfile={false}
+      />
 
       {/* 팔로우 버튼 - 자기 자신이 아니고 팔로우 상태가 없을 때만 표시 */}
       {!isOwnProfile && !displayFollowStatus && !followStatus && (
@@ -241,6 +239,36 @@ const UserProfileScreen: React.FC = () => {
         contentContainerStyle={styles.flatListContent}
         showsVerticalScrollIndicator={false}
       />
+
+      {/* 이미지 확대 모달 */}
+      <Modal
+        visible={imageModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setImageModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity
+            style={styles.modalBackground}
+            activeOpacity={1}
+            onPress={() => setImageModalVisible(false)}>
+            <TouchableOpacity
+              style={styles.modalContent}
+              activeOpacity={1}
+              onPress={() => {}}>
+              <Image
+                source={{uri: user.profileImage}}
+                style={styles.expandedImage}
+                resizeMode="contain"
+              />
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setImageModalVisible(false)}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -350,6 +378,47 @@ const styles = StyleSheet.create({
   },
   flatListContent: {
     flexGrow: 1,
+  },
+  profileImageContainer: {
+    marginBottom: 5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  expandedImage: {
+    width: 300,
+    height: 300,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: -20,
+    right: -20,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
 

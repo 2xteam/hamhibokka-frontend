@@ -19,7 +19,7 @@ export const API_CONFIG = {
 };
 
 // 현재 환경 설정 (개발자가 여기서 변경 가능)
-export const CURRENT_ENV = 'PROD'; // 'DEV' 또는 'PROD'
+export const CURRENT_ENV = 'DEV'; // 'DEV' 또는 'PROD'
 
 // 현재 환경의 API 설정 가져오기
 export const getCurrentApiConfig = () => {

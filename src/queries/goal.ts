@@ -20,6 +20,7 @@ export const GET_GOALS = gql`
       participants {
         userId
         nickname
+        profileImage
         status
         currentStickerCount
         joinedAt
@@ -52,6 +53,7 @@ export const GET_GOAL = gql`
       participants {
         userId
         nickname
+        profileImage
         status
         currentStickerCount
         joinedAt
@@ -103,6 +105,7 @@ export const LEAVE_GOAL = gql`
       participants {
         userId
         nickname
+        profileImage
         status
         currentStickerCount
         joinedAt
@@ -280,6 +283,7 @@ export const RECEIVE_STICKER = gql`
       participants {
         userId
         nickname
+        profileImage
         status
         currentStickerCount
         joinedAt
@@ -312,6 +316,7 @@ export const SEARCH_GOALS_BY_TITLE = gql`
       participants {
         userId
         nickname
+        profileImage
         status
         currentStickerCount
         joinedAt
@@ -344,6 +349,7 @@ export const GET_GOALS_BY_USER_ID = gql`
       participants {
         userId
         nickname
+        profileImage
         status
         currentStickerCount
         joinedAt
@@ -375,6 +381,7 @@ export const GET_MY_PARTICIPATED_GOALS = gql`
       participants {
         userId
         nickname
+        profileImage
         status
         currentStickerCount
         joinedAt
@@ -405,6 +412,7 @@ export const GET_FOLLOWED_USERS_GOALS = gql`
       participants {
         userId
         nickname
+        profileImage
         status
         currentStickerCount
         joinedAt

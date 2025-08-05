@@ -342,9 +342,14 @@ const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
                 <TextInput
                   style={styles.textInput}
                   value={nickname}
-                  onChangeText={setNickname}
-                  placeholder="다른 사용자들에게 보여질 이름"
+                  onChangeText={text => {
+                    if (text.length <= 12) {
+                      setNickname(text);
+                    }
+                  }}
+                  placeholder="다른 사용자들에게 보여질 이름 (최대 12자)"
                   placeholderTextColor="#BDC3C7"
+                  maxLength={12}
                   autoCapitalize="none"
                 />
               </View>

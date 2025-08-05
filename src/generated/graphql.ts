@@ -72,6 +72,7 @@ export type Goal = {
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
   creatorNickname?: Maybe<Scalars['String']['output']>;
+  creatorProfileImage?: Maybe<Scalars['String']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   goalId: Scalars['String']['output'];
   id: Scalars['ID']['output'];
@@ -118,6 +119,7 @@ export type GoalParticipant = {
   currentStickerCount: Scalars['Float']['output'];
   joinedAt: Scalars['DateTime']['output'];
   nickname?: Maybe<Scalars['String']['output']>;
+  profileImage?: Maybe<Scalars['String']['output']>;
   status: Scalars['String']['output'];
   stickerReceivedLogs?: Maybe<Array<StickerReceivedLog>>;
   userId: Scalars['String']['output'];
@@ -155,6 +157,7 @@ export type Mutation = {
   updateFollow: Follow;
   updateGoal: Goal;
   updateGoalInvitation: GoalInvitation;
+  updateNickname: User;
   updateProfileImage: User;
   updateSticker: Sticker;
   updateUser: User;
@@ -261,6 +264,11 @@ export type MutationUpdateGoalArgs = {
 export type MutationUpdateGoalInvitationArgs = {
   id: Scalars['String']['input'];
   input: UpdateGoalInvitationInput;
+};
+
+
+export type MutationUpdateNicknameArgs = {
+  input: UpdateNicknameInput;
 };
 
 
@@ -407,6 +415,10 @@ export type UpdateGoalInvitationInput = {
   status: Scalars['String']['input'];
 };
 
+export type UpdateNicknameInput = {
+  nickname: Scalars['String']['input'];
+};
+
 export type UpdateProfileImageInput = {
   profileImage: Scalars['String']['input'];
 };
@@ -432,14 +444,14 @@ export type UserInput = {
 export type GetGoalsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGoalsQuery = { __typename?: 'Query', getGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
+export type GetGoalsQuery = { __typename?: 'Query', getGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, profileImage?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
 
 export type GetGoalQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type GetGoalQuery = { __typename?: 'Query', getGoal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } | null };
+export type GetGoalQuery = { __typename?: 'Query', getGoal?: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, profileImage?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } | null };
 
 export type CreateGoalMutationVariables = Exact<{
   input: GoalInput;
@@ -460,7 +472,7 @@ export type LeaveGoalMutationVariables = Exact<{
 }>;
 
 
-export type LeaveGoalMutation = { __typename?: 'Mutation', leaveGoal: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } };
+export type LeaveGoalMutation = { __typename?: 'Mutation', leaveGoal: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, profileImage?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } };
 
 export type CreateGoalJoinRequestMutationVariables = Exact<{
   input: CreateGoalJoinRequestInput;
@@ -489,31 +501,31 @@ export type ReceiveStickerMutationVariables = Exact<{
 }>;
 
 
-export type ReceiveStickerMutation = { __typename?: 'Mutation', receiveSticker: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } };
+export type ReceiveStickerMutation = { __typename?: 'Mutation', receiveSticker: { __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, profileImage?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null } };
 
 export type SearchGoalsByTitleQueryVariables = Exact<{
   title: Scalars['String']['input'];
 }>;
 
 
-export type SearchGoalsByTitleQuery = { __typename?: 'Query', searchGoalsByTitle: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
+export type SearchGoalsByTitleQuery = { __typename?: 'Query', searchGoalsByTitle: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, profileImage?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
 
 export type GetGoalsByUserIdQueryVariables = Exact<{
   userId: Scalars['String']['input'];
 }>;
 
 
-export type GetGoalsByUserIdQuery = { __typename?: 'Query', getGoalsByUserId: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
+export type GetGoalsByUserIdQuery = { __typename?: 'Query', getGoalsByUserId: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, isParticipant?: boolean | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, profileImage?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
 
 export type GetMyParticipatedGoalsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetMyParticipatedGoalsQuery = { __typename?: 'Query', getMyParticipatedGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
+export type GetMyParticipatedGoalsQuery = { __typename?: 'Query', getMyParticipatedGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, creatorNickname?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, profileImage?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
 
 export type GetFollowedUsersGoalsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetFollowedUsersGoalsQuery = { __typename?: 'Query', getFollowedUsersGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
+export type GetFollowedUsersGoalsQuery = { __typename?: 'Query', getFollowedUsersGoals: Array<{ __typename?: 'Goal', id: string, goalId: string, title: string, description?: string | null, stickerCount: number, mode?: string | null, visibility?: string | null, status?: string | null, createdBy?: string | null, autoApprove?: boolean | null, createdAt?: any | null, updatedAt?: any | null, participants?: Array<{ __typename?: 'GoalParticipant', userId: string, nickname?: string | null, profileImage?: string | null, status: string, currentStickerCount: number, joinedAt: any, stickerReceivedLogs?: Array<{ __typename?: 'StickerReceivedLog', date: any, count: number }> | null }> | null }> };
 
 export type GetInvitationsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -602,6 +614,13 @@ export type GetMyProfileImageQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetMyProfileImageQuery = { __typename?: 'Query', getMyProfileImage?: string | null };
 
+export type UpdateNicknameMutationVariables = Exact<{
+  input: UpdateNicknameInput;
+}>;
+
+
+export type UpdateNicknameMutation = { __typename?: 'Mutation', updateNickname: { __typename?: 'User', id: string, userId: string, email: string, nickname: string, profileImage?: string | null } };
+
 
 export const GetGoalsDocument = gql`
     query GetGoals {
@@ -623,6 +642,7 @@ export const GetGoalsDocument = gql`
     participants {
       userId
       nickname
+      profileImage
       status
       currentStickerCount
       joinedAt
@@ -686,6 +706,7 @@ export const GetGoalDocument = gql`
     participants {
       userId
       nickname
+      profileImage
       status
       currentStickerCount
       joinedAt
@@ -819,6 +840,7 @@ export const LeaveGoalDocument = gql`
     participants {
       userId
       nickname
+      profileImage
       status
       currentStickerCount
       joinedAt
@@ -1085,6 +1107,7 @@ export const ReceiveStickerDocument = gql`
     participants {
       userId
       nickname
+      profileImage
       status
       currentStickerCount
       joinedAt
@@ -1142,6 +1165,7 @@ export const SearchGoalsByTitleDocument = gql`
     participants {
       userId
       nickname
+      profileImage
       status
       currentStickerCount
       joinedAt
@@ -1206,6 +1230,7 @@ export const GetGoalsByUserIdDocument = gql`
     participants {
       userId
       nickname
+      profileImage
       status
       currentStickerCount
       joinedAt
@@ -1269,6 +1294,7 @@ export const GetMyParticipatedGoalsDocument = gql`
     participants {
       userId
       nickname
+      profileImage
       status
       currentStickerCount
       joinedAt
@@ -1330,6 +1356,7 @@ export const GetFollowedUsersGoalsDocument = gql`
     participants {
       userId
       nickname
+      profileImage
       status
       currentStickerCount
       joinedAt
@@ -1943,3 +1970,40 @@ export type GetMyProfileImageQueryHookResult = ReturnType<typeof useGetMyProfile
 export type GetMyProfileImageLazyQueryHookResult = ReturnType<typeof useGetMyProfileImageLazyQuery>;
 export type GetMyProfileImageSuspenseQueryHookResult = ReturnType<typeof useGetMyProfileImageSuspenseQuery>;
 export type GetMyProfileImageQueryResult = Apollo.QueryResult<GetMyProfileImageQuery, GetMyProfileImageQueryVariables>;
+export const UpdateNicknameDocument = gql`
+    mutation UpdateNickname($input: UpdateNicknameInput!) {
+  updateNickname(input: $input) {
+    id
+    userId
+    email
+    nickname
+    profileImage
+  }
+}
+    `;
+export type UpdateNicknameMutationFn = Apollo.MutationFunction<UpdateNicknameMutation, UpdateNicknameMutationVariables>;
+
+/**
+ * __useUpdateNicknameMutation__
+ *
+ * To run a mutation, you first call `useUpdateNicknameMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateNicknameMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateNicknameMutation, { data, loading, error }] = useUpdateNicknameMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateNicknameMutation(baseOptions?: Apollo.MutationHookOptions<UpdateNicknameMutation, UpdateNicknameMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateNicknameMutation, UpdateNicknameMutationVariables>(UpdateNicknameDocument, options);
+      }
+export type UpdateNicknameMutationHookResult = ReturnType<typeof useUpdateNicknameMutation>;
+export type UpdateNicknameMutationResult = Apollo.MutationResult<UpdateNicknameMutation>;
+export type UpdateNicknameMutationOptions = Apollo.BaseMutationOptions<UpdateNicknameMutation, UpdateNicknameMutationVariables>;
