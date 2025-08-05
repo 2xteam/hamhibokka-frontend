@@ -114,6 +114,18 @@ const App: React.FC = () => {
     }
   };
 
+  const updateUserInfo = async (updatedUser: User) => {
+    try {
+      await AsyncStorage.setItem(
+        '@hamhibokka_user',
+        JSON.stringify(updatedUser),
+      );
+      setUser(updatedUser);
+    } catch (error) {
+      console.error('Failed to update user info:', error);
+    }
+  };
+
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -131,7 +143,13 @@ const App: React.FC = () => {
           {isAuthenticated ? (
             <>
               <Stack.Screen name="Main">
-                {() => <MainTabNavigator user={user} onLogout={logout} />}
+                {() => (
+                  <MainTabNavigator
+                    user={user}
+                    onLogout={logout}
+                    onUpdateUser={updateUserInfo}
+                  />
+                )}
               </Stack.Screen>
               <Stack.Screen
                 name="CreateGoal"

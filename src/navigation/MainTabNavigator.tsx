@@ -20,11 +20,13 @@ interface User {
 interface MainTabNavigatorProps {
   user: User | null;
   onLogout: () => void;
+  onUpdateUser: (updatedUser: User) => void;
 }
 
 const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({
   user,
   onLogout,
+  onUpdateUser,
 }) => {
   return (
     <Tab.Navigator
@@ -89,7 +91,13 @@ const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({
       </Tab.Screen>
 
       <Tab.Screen name="Profile" options={{tabBarLabel: '프로필'}}>
-        {() => <ProfileScreen user={user} onLogout={onLogout} />}
+        {() => (
+          <ProfileScreen
+            user={user}
+            onLogout={onLogout}
+            onUpdateUser={onUpdateUser}
+          />
+        )}
       </Tab.Screen>
     </Tab.Navigator>
   );

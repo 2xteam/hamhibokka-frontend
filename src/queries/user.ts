@@ -149,3 +149,15 @@ export const GET_MY_PROFILE_IMAGE = gql`
     getMyProfileImage
   }
 `;
+
+export const UPDATE_NICKNAME = gql`
+  mutation UpdateNickname($input: UpdateNicknameInput!) {
+    updateNickname(input: $input) {
+      id
+      userId
+      email
+      nickname
+      profileImage
+    }
+  }
+`;

@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   Alert,
   FlatList,
-  Image,
   Platform,
   SafeAreaView,
   StatusBar,
@@ -16,11 +15,13 @@ import {
   View,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
+import ProfileHeader from '../components/ProfileHeader';
 import {getUploadProfileImageUrl} from '../config/api';
 import {
   APPROVE_FOLLOW,
   GET_FOLLOWS,
   GET_MY_PROFILE_IMAGE,
+  UPDATE_NICKNAME,
   UPDATE_PROFILE_IMAGE,
 } from '../queries/user';
 import {colors} from '../styles/colors';
@@ -53,11 +54,16 @@ interface Follow {
 }
 
 interface ProfileScreenProps {
-  user: ProfileUser | null;
+  user: User | null;
   onLogout: () => void;
+  onUpdateUser?: (updatedUser: User) => void;
 }
 
-const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
+const ProfileScreen: React.FC<ProfileScreenProps> = ({
+  user,
+  onLogout,
+  onUpdateUser,
+}) => {
   const navigation = useNavigation<any>();
   const [followsList, setFollowsList] = useState<Follow[]>([]);
   const [actualCurrentUserId, setActualCurrentUserId] = useState<string>('');
@@ -65,6 +71,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
   const [localProfileImage, setLocalProfileImage] = useState<
     string | undefined
   >(user?.profileImage);
+  const [localNickname, setLocalNickname] = useState(user?.nickname || '');
 
   // AsyncStorage 프로필 이미지 업데이트 함수
   const updateAsyncStorageProfileImage = async (newProfileImage: string) => {
@@ -86,10 +93,30 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
     }
   };
 
-  // user prop이 변경될 때 localProfileImage 업데이트
+  const updateAsyncStorageNickname = async (newNickname: string) => {
+    try {
+      const userData = await AsyncStorage.getItem('@hamhibokka_user');
+      if (userData) {
+        const currentUser = JSON.parse(userData);
+        const updatedUser = {
+          ...currentUser,
+          nickname: newNickname,
+        };
+        await AsyncStorage.setItem(
+          '@hamhibokka_user',
+          JSON.stringify(updatedUser),
+        );
+      }
+    } catch (error) {
+      console.error('Failed to update AsyncStorage nickname:', error);
+    }
+  };
+
+  // user prop이 변경될 때 localProfileImage와 localNickname 업데이트
   useEffect(() => {
     setLocalProfileImage(user?.profileImage);
-  }, [user?.profileImage]);
+    setLocalNickname(user?.nickname || '');
+  }, [user?.profileImage, user?.nickname]);
 
   // StatusBar 설정
   useEffect(() => {
@@ -175,6 +202,32 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
     onError: error => {
       Alert.alert('오류', '프로필 이미지 업데이트에 실패했습니다.');
       console.error('Update profile image error:', error);
+    },
+  });
+
+  const [updateNickname] = useMutation(UPDATE_NICKNAME, {
+    onCompleted: async data => {
+      console.log('Nickname updated successfully:', data);
+      const newNickname = data.updateNickname.nickname;
+      setLocalNickname(newNickname);
+
+      // AsyncStorage 업데이트
+      await updateAsyncStorageNickname(newNickname);
+
+      // App.tsx의 사용자 정보 업데이트
+      if (onUpdateUser && user) {
+        const updatedUser = {
+          ...user,
+          nickname: newNickname,
+        };
+        onUpdateUser(updatedUser);
+      }
+
+      Alert.alert('성공', '닉네임이 성공적으로 변경되었습니다!');
+    },
+    onError: error => {
+      console.error('Error updating nickname:', error);
+      Alert.alert('오류', '닉네임 업데이트에 실패했습니다.');
     },
   });
 
@@ -298,6 +351,20 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
     ]);
   };
 
+  const handleNicknameUpdate = async (newNickname: string) => {
+    try {
+      await updateNickname({
+        variables: {
+          input: {
+            nickname: newNickname,
+          },
+        },
+      });
+    } catch (error) {
+      console.error('Error updating nickname:', error);
+    }
+  };
+
   // 이미지 선택 및 업로드
   const handleImageUpload = async () => {
     try {
@@ -376,6 +443,15 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
 
         // 로컬 사용자 정보 업데이트
         await updateLocalUserProfileImage(result.profileImage);
+
+        // App.tsx의 사용자 정보 업데이트
+        if (onUpdateUser && user) {
+          const updatedUser = {
+            ...user,
+            profileImage: result.profileImage,
+          };
+          onUpdateUser(updatedUser);
+        }
       }
     } catch (error) {
       console.error('업로드 실패:', error);
@@ -399,32 +475,16 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({user, onLogout}) => {
   const renderHeader = () => (
     <View style={styles.contentContainer}>
       {/* 프로필 정보 */}
-      <View style={styles.profileSection}>
-        <TouchableOpacity
-          style={styles.profileImageContainer}
-          onPress={handleImageUpload}
-          disabled={uploading}>
-          <Image
-            source={
-              localProfileImage
-                ? {uri: localProfileImage}
-                : require('../../assets/default-profile.jpg')
-            }
-            style={styles.profileImage}
-          />
-          <View style={styles.profileImageBorder} />
-          {uploading && (
-            <View style={styles.uploadingOverlay}>
-              <ActivityIndicator size="small" color={colors.white} />
-            </View>
-          )}
-        </TouchableOpacity>
-        <Text style={styles.nickname}>🌟 {user?.nickname}</Text>
-        <Text style={styles.email}>📧 {user?.email}</Text>
-        <Text style={styles.uploadHint}>
-          📷 프로필 이미지를 클릭하여 변경하세요
-        </Text>
-      </View>
+      <ProfileHeader
+        nickname={localNickname}
+        email={user?.email || ''}
+        profileImage={localProfileImage}
+        showCameraButton={true}
+        onCameraPress={handleImageUpload}
+        uploading={uploading}
+        isOwnProfile={true}
+        onNicknameUpdate={handleNicknameUpdate}
+      />
 
       {/* 친구 관리 섹션 */}
       <View style={styles.friendsSection}>

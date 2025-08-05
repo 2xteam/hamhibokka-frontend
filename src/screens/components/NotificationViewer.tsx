@@ -5,6 +5,7 @@ import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Modal,
   StyleSheet,
   Text,
@@ -169,20 +170,42 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
         onPress={() => handleInvitationPress(item)}>
         <View style={styles.invitationHeader}>
           <View style={styles.titleContainer}>
-            <Text style={styles.invitationEmoji}>{isSent ? '📤' : '📥'}</Text>
-            <Text style={styles.invitationTitle}>
-              {isSent
-                ? `${
-                    item.toUser?.nickname || '알 수 없는 친구'
-                  }에게 보낸 참여 요청`
-                : `${
-                    item.fromUser?.nickname || '알 수 없는 친구'
-                  }로부터 온 참여 요청`}
-            </Text>
+            <View style={styles.titleWithProfile}>
+              {isSent ? (
+                // 보낸 요청인 경우: 받는 사람의 프로필 이미지와 닉네임
+                <>
+                  <Image
+                    source={
+                      item.toUser?.profileImage
+                        ? {uri: item.toUser.profileImage}
+                        : require('../../../assets/default-profile.jpg')
+                    }
+                    style={styles.smallProfileImage}
+                  />
+                  <Text style={styles.invitationTitle}>
+                    {item.toUser?.nickname || '알 수 없는 친구'}에게 보낸 참여
+                    요청
+                  </Text>
+                </>
+              ) : (
+                // 받은 요청인 경우: 보낸 사람의 프로필 이미지와 닉네임
+                <>
+                  <Image
+                    source={
+                      item.fromUser?.profileImage
+                        ? {uri: item.fromUser.profileImage}
+                        : require('../../../assets/default-profile.jpg')
+                    }
+                    style={styles.smallProfileImage}
+                  />
+                  <Text style={styles.invitationTitle}>
+                    {item.fromUser?.nickname || '알 수 없는 친구'}로부터 온 참여
+                    요청
+                  </Text>
+                </>
+              )}
+            </View>
           </View>
-          <Text style={styles.invitationTime}>
-            {new Date(item.createdAt).toLocaleDateString()}
-          </Text>
         </View>
 
         <View style={styles.goalContainer}>
@@ -197,22 +220,27 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
         </Text>
 
         <View style={styles.statusContainer}>
-          <Text style={styles.statusEmoji}>
-            {getStatusEmoji(item.status || 'unknown')}
-          </Text>
-          <Text
-            style={[
-              styles.statusText,
-              {
-                color:
-                  item.status === 'pending'
-                    ? '#F39C12'
-                    : item.status === 'accepted'
-                    ? '#27AE60'
-                    : '#E74C3C',
-              },
-            ]}>
-            {getStatusText(item.status || 'unknown')}
+          <View style={styles.statusInfo}>
+            <Text style={styles.statusEmoji}>
+              {getStatusEmoji(item.status || 'unknown')}
+            </Text>
+            <Text
+              style={[
+                styles.statusText,
+                {
+                  color:
+                    item.status === 'pending'
+                      ? '#F39C12'
+                      : item.status === 'accepted'
+                      ? '#27AE60'
+                      : '#E74C3C',
+                },
+              ]}>
+              {getStatusText(item.status || 'unknown')}
+            </Text>
+          </View>
+          <Text style={styles.invitationTime}>
+            {new Date(item.createdAt).toLocaleDateString()}
           </Text>
         </View>
       </TouchableOpacity>
@@ -374,27 +402,30 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   invitationHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     marginBottom: 8,
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  invitationEmoji: {
-    fontSize: 18,
+  titleWithProfile: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  smallProfileImage: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#20B2AA',
   },
   invitationTitle: {
     fontSize: 14,
     fontWeight: '600',
     color: '#20B2AA',
-  },
-  invitationTime: {
-    fontSize: 12,
-    color: '#7F8C8D',
+    flex: 1,
   },
   goalContainer: {
     flexDirection: 'row',
@@ -419,8 +450,12 @@ const styles = StyleSheet.create({
   },
   statusContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    alignSelf: 'flex-start',
+  },
+  statusInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   statusEmoji: {
     fontSize: 16,
@@ -434,24 +469,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#E0F8F0',
   },
-  userInfoContainer: {
-    marginBottom: 8,
-  },
-  userInfoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  userInfoLabel: {
+  invitationTime: {
     fontSize: 12,
     color: '#7F8C8D',
     fontWeight: '500',
-    marginRight: 8,
-  },
-  userInfoValue: {
-    fontSize: 14,
-    color: '#20B2AA',
-    fontWeight: '600',
   },
   emptyContainer: {
     flex: 1,

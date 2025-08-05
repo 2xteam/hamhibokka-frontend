@@ -1,6 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {colors} from '../../styles/colors';
 
 export interface Goal {
@@ -24,6 +31,7 @@ export interface Goal {
 export interface GoalParticipant {
   userId: string;
   nickname?: string;
+  profileImage?: string;
   status: string;
   currentStickerCount: number;
   joinedAt: string;
@@ -228,9 +236,19 @@ const GoalList: React.FC<GoalListProps> = ({
             </View>
             {item.participants.slice(0, 3).map((participant, index) => (
               <View key={index} style={styles.participantInfo}>
-                <Text style={styles.participantName}>
-                  {participant.nickname || '익명'}
-                </Text>
+                <View style={styles.participantHeader}>
+                  <Image
+                    source={
+                      participant.profileImage
+                        ? {uri: participant.profileImage}
+                        : require('../../../assets/default-profile.jpg')
+                    }
+                    style={styles.participantImage}
+                  />
+                  <Text style={styles.participantName}>
+                    {participant.nickname || '익명'}
+                  </Text>
+                </View>
                 <View style={styles.participantStickerInfo}>
                   <Text style={styles.participantStickers}>
                     ⭐ {participant.currentStickerCount}개 수집
@@ -496,6 +514,17 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 8,
+  },
+  participantHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  participantImage: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginRight: 8,
+    backgroundColor: colors.primaryLight,
   },
   participantName: {
     fontSize: 15, // 14에서 15로 증가

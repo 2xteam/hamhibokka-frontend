@@ -446,9 +446,19 @@ const GoalDetailScreen: React.FC = () => {
                 key={p.id || p.nickname || idx}
                 style={styles.participantItem}
                 onPress={() => handleParticipantPress(p)}>
-                <Text style={styles.participantName}>
-                  👬 {p.nickname || p.id || '이름없음'}
-                </Text>
+                <View style={styles.participantInfo}>
+                  <Image
+                    source={
+                      p.profileImage
+                        ? {uri: p.profileImage}
+                        : require('../../assets/default-profile.jpg')
+                    }
+                    style={styles.participantImage}
+                  />
+                  <Text style={styles.participantName}>
+                    {p.nickname || '이름없음'}
+                  </Text>
+                </View>
               </TouchableOpacity>
             ))
           ) : (
@@ -871,6 +881,17 @@ const styles = StyleSheet.create({
       colors.components.goalDetail.section.participant.background,
     borderRadius: 12,
     marginBottom: 8,
+  },
+  participantInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  participantImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 12,
+    backgroundColor: colors.primaryLight,
   },
   participantName: {
     fontSize: 16,
