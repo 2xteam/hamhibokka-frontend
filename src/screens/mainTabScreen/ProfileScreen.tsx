@@ -15,17 +15,18 @@ import {
   View,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
-import ProfileHeader from '../components/ProfileHeader';
-import {getUploadProfileImageUrl} from '../config/api';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import ProfileHeader from '../../components/ProfileHeader';
+import UserList, {User} from '../../components/UserList';
+import {getUploadProfileImageUrl} from '../../config/api';
 import {
   APPROVE_FOLLOW,
   GET_FOLLOWS,
   GET_MY_PROFILE_IMAGE,
   UPDATE_NICKNAME,
   UPDATE_PROFILE_IMAGE,
-} from '../queries/user';
-import {colors} from '../styles/colors';
-import UserList, {User} from './components/UserList';
+} from '../../queries/user';
+import {colors} from '../../styles/colors';
 
 interface ProfileUser {
   id: string;
@@ -65,6 +66,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onUpdateUser,
 }) => {
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
   const [followsList, setFollowsList] = useState<Follow[]>([]);
   const [actualCurrentUserId, setActualCurrentUserId] = useState<string>('');
   const [uploading, setUploading] = useState(false);
@@ -184,11 +186,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
   // 팔로우 승인 뮤테이션
   const [approveFollow] = useMutation(APPROVE_FOLLOW, {
     onCompleted: () => {
-      Alert.alert('성공', '팔로우 요청을 승인했습니다.');
+      Alert.alert('😁', '팔로우 요청을 승인했습니다.');
       refetchFollows();
     },
     onError: error => {
-      Alert.alert('오류', '팔로우 승인에 실패했습니다.');
+      Alert.alert('😣', '팔로우 승인에 실패했습니다.');
       console.error('Approve follow error:', error);
     },
   });
@@ -196,11 +198,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
   // 프로필 이미지 업데이트 뮤테이션
   const [updateProfileImage] = useMutation(UPDATE_PROFILE_IMAGE, {
     onCompleted: data => {
-      Alert.alert('성공', '프로필 이미지가 업데이트되었습니다!');
+      Alert.alert('😁', '프로필 이미지가 업데이트되었습니다!');
       // 사용자 정보 새로고침 로직이 필요하다면 여기에 추가
     },
     onError: error => {
-      Alert.alert('오류', '프로필 이미지 업데이트에 실패했습니다.');
+      Alert.alert('😣', '프로필 이미지 업데이트에 실패했습니다.');
       console.error('Update profile image error:', error);
     },
   });
@@ -223,11 +225,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
         onUpdateUser(updatedUser);
       }
 
-      Alert.alert('성공', '닉네임이 성공적으로 변경되었습니다!');
+      Alert.alert('😁', '닉네임이 성공적으로 변경되었습니다!');
     },
     onError: error => {
       console.error('Error updating nickname:', error);
-      Alert.alert('오류', '닉네임 업데이트에 실패했습니다.');
+      Alert.alert('😣', '닉네임 업데이트에 실패했습니다.');
     },
   });
 
@@ -383,7 +385,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
       // 파일 크기 검증 (5MB)
       if (file.fileSize && file.fileSize > 5 * 1024 * 1024) {
-        Alert.alert('오류', '파일 크기는 5MB 이하여야 합니다.');
+        Alert.alert('😣', '파일 크기는 5MB 이하여야 합니다.');
         return;
       }
 
@@ -391,7 +393,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
       await uploadProfileImage(file);
     } catch (error) {
       console.error('이미지 선택 실패:', error);
-      Alert.alert('오류', '이미지 선택에 실패했습니다.');
+      Alert.alert('😣', '이미지 선택에 실패했습니다.');
     }
   };
 
@@ -456,7 +458,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
     } catch (error) {
       console.error('업로드 실패:', error);
       Alert.alert(
-        '오류',
+        '😣',
         `업로드 실패: ${
           error instanceof Error ? error.message : '알 수 없는 오류'
         }`,
@@ -517,8 +519,17 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* SafeArea 위쪽 영역을 같은 색상으로 덮기 */}
-      <View style={styles.statusBarArea} />
+      {/* 상태바 영역 */}
+      <View
+        style={[
+          styles.statusBarArea,
+          {
+            height: insets.top,
+          },
+        ]}
+      />
+
+      {/* 메인 컨텐츠 영역 */}
       <SafeAreaView style={styles.safeArea}>
         {/* 헤더 */}
         <View style={styles.header}>
@@ -547,7 +558,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   statusBarArea: {
-    height: 62, // SafeAreaView의 상단 여백을 채우기 위해 높이 설정
     backgroundColor: colors.primary,
   },
   safeArea: {

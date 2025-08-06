@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {SEARCH_GOALS_BY_TITLE} from '../queries/goal';
-import {colors} from '../styles/colors';
-import {searchScreenStyles} from '../styles/searchScreenStyles';
-import GoalList, {Goal} from './components/GoalList';
+import GoalList, {Goal} from '../../components/GoalList';
+import {SEARCH_GOALS_BY_TITLE} from '../../queries/goal';
+import {colors} from '../../styles/colors';
+import {searchScreenStyles} from '../../styles/searchScreenStyles';
 
 const GoalSearchScreen: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -63,7 +63,7 @@ const GoalSearchScreen: React.FC = () => {
 
       {!loading && !touched && (
         <View style={searchScreenStyles.welcomeSection}>
-          <View style={searchScreenStyles.welcomeIcon}>
+          <View style={searchScreenStyles.goalWelcomeIcon}>
             <Text style={searchScreenStyles.welcomeIconText}>🥇</Text>
           </View>
           <Text style={searchScreenStyles.welcomeTitle}>목표 찾기</Text>

@@ -3,9 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {GET_GOALS} from '../queries/goal';
-import FloatingAddGoalButton from './components/FloatingAddGoalButton';
-import GoalList, {Goal} from './components/GoalList';
+import FloatingAddGoalButton from '../../components/FloatingAddGoalButton';
+import GoalList, {Goal} from '../../components/GoalList';
+import {GET_GOALS} from '../../queries/goal';
 
 const GoalScreen: React.FC = () => {
   const navigation = useNavigation<any>();

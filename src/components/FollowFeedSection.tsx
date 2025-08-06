@@ -2,8 +2,8 @@ import {useQuery} from '@apollo/client';
 import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {GET_MY_PARTICIPATED_GOALS} from '../../queries/goal';
-import {colors} from '../../styles/colors';
+import {GET_MY_PARTICIPATED_GOALS} from '../queries/goal';
+import {colors} from '../styles/colors';
 import GoalCard from './GoalCard';
 
 interface Goal {
@@ -52,7 +52,7 @@ const FollowFeedSection: React.FC<FollowFeedSectionProps> = ({navigation}) => {
   if (loading) {
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>👬 팔로우한 목표</Text>
+        <Text style={styles.sectionTitle}>👬 참여한 목표</Text>
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>참여한 목표를 불러오는 중...</Text>
         </View>
@@ -63,7 +63,7 @@ const FollowFeedSection: React.FC<FollowFeedSectionProps> = ({navigation}) => {
   if (participatedGoals.length === 0) {
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>👬 팔로우한 목표</Text>
+        <Text style={styles.sectionTitle}>👬 참여한 목표</Text>
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>아직 참여한 목표가 없어요! 🥺</Text>
           <Text style={styles.emptySubtext}>
@@ -77,7 +77,7 @@ const FollowFeedSection: React.FC<FollowFeedSectionProps> = ({navigation}) => {
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>👬 팔로우한 목표</Text>
+        <Text style={styles.sectionTitle}>👬 참여한 목표</Text>
         <TouchableOpacity
           onPress={() =>
             navigation.navigate('Goals', {screen: 'MyParticipated'})
@@ -114,6 +114,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: colors.primary,
+    marginBottom: 16,
   },
   seeAllText: {
     fontSize: 14,

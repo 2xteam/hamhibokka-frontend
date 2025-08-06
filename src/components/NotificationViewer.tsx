@@ -13,7 +13,8 @@ import {
   View,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {GET_INVITATIONS} from '../../queries/goal';
+import {GET_INVITATIONS} from '../queries/goal';
+import {formatDate} from '../utils/dateUtils';
 
 interface Invitation {
   id: string;
@@ -178,7 +179,7 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
                     source={
                       item.toUser?.profileImage
                         ? {uri: item.toUser.profileImage}
-                        : require('../../../assets/default-profile.jpg')
+                        : require('../../assets/default-profile.jpg')
                     }
                     style={styles.smallProfileImage}
                   />
@@ -194,7 +195,7 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
                     source={
                       item.fromUser?.profileImage
                         ? {uri: item.fromUser.profileImage}
-                        : require('../../../assets/default-profile.jpg')
+                        : require('../../assets/default-profile.jpg')
                     }
                     style={styles.smallProfileImage}
                   />
@@ -240,7 +241,7 @@ const NotificationViewer: React.FC<NotificationViewerProps> = ({
             </Text>
           </View>
           <Text style={styles.invitationTime}>
-            {new Date(item.createdAt).toLocaleDateString()}
+            {formatDate(item.createdAt)}
           </Text>
         </View>
       </TouchableOpacity>

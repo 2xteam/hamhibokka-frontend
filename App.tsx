@@ -3,15 +3,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import Reactotron from 'reactotron-react-native';
 import CustomBackButton from './src/components/CustomBackButton';
 import MainTabNavigator from './src/navigation/MainTabNavigator';
-import AuthScreen from './src/screens/AuthScreen';
-import CreateGoalScreen from './src/screens/CreateGoalScreen';
-import GoalDetailScreen from './src/screens/GoalDetailScreen';
-import InvitationDetailScreen from './src/screens/InvitationDetailScreen';
-import LoadingScreen from './src/screens/LoadingScreen';
-import UserProfileScreen from './src/screens/UserProfileScreen';
+import AuthScreen from './src/screens/etcScreen/AuthScreen';
+import CreateGoalScreen from './src/screens/etcScreen/CreateGoalScreen';
+import EditGoalScreen from './src/screens/etcScreen/EditGoalScreen';
+import GoalDetailScreen from './src/screens/etcScreen/GoalDetailScreen';
+import InvitationDetailScreen from './src/screens/etcScreen/InvitationDetailScreen';
+import LoadingScreen from './src/screens/etcScreen/LoadingScreen';
+import UserProfileScreen from './src/screens/etcScreen/UserProfileScreen';
 import apolloClient from './src/services/apollo-client';
 import {colors} from './src/styles/colors';
 
@@ -37,13 +39,13 @@ const commonHeaderStyle = {
   elevation: 0,
   shadowOpacity: 0,
   borderBottomWidth: 0,
-  height: 120,
 };
 
 const commonHeaderTitleStyle = {
   fontWeight: 'bold' as const,
-  fontSize: 24,
+  fontSize: 20,
   color: colors.white,
+  paddingBottom: 10,
 };
 
 // 헤더가 있는 화면을 위한 공통 옵션 생성 함수
@@ -131,55 +133,62 @@ const App: React.FC = () => {
   }
 
   return (
-    <ApolloProvider client={apolloClient}>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-            headerStyle: commonHeaderStyle,
-            headerTintColor: colors.white,
-            headerTitleStyle: commonHeaderTitleStyle,
-          }}>
-          {isAuthenticated ? (
-            <>
-              <Stack.Screen name="Main">
-                {() => (
-                  <MainTabNavigator
-                    user={user}
-                    onLogout={logout}
-                    onUpdateUser={updateUserInfo}
-                  />
-                )}
+    <SafeAreaProvider>
+      <ApolloProvider client={apolloClient}>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+              headerStyle: commonHeaderStyle,
+              headerTintColor: colors.white,
+              headerTitleStyle: commonHeaderTitleStyle,
+            }}>
+            {isAuthenticated ? (
+              <>
+                <Stack.Screen name="Main">
+                  {() => (
+                    <MainTabNavigator
+                      user={user}
+                      onLogout={logout}
+                      onUpdateUser={updateUserInfo}
+                    />
+                  )}
+                </Stack.Screen>
+                <Stack.Screen
+                  name="CreateGoal"
+                  component={CreateGoalScreen}
+                  options={createHeaderOptions('✨ 새 목표 만들기')}
+                />
+                <Stack.Screen
+                  name="GoalDetail"
+                  component={GoalDetailScreen}
+                  options={createHeaderOptions('🥇 목표 상세')}
+                />
+                <Stack.Screen
+                  name="EditGoal"
+                  component={EditGoalScreen}
+                  options={createHeaderOptions('✏️ 목표 수정')}
+                />
+                <Stack.Screen
+                  name="InvitationDetail"
+                  component={InvitationDetailScreen}
+                  options={createHeaderOptions('📨 목표 요청 상세')}
+                />
+                <Stack.Screen
+                  name="UserProfile"
+                  component={UserProfileScreen}
+                  options={createHeaderOptions('🤖 프로필')}
+                />
+              </>
+            ) : (
+              <Stack.Screen name="Auth">
+                {() => <AuthScreen onAuthSuccess={handleAuthSuccess} />}
               </Stack.Screen>
-              <Stack.Screen
-                name="CreateGoal"
-                component={CreateGoalScreen}
-                options={createHeaderOptions('✨ 새 목표 만들기')}
-              />
-              <Stack.Screen
-                name="GoalDetail"
-                component={GoalDetailScreen}
-                options={createHeaderOptions('🥇 목표 상세')}
-              />
-              <Stack.Screen
-                name="InvitationDetail"
-                component={InvitationDetailScreen}
-                options={createHeaderOptions('📨 목표 요청 상세')}
-              />
-              <Stack.Screen
-                name="UserProfile"
-                component={UserProfileScreen}
-                options={createHeaderOptions('🤖 프로필')}
-              />
-            </>
-          ) : (
-            <Stack.Screen name="Auth">
-              {() => <AuthScreen onAuthSuccess={handleAuthSuccess} />}
-            </Stack.Screen>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </ApolloProvider>
+            )}
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ApolloProvider>
+    </SafeAreaProvider>
   );
 };
 

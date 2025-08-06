@@ -1,10 +1,10 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-import ExploreTabScreen from '../screens/ExploreTabScreen';
-import GoalTabScreen from '../screens/GoalTabScreen';
-import HomeScreen from '../screens/HomeScreen';
-import ProfileScreen from '../screens/ProfileScreen';
+import ExploreTabScreen from '../screens/mainTabScreen/ExploreTabScreen';
+import GoalTabScreen from '../screens/mainTabScreen/GoalTabScreen';
+import HomeScreen from '../screens/mainTabScreen/HomeScreen';
+import ProfileScreen from '../screens/mainTabScreen/ProfileScreen';
 import {colors} from '../styles/colors';
 
 const Tab = createBottomTabNavigator();
@@ -83,10 +83,10 @@ const MainTabNavigator: React.FC<MainTabNavigatorProps> = ({
       <Tab.Screen
         name="Goals"
         component={GoalTabScreen}
-        options={{tabBarLabel: '목표 관리'}}
+        options={{tabBarLabel: '목표'}}
       />
 
-      <Tab.Screen name="Explore" options={{tabBarLabel: '탐색'}}>
+      <Tab.Screen name="Explore" options={{tabBarLabel: '찾기'}}>
         {() => <ExploreTabScreen />}
       </Tab.Screen>
 

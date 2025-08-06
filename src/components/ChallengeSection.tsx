@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
-import {GET_FOLLOWED_USERS_GOALS} from '../../queries/goal';
-import {colors} from '../../styles/colors';
+import {GET_FOLLOWED_USERS_GOALS} from '../queries/goal';
+import {colors} from '../styles/colors';
 import GoalCard from './GoalCard';
 
 interface Goal {

@@ -12,14 +12,15 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {GET_INVITATIONS} from '../queries/goal';
-import {colors} from '../styles/colors';
-import ChallengeSection from './components/ChallengeSection';
-import FloatingAddGoalButton from './components/FloatingAddGoalButton';
-import FollowFeedSection from './components/FollowFeedSection';
-import MyCreatedGoalsSection from './components/GoalSummarySection';
-import NotificationViewer from './components/NotificationViewer';
+import ChallengeSection from '../../components/ChallengeSection';
+import FloatingAddGoalButton from '../../components/FloatingAddGoalButton';
+import FollowFeedSection from '../../components/FollowFeedSection';
+import MyCreatedGoalsSection from '../../components/GoalSummarySection';
+import NotificationViewer from '../../components/NotificationViewer';
+import {GET_INVITATIONS} from '../../queries/goal';
+import {colors} from '../../styles/colors';
 
 interface User {
   id: string;
@@ -38,6 +39,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
   const [notificationViewerVisible, setNotificationViewerVisible] =
     useState(false);
   const navigation = useNavigation<any>();
+  const insets = useSafeAreaInsets();
 
   // StatusBar 설정
   useEffect(() => {
@@ -87,9 +89,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
 
   return (
     <View style={styles.container}>
-      {/* 상태바 설정 */}
-      {/* SafeArea 위쪽 영역을 같은 색상으로 덮기 */}
-      <View style={styles.statusBarArea} />
+      {/* 상태바 영역 */}
+      <View
+        style={[
+          styles.statusBarArea,
+          {
+            height: insets.top,
+          },
+        ]}
+      />
+
+      {/* 메인 컨텐츠 영역 */}
       <SafeAreaView style={styles.safeArea}>
         {/* 헤더 */}
         <View style={styles.header}>
@@ -145,7 +155,6 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   statusBarArea: {
-    height: 62, // SafeAreaView의 상단 여백을 채우기 위한 높이
     backgroundColor: colors.primary,
   },
   safeArea: {

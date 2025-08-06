@@ -8,13 +8,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {colors} from '../../styles/colors';
+import {colors} from '../styles/colors';
 
 export interface Goal {
   id: string;
   goalId: string;
   title: string;
   description?: string;
+  goalImage?: string;
   stickerCount: number;
   mode?: string;
   visibility?: string;
@@ -155,7 +156,11 @@ const GoalList: React.FC<GoalListProps> = ({
 
         <View style={styles.goalHeader}>
           <View style={styles.goalIconContainer}>
-            <Text style={styles.goalEmoji}>{getGoalEmoji(item.title)}</Text>
+            {item.goalImage ? (
+              <Image source={{uri: item.goalImage}} style={styles.goalImage} />
+            ) : (
+              <Text style={styles.goalEmoji}>{getGoalEmoji(item.title)}</Text>
+            )}
           </View>
           <View style={styles.goalTitleContainer}>
             <Text style={styles.goalTitle}>{item.title}</Text>
@@ -241,7 +246,7 @@ const GoalList: React.FC<GoalListProps> = ({
                     source={
                       participant.profileImage
                         ? {uri: participant.profileImage}
-                        : require('../../../assets/default-profile.jpg')
+                        : require('../../assets/default-profile.jpg')
                     }
                     style={styles.participantImage}
                   />
@@ -372,13 +377,18 @@ const styles = StyleSheet.create({
   goalIconContainer: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 12,
     backgroundColor: colors.components.goalList.header.icon.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
     borderWidth: 2,
     borderColor: colors.components.goalList.header.icon.border,
+  },
+  goalImage: {
+    width: 46,
+    height: 46,
+    borderRadius: 10,
   },
   goalEmoji: {
     fontSize: 28,

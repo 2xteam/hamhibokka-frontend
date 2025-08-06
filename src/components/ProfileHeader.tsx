@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {
   ActivityIndicator,
   Image,
-  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -10,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import {colors} from '../styles/colors';
+import ImageModal from './ImageModal';
 
 interface ProfileHeaderProps {
   nickname: string;
@@ -129,34 +129,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       </View>
 
       {/* 이미지 확대 모달 */}
-      <Modal
+      <ImageModal
         visible={imageModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setImageModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <TouchableOpacity
-            style={styles.modalBackground}
-            activeOpacity={1}
-            onPress={() => setImageModalVisible(false)}>
-            <TouchableOpacity
-              style={styles.modalContent}
-              activeOpacity={1}
-              onPress={() => {}}>
-              <Image
-                source={{uri: profileImage}}
-                style={styles.expandedImage}
-                resizeMode="contain"
-              />
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setImageModalVisible(false)}>
-                <Text style={styles.closeButtonText}>✕</Text>
-              </TouchableOpacity>
-            </TouchableOpacity>
-          </TouchableOpacity>
-        </View>
-      </Modal>
+        imageUri={profileImage || null}
+        onClose={() => setImageModalVisible(false)}
+      />
     </>
   );
 };
@@ -291,44 +268,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.medium,
     textAlign: 'center',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalBackground: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  expandedImage: {
-    width: 300,
-    height: 300,
-    borderRadius: 20,
-    backgroundColor: '#FFFFFF',
-  },
-  closeButton: {
-    position: 'absolute',
-    top: -20,
-    right: -20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  closeButtonText: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: 'bold',
   },
 });
 

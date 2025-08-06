@@ -11,8 +11,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {GET_GOALS_BY_USER_ID} from '../../queries/goal';
-import {CREATE_FOLLOW} from '../../queries/user';
+import {
+  FOLLOW_BUTTON_TEXT,
+  FOLLOW_STATUS,
+  FOLLOW_STATUS_TEXT,
+} from '../constants/followStatus';
+import {GET_GOALS_BY_USER_ID} from '../queries/goal';
+import {CREATE_FOLLOW} from '../queries/user';
 import GoalList, {Goal} from './GoalList';
 
 interface User {
@@ -59,14 +64,14 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       }
 
       if (status === 'approved') {
-        Alert.alert('성공', '맞팔로우가 되었습니다!');
+        Alert.alert('😁', '맞팔로우가 되었습니다!');
       } else {
-        Alert.alert('성공', '팔로우 요청을 보냈습니다.');
+        Alert.alert('😁', '팔로우 요청을 보냈습니다.');
       }
     },
     onError: error => {
       setIsLoading(false);
-      Alert.alert('오류', '팔로우 요청에 실패했습니다.');
+      Alert.alert('😣', '팔로우 요청에 실패했습니다.');
       console.error('Create follow error:', error);
     },
   });
@@ -106,10 +111,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   // 팔로우 상태에 따른 표시 텍스트
   const getFollowStatusText = () => {
     switch (followStatus) {
-      case 'pending':
-        return '대기중';
-      case 'approved':
-        return '맞팔중';
+      case FOLLOW_STATUS.PENDING:
+        return FOLLOW_STATUS_TEXT[FOLLOW_STATUS.PENDING];
+      case FOLLOW_STATUS.APPROVED:
+        return FOLLOW_STATUS_TEXT[FOLLOW_STATUS.APPROVED];
       default:
         return '팔로우 중';
     }
@@ -178,7 +183,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
               onPress={handleFollowToggle}
               disabled={isLoading}>
               <Text style={styles.followButtonText}>
-                {isLoading ? '처리 중...' : '팔로우'}
+                {isLoading ? '처리 중...' : FOLLOW_BUTTON_TEXT.FOLLOW}
               </Text>
             </TouchableOpacity>
           )}

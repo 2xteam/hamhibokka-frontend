@@ -1,15 +1,24 @@
 import {useQuery} from '@apollo/client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect} from '@react-navigation/native';
-import React, {useCallback} from 'react';
-import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {GET_GOALS} from '../../queries/goal';
-import {colors} from '../../styles/colors';
+import React, {useCallback, useEffect, useState} from 'react';
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {GET_GOALS} from '../queries/goal';
+import {colors} from '../styles/colors';
 
 interface Goal {
   id: string;
   goalId: string;
   title: string;
   description?: string;
+  goalImage?: string;
   stickerCount: number;
   mode?: string;
   visibility?: string;
@@ -30,6 +39,25 @@ interface MyCreatedGoalsSectionProps {
 const MyCreatedGoalsSection: React.FC<MyCreatedGoalsSectionProps> = ({
   navigation,
 }) => {
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // 현재 사용자 ID 가져오기
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('@hamhibokka_user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          setCurrentUserId(user.userId);
+        }
+      } catch (error) {
+        console.error('Failed to get current user:', error);
+      }
+    };
+
+    getCurrentUser();
+  }, []);
+
   const {
     data: goalsData,
     loading,
@@ -84,39 +112,89 @@ const MyCreatedGoalsSection: React.FC<MyCreatedGoalsSectionProps> = ({
     navigation.navigate('GoalDetail', {id: goal.id});
   };
 
-  const renderGoalItem = ({item}: {item: Goal}) => (
-    <TouchableOpacity
-      style={styles.goalCard}
-      onPress={() => handleGoalPress(item)}>
-      <View style={styles.goalIconContainer}>
-        <Text style={styles.goalEmoji}>{getGoalEmoji(item.title)}</Text>
-      </View>
-      <Text style={styles.goalTitle} numberOfLines={1}>
-        {item.title}
-      </Text>
-      <View style={styles.goalMeta}>
-        <Text style={styles.modeEmoji}>{getModeEmoji(item.mode)}</Text>
-        <Text style={styles.modeText}>
-          {item.mode === 'personal'
-            ? '개인'
-            : item.mode === 'competition'
-            ? '경쟁'
-            : item.mode === 'challenger_recruitment'
-            ? '챌린저'
-            : '목표'}
+  const renderGoalItem = ({item}: {item: Goal}) => {
+    // 나의 목표에서는 목표 생성자의 관점에서 진행률을 보여줌
+    const myParticipant = item.participants?.find(
+      (p: any) => p.userId === currentUserId,
+    );
+
+    let progress = 0;
+    let currentStickerCount = 0;
+    let totalStickerCount = item.stickerCount || 0;
+
+    if (myParticipant) {
+      // 내가 참여한 경우 내 진행률 사용
+      currentStickerCount = myParticipant.currentStickerCount || 0;
+      progress =
+        totalStickerCount > 0
+          ? Math.round((currentStickerCount / totalStickerCount) * 100)
+          : 0;
+    } else if (item.participants && item.participants.length > 0) {
+      // 내가 참여하지 않았지만 다른 참여자들이 있는 경우 최고 진행률을 보여줌
+      const validParticipants = item.participants.filter(
+        (p: any) => p.currentStickerCount !== undefined,
+      );
+      if (validParticipants.length > 0) {
+        const maxCurrentStickers = Math.max(
+          ...validParticipants.map((p: any) => p.currentStickerCount || 0),
+        );
+        currentStickerCount = maxCurrentStickers;
+        progress =
+          totalStickerCount > 0
+            ? Math.round((currentStickerCount / totalStickerCount) * 100)
+            : 0;
+      }
+    }
+
+    return (
+      <TouchableOpacity
+        style={styles.goalCard}
+        onPress={() => handleGoalPress(item)}>
+        <View style={styles.goalIconContainer}>
+          {item.goalImage ? (
+            <Image
+              source={{uri: item.goalImage}}
+              style={styles.goalImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <Text style={styles.goalEmoji}>{getGoalEmoji(item.title)}</Text>
+          )}
+        </View>
+        <Text style={styles.goalTitle} numberOfLines={1}>
+          {item.title}
         </Text>
-      </View>
-      <View style={styles.stickerInfo}>
-        <Text style={styles.stickerEmoji}>⭐</Text>
-        <Text style={styles.stickerCount}>{item.stickerCount}개</Text>
-      </View>
-    </TouchableOpacity>
-  );
+        <View style={styles.goalMeta}>
+          <Text style={styles.modeEmoji}>{getModeEmoji(item.mode)}</Text>
+          <Text style={styles.modeText}>
+            {item.mode === 'personal'
+              ? '개인'
+              : item.mode === 'competition'
+              ? '경쟁'
+              : item.mode === 'challenger_recruitment'
+              ? '챌린저'
+              : '목표'}
+          </Text>
+        </View>
+        {/* Progress Bar */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBar}>
+            <View
+              style={[
+                styles.progressFill,
+                {width: `${Math.max(5, Math.min(100, progress))}%`},
+              ]}
+            />
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.section}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>🥇 내가 만든 목표</Text>
+        <Text style={styles.sectionTitle}>🥇 나의 목표</Text>
         <TouchableOpacity
           onPress={() => navigation.navigate('Goals', {screen: 'Goals'})}>
           <Text style={styles.seeAllText}>전체보기</Text>
@@ -226,7 +304,7 @@ const styles = StyleSheet.create({
   goalIconContainer: {
     width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 10,
     backgroundColor: colors.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
@@ -236,6 +314,11 @@ const styles = StyleSheet.create({
   },
   goalEmoji: {
     fontSize: 20,
+  },
+  goalImage: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
   },
   goalTitle: {
     fontSize: 12,
@@ -259,18 +342,34 @@ const styles = StyleSheet.create({
     color: colors.medium,
     fontWeight: '600',
   },
-  stickerInfo: {
-    flexDirection: 'row',
+  progressContainer: {
+    marginTop: 8,
     alignItems: 'center',
+    width: '100%',
   },
-  stickerEmoji: {
-    fontSize: 10,
-    marginRight: 2,
+  progressBar: {
+    width: '100%',
+    height: 10,
+    backgroundColor: '#E6F3FF',
+    borderRadius: 5,
+    overflow: 'hidden',
+    marginBottom: 4,
+    borderWidth: 0,
   },
-  stickerCount: {
-    fontSize: 10,
-    color: colors.warning,
-    fontWeight: 'bold',
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#20B2AA',
+    borderRadius: 5,
+    shadowColor: '#20B2AA',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  progressText: {
+    fontSize: 9,
+    color: colors.medium,
+    fontWeight: '600',
   },
 });
 

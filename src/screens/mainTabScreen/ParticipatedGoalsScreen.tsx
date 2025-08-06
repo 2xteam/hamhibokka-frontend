@@ -3,9 +3,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import React, {useCallback, useEffect, useState} from 'react';
 import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {GET_MY_PARTICIPATED_GOALS} from '../queries/goal';
-import FloatingAddGoalButton from './components/FloatingAddGoalButton';
-import GoalList, {Goal} from './components/GoalList';
+import FloatingAddGoalButton from '../../components/FloatingAddGoalButton';
+import GoalList, {Goal} from '../../components/GoalList';
+import {GET_MY_PARTICIPATED_GOALS} from '../../queries/goal';
 
 const ParticipatedGoalsScreen: React.FC = () => {
   const navigation = useNavigation<any>();
