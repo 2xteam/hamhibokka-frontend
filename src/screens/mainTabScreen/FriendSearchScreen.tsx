@@ -11,9 +11,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {SEARCH_USERS_BY_NICKNAME} from '../queries/user';
-import {colors} from '../styles/colors';
-import {searchScreenStyles} from '../styles/searchScreenStyles';
+import {
+  FOLLOW_STATUS,
+  FOLLOW_STATUS_DISPLAY,
+} from '../../constants/followStatus';
+import {SEARCH_USERS_BY_NICKNAME} from '../../queries/user';
+import {colors} from '../../styles/colors';
+import {searchScreenStyles} from '../../styles/searchScreenStyles';
 
 interface User {
   id: string;
@@ -154,7 +158,7 @@ const FriendSearchScreen: React.FC = () => {
                 source={
                   item.profileImage
                     ? {uri: item.profileImage}
-                    : require('../../assets/default-profile.jpg')
+                    : require('../../../assets/default-profile.jpg')
                 }
                 style={searchScreenStyles.userAvatar}
               />
@@ -168,10 +172,10 @@ const FriendSearchScreen: React.FC = () => {
                 {item.followStatus && (
                   <View style={searchScreenStyles.statusContainer}>
                     <Text style={searchScreenStyles.followedText}>
-                      {item.followStatus === 'pending'
-                        ? '⏳ 대기중'
-                        : item.followStatus === 'approved'
-                        ? '🤝 맞팔중'
+                      {item.followStatus === FOLLOW_STATUS.PENDING
+                        ? FOLLOW_STATUS_DISPLAY[FOLLOW_STATUS.PENDING]
+                        : item.followStatus === FOLLOW_STATUS.APPROVED
+                        ? FOLLOW_STATUS_DISPLAY[FOLLOW_STATUS.APPROVED]
                         : '👬 팔로우 중'}
                     </Text>
                   </View>

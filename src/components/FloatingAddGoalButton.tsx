@@ -2,7 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import React from 'react';
 import {StyleSheet, TouchableOpacity} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {colors} from '../../styles/colors';
+import {colors} from '../styles/colors';
 
 const FloatingAddGoalButton: React.FC = () => {
   const navigation = useNavigation<any>();

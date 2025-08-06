@@ -1,4 +1,3 @@
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import React, {useEffect} from 'react';
 import {
   Platform,
@@ -7,29 +6,28 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import {colors} from '../styles/colors';
-import CommonTabNavigator from './components/CommonTabNavigator';
-import GoalScreen from './GoalScreen';
-import ParticipatedGoalsScreen from './ParticipatedGoalsScreen';
-
-const Tab = createMaterialTopTabNavigator();
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import CommonTabNavigator from '../../components/CommonTabNavigator';
+import {colors} from '../../styles/colors';
+import FriendSearchScreen from './FriendSearchScreen';
+import GoalSearchScreen from './GoalSearchScreen';
 
 const screens = [
   {
-    name: 'MyGoals',
-    component: GoalScreen,
-    options: {tabBarLabel: '나의 목표'},
+    name: 'FriendSearch',
+    component: FriendSearchScreen,
+    options: {tabBarLabel: '친구 찾기'},
   },
   {
-    name: 'MyParticipated',
-    component: ParticipatedGoalsScreen,
-    options: {tabBarLabel: '참여한 목표'},
+    name: 'GoalSearch',
+    component: GoalSearchScreen,
+    options: {tabBarLabel: '목표 찾기'},
   },
 ];
 
 const tabBarOptions = {
   tabBarLabelStyle: {
-    fontSize: 24,
+    fontSize: 24, // 22에서 24로 증가
     fontWeight: 'bold',
     textShadowColor: colors.primaryDark,
     textShadowOffset: {width: 1, height: 1},
@@ -54,11 +52,13 @@ const tabBarOptions = {
     marginTop: -10,
   },
   tabBarItemStyle: {
-    paddingVertical: 14,
+    paddingVertical: 14, // 12에서 16으로 증가
   },
 };
 
-const GoalTabScreen: React.FC = () => {
+const ExploreTabScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
+
   useEffect(() => {
     StatusBar.setBarStyle('light-content');
     if (Platform.OS === 'android') {
@@ -69,13 +69,22 @@ const GoalTabScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* SafeArea 위쪽 영역을 같은 색상으로 덮기 */}
-      <View style={styles.statusBarArea} />
+      {/* 상태바 영역 */}
+      <View
+        style={[
+          styles.statusBarArea,
+          {
+            height: insets.top,
+          },
+        ]}
+      />
+
+      {/* 메인 컨텐츠 영역 */}
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.tabContainer}>
           <CommonTabNavigator
             screens={screens}
-            initialRouteName="MyGoals"
+            initialRouteName="FriendSearch"
             tabBarOptions={tabBarOptions}
           />
         </View>
@@ -90,11 +99,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   statusBarArea: {
-    height: 62, // SafeAreaView의 상단 여백을 채우기 위한 높이
     backgroundColor: colors.primary,
   },
   safeArea: {
     flex: 1,
+    backgroundColor: colors.background,
+    zIndex: 1,
   },
   tabContainer: {
     flex: 1,
@@ -103,4 +113,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GoalTabScreen;
+export default ExploreTabScreen;

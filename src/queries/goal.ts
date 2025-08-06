@@ -7,6 +7,7 @@ export const GET_GOALS = gql`
       goalId
       title
       description
+      goalImage
       stickerCount
       mode
       visibility
@@ -40,6 +41,7 @@ export const GET_GOAL = gql`
       goalId
       title
       description
+      goalImage
       stickerCount
       mode
       visibility
@@ -73,6 +75,7 @@ export const CREATE_GOAL = gql`
       goalId
       title
       description
+      goalImage
       stickerCount
       visibility
     }
@@ -85,6 +88,26 @@ export const DELETE_GOAL = gql`
   }
 `;
 
+export const UPDATE_GOAL = gql`
+  mutation UpdateGoal($id: String!, $input: GoalInput!) {
+    updateGoal(id: $id, input: $input) {
+      id
+      goalId
+      title
+      description
+      goalImage
+      stickerCount
+      mode
+      visibility
+      autoApprove
+      status
+      createdBy
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
 export const LEAVE_GOAL = gql`
   mutation LeaveGoal($input: LeaveGoalInput!) {
     leaveGoal(input: $input) {
@@ -92,6 +115,7 @@ export const LEAVE_GOAL = gql`
       goalId
       title
       description
+      goalImage
       stickerCount
       mode
       visibility
@@ -157,6 +181,7 @@ export const GET_INVITATION = gql`
         goalId
         title
         description
+        goalImage
         stickerCount
         mode
         visibility
@@ -222,6 +247,7 @@ export const UPDATE_GOAL_INVITATION = gql`
         goalId
         title
         description
+        goalImage
         stickerCount
         mode
         visibility
@@ -270,6 +296,7 @@ export const RECEIVE_STICKER = gql`
       goalId
       title
       description
+      goalImage
       stickerCount
       mode
       visibility
@@ -303,6 +330,7 @@ export const SEARCH_GOALS_BY_TITLE = gql`
       goalId
       title
       description
+      goalImage
       stickerCount
       mode
       visibility
@@ -336,6 +364,7 @@ export const GET_GOALS_BY_USER_ID = gql`
       goalId
       title
       description
+      goalImage
       stickerCount
       mode
       visibility
@@ -369,6 +398,7 @@ export const GET_MY_PARTICIPATED_GOALS = gql`
       goalId
       title
       description
+      goalImage
       stickerCount
       mode
       visibility
@@ -401,6 +431,7 @@ export const GET_FOLLOWED_USERS_GOALS = gql`
       goalId
       title
       description
+      goalImage
       stickerCount
       mode
       visibility
@@ -420,6 +451,26 @@ export const GET_FOLLOWED_USERS_GOALS = gql`
           date
           count
         }
+      }
+    }
+  }
+`;
+
+export const GET_ALL_GOALS_BY_USER_ID = gql`
+  query GetAllGoalsByUserId($userId: String!) {
+    getAllGoalsByUserId(userId: $userId) {
+      id
+      goalId
+      title
+      description
+      goalImage
+      createdBy
+      creatorNickname
+      participants {
+        userId
+        nickname
+        status
+        currentStickerCount
       }
     }
   }
@@ -446,6 +497,7 @@ export const GET_INVITATIONS = gql`
         goalId
         title
         description
+        goalImage
         stickerCount
         mode
         visibility

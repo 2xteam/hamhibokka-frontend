@@ -11,8 +11,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {GET_INVITATION, UPDATE_GOAL_INVITATION} from '../queries/goal';
-import {colors} from '../styles/colors';
+import {GET_INVITATION, UPDATE_GOAL_INVITATION} from '../../queries/goal';
+import {colors} from '../../styles/colors';
+import {formatDate, formatDateTime} from '../../utils/dateUtils';
 
 const typeIconMap: Record<string, string> = {
   invite: 'person-add',
@@ -168,9 +169,7 @@ const InvitationDetailScreen: React.FC = () => {
               <Text style={styles.goalInfo}>
                 만든 날:{' '}
                 <Text style={styles.goalInfoValue}>
-                  {goal.createdAt
-                    ? new Date(goal.createdAt).toLocaleDateString()
-                    : '-'}
+                  {formatDate(goal.createdAt)}
                 </Text>
               </Text>
             </View>
@@ -237,7 +236,7 @@ const InvitationDetailScreen: React.FC = () => {
               <Text style={styles.invInfo}>
                 요청한 날:{' '}
                 <Text style={styles.invInfoValue}>
-                  {new Date(inv.createdAt).toLocaleString()}
+                  {formatDateTime(inv.createdAt)}
                 </Text>
               </Text>
             </View>
@@ -246,9 +245,7 @@ const InvitationDetailScreen: React.FC = () => {
               <Text style={styles.invInfo}>
                 응답한 날:{' '}
                 <Text style={styles.invInfoValue}>
-                  {inv.respondedAt
-                    ? new Date(inv.respondedAt).toLocaleString()
-                    : '-'}
+                  {inv.respondedAt ? formatDateTime(inv.respondedAt) : '-'}
                 </Text>
               </Text>
             </View>

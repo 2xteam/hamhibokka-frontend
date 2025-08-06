@@ -18,14 +18,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import ProfileHeader from '../components/ProfileHeader';
-import {GET_GOALS_BY_USER_ID} from '../queries/goal';
+import GoalList, {Goal} from '../../components/GoalList';
+import ProfileHeader from '../../components/ProfileHeader';
+import {
+  FOLLOW_BUTTON_TEXT,
+  FOLLOW_STATUS,
+  FOLLOW_STATUS_TEXT,
+} from '../../constants/followStatus';
+import {GET_ALL_GOALS_BY_USER_ID} from '../../queries/goal';
 import {
   CHECK_FOLLOW_STATUS,
   CREATE_FOLLOW,
   GET_FOLLOW_REQUESTS,
-} from '../queries/user';
-import GoalList, {Goal} from './components/GoalList';
+} from '../../queries/user';
 
 interface UserProfileParams {
   user: {
@@ -105,7 +110,7 @@ const UserProfileScreen: React.FC = () => {
 
   // 사용자의 목표 조회
   const {data: goalsData, loading: goalsLoading} = useQuery(
-    GET_GOALS_BY_USER_ID,
+    GET_ALL_GOALS_BY_USER_ID,
     {
       variables: {userId: user.userId},
     },
@@ -114,15 +119,15 @@ const UserProfileScreen: React.FC = () => {
   // 팔로우 생성 뮤테이션
   const [createFollow] = useMutation(CREATE_FOLLOW, {
     onCompleted: data => {
-      setFollowStatus('pending'); // 대기중 상태로 설정
+      setFollowStatus(FOLLOW_STATUS.PENDING); // 대기중 상태로 설정
       setIsLoading(false);
       // 팔로우 요청 상태 새로고침
       refetchFollowRequests();
-      Alert.alert('성공', '팔로우 요청을 보냈습니다.');
+      Alert.alert('😁', '팔로우 요청을 보냈습니다.');
     },
     onError: error => {
       setIsLoading(false);
-      Alert.alert('오류', '팔로우 요청에 실패했습니다.');
+      Alert.alert('😣', '팔로우 요청에 실패했습니다.');
       console.error('Create follow error:', error);
     },
   });
@@ -148,16 +153,18 @@ const UserProfileScreen: React.FC = () => {
     (request: any) =>
       request.followerId === currentUserId &&
       request.followingId === user.userId &&
-      request.status === 'pending',
+      request.status === FOLLOW_STATUS.PENDING,
   );
 
   // 실제 친구 상태 확인
   const actualFollowStatus = followStatusData?.checkFollowStatus?.followStatus;
 
   // 팔로우 상태 결정 (요청이 pending이면 대기중, 아니면 실제 친구 상태)
-  const displayFollowStatus = pendingRequest ? 'pending' : actualFollowStatus;
+  const displayFollowStatus = pendingRequest
+    ? FOLLOW_STATUS.PENDING
+    : actualFollowStatus;
 
-  const goals: Goal[] = goalsData?.getGoalsByUserId || [];
+  const goals: Goal[] = goalsData?.getAllGoalsByUserId || [];
 
   // 목표 클릭 핸들러
   const handleGoalPress = (goal: Goal) => {
@@ -186,7 +193,7 @@ const UserProfileScreen: React.FC = () => {
           onPress={handleFollowToggle}
           disabled={isLoading}>
           <Text style={styles.followButtonText}>
-            {isLoading ? '처리 중...' : '팔로우'}
+            {isLoading ? '처리 중...' : FOLLOW_BUTTON_TEXT.FOLLOW}
           </Text>
         </TouchableOpacity>
       )}
@@ -196,16 +203,18 @@ const UserProfileScreen: React.FC = () => {
         <View
           style={[
             styles.followedStatus,
-            (displayFollowStatus === 'pending' || followStatus === 'pending') &&
+            (displayFollowStatus === FOLLOW_STATUS.PENDING ||
+              followStatus === FOLLOW_STATUS.PENDING) &&
               styles.pendingStatus,
           ]}>
           <Text style={styles.followedStatusText}>
-            {displayFollowStatus === 'pending' || followStatus === 'pending'
-              ? '대기중'
-              : displayFollowStatus === 'approved'
-              ? '맞팔중'
-              : displayFollowStatus === 'mutual'
-              ? '맞팔중'
+            {displayFollowStatus === FOLLOW_STATUS.PENDING ||
+            followStatus === FOLLOW_STATUS.PENDING
+              ? FOLLOW_STATUS_TEXT[FOLLOW_STATUS.PENDING]
+              : displayFollowStatus === FOLLOW_STATUS.APPROVED
+              ? FOLLOW_STATUS_TEXT[FOLLOW_STATUS.APPROVED]
+              : displayFollowStatus === FOLLOW_STATUS.BLOCKED
+              ? FOLLOW_STATUS_TEXT[FOLLOW_STATUS.BLOCKED]
               : '팔로우 중'}
           </Text>
         </View>

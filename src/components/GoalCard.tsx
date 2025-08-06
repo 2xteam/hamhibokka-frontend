@@ -1,13 +1,21 @@
-import React from 'react';
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect, useState} from 'react';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {colors} from '../../styles/colors';
+import {
+  GOAL_STATUS_COLOR,
+  GOAL_STATUS_EMOJI,
+  GOAL_STATUS_TEXT,
+} from '../constants/goalStatus';
+import {colors} from '../styles/colors';
+import {formatDate} from '../utils/dateUtils';
 
 interface Goal {
   id: string;
   goalId: string;
   title: string;
   description?: string;
+  goalImage?: string;
   stickerCount: number;
   mode?: string;
   visibility?: string;
@@ -37,6 +45,25 @@ const GoalCard: React.FC<GoalCardProps> = ({
   showJoinButton = false,
   showDuration = false,
 }) => {
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // 현재 사용자 ID 가져오기
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const userData = await AsyncStorage.getItem('@hamhibokka_user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          setCurrentUserId(user.userId);
+        }
+      } catch (error) {
+        console.error('Failed to get current user:', error);
+      }
+    };
+
+    getCurrentUser();
+  }, []);
+
   const getGoalEmoji = (title: string) => {
     const lowerTitle = title.toLowerCase();
     if (lowerTitle.includes('운동') || lowerTitle.includes('스포츠'))
@@ -52,8 +79,24 @@ const GoalCard: React.FC<GoalCardProps> = ({
     return '🥇';
   };
 
+  const getStatusDisplay = (status?: string) => {
+    if (!status) return null;
+
+    switch (status) {
+      case 'active':
+        return `${GOAL_STATUS_EMOJI.active} ${GOAL_STATUS_TEXT.active}`;
+      case 'completed':
+        return `${GOAL_STATUS_EMOJI.completed} ${GOAL_STATUS_TEXT.completed}`;
+      case 'cancelled':
+        return `${GOAL_STATUS_EMOJI.cancelled} ${GOAL_STATUS_TEXT.cancelled}`;
+      default:
+        return null;
+    }
+  };
+
+  // 현재 사용자가 참여자인지 확인하고 해당 participant 찾기
   const participant = goal.participants?.find(
-    (p: any) => p.userId === goal.createdBy,
+    (p: any) => p.userId === currentUserId,
   );
 
   // progress 계산 시 stickerCount가 0이거나 undefined인 경우 처리
@@ -79,17 +122,20 @@ const GoalCard: React.FC<GoalCardProps> = ({
       <View style={styles.feedHeader}>
         <View style={styles.feedUserInfo}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{getGoalEmoji(goal.title)}</Text>
+            {goal.goalImage ? (
+              <Image
+                source={{uri: goal.goalImage}}
+                style={styles.avatarImage}
+              />
+            ) : (
+              <Text style={styles.avatarText}>{getGoalEmoji(goal.title)}</Text>
+            )}
           </View>
           <View style={styles.titleContainer}>
             <Text style={styles.feedUserName} numberOfLines={1}>
               {goal.title}
             </Text>
-            <Text style={styles.feedTime}>
-              {goal.updatedAt
-                ? new Date(goal.updatedAt).toLocaleDateString()
-                : '-'}
-            </Text>
+            <Text style={styles.feedTime}>{formatDate(goal.updatedAt)}</Text>
           </View>
         </View>
         {showParticipantCount && (
@@ -104,6 +150,24 @@ const GoalCard: React.FC<GoalCardProps> = ({
       <Text style={styles.feedGoalTitle} numberOfLines={2}>
         {goal.description || '설명이 없습니다.'}
       </Text>
+
+      {/* 목표 상태 표시 */}
+      {goal.status && (
+        <View style={styles.statusContainer}>
+          <Text
+            style={[
+              styles.statusText,
+              {
+                color:
+                  GOAL_STATUS_COLOR[
+                    goal.status as keyof typeof GOAL_STATUS_COLOR
+                  ] || colors.primary,
+              },
+            ]}>
+            {getStatusDisplay(goal.status)}
+          </Text>
+        </View>
+      )}
 
       {showProgress && (
         <View style={styles.feedProgress}>
@@ -122,12 +186,12 @@ const GoalCard: React.FC<GoalCardProps> = ({
         </View>
       )}
 
-      {(showDuration || showJoinButton) && (
+      {(showDuration || (showJoinButton && goal.status !== 'completed')) && (
         <View style={styles.footer}>
           {showDuration && (
             <Text style={styles.duration}>{daysLeft}일 남음</Text>
           )}
-          {showJoinButton && (
+          {showJoinButton && goal.status !== 'completed' && (
             <TouchableOpacity style={styles.joinButton}>
               <Text style={styles.joinButtonText}>참여하기</Text>
             </TouchableOpacity>
@@ -166,13 +230,18 @@ const styles = StyleSheet.create({
   avatar: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 12,
     backgroundColor: colors.components.goalCard.avatar.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
     borderWidth: 2,
     borderColor: colors.components.goalCard.avatar.border,
+  },
+  avatarImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
   },
   avatarText: {
     fontSize: 20,
@@ -220,15 +289,20 @@ const styles = StyleSheet.create({
   progressBar: {
     flex: 1,
     height: 10,
-    backgroundColor: colors.components.goalCard.progress.background,
+    backgroundColor: '#E6F3FF',
     borderRadius: 5,
     marginRight: 12,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.components.goalCard.progress.fill,
+    backgroundColor: '#20B2AA',
     borderRadius: 5,
+    shadowColor: '#20B2AA',
+    shadowOffset: {width: 0, height: 1},
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+    elevation: 2,
   },
   progressText: {
     fontSize: 14,
@@ -277,6 +351,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.components.goalCard.participant.text,
     marginLeft: 6,
+    fontWeight: '600',
+  },
+  statusContainer: {
+    marginBottom: 12,
+  },
+  statusText: {
+    fontSize: 14,
     fontWeight: '600',
   },
 });

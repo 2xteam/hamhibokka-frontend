@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Dimensions, View, ViewStyle} from 'react-native';
 import {SceneMap, TabBar, TabView} from 'react-native-tab-view';
-import {colors} from '../../styles/colors';
+import {colors} from '../styles/colors';
 
 export interface TabRoute {
   key: string;

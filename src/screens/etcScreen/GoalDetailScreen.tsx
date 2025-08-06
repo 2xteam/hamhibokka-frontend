@@ -19,28 +19,23 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import ImageModal from '../../components/ImageModal';
+import {GOAL_STATUS_EMOJI, GOAL_STATUS_TEXT} from '../../constants/goalStatus';
 import {
   CREATE_GOAL_JOIN_REQUEST,
   DELETE_GOAL,
   GET_GOAL,
   LEAVE_GOAL,
   RECEIVE_STICKER,
-} from '../queries/goal';
-import {CHECK_FOLLOW_STATUS} from '../queries/user';
-import {colors} from '../styles/colors';
+} from '../../queries/goal';
+import {CHECK_FOLLOW_STATUS} from '../../queries/user';
+import {colors} from '../../styles/colors';
+import {formatDate} from '../../utils/dateUtils';
 
 interface GoalDetailParams {
   id: string;
   from?: string;
-}
-
-function formatDate(dateStr?: string) {
-  if (!dateStr) return '-';
-  const d = new Date(dateStr);
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(
-    2,
-    '0',
-  )}.${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function getModeLabel(mode?: string) {
@@ -49,9 +44,12 @@ function getModeLabel(mode?: string) {
   return mode || '-';
 }
 function getStatusLabel(status?: string) {
-  if (status === 'active') return '진행 중';
-  if (status === 'completed') return '완료';
-  if (status === 'archived') return '보관됨';
+  if (status === 'active')
+    return `${GOAL_STATUS_EMOJI.active} ${GOAL_STATUS_TEXT.active}`;
+  if (status === 'completed')
+    return `${GOAL_STATUS_EMOJI.completed} ${GOAL_STATUS_TEXT.completed}`;
+  if (status === 'cancelled')
+    return `${GOAL_STATUS_EMOJI.cancelled} ${GOAL_STATUS_TEXT.cancelled}`;
   return status || '-';
 }
 
@@ -59,6 +57,7 @@ const GoalDetailScreen: React.FC = () => {
   const route = useRoute<RouteProp<{GoalDetail: GoalDetailParams}>>();
   const navigation = useNavigation<any>();
   const {id, from} = route.params;
+  const insets = useSafeAreaInsets();
   const {data, loading, error, refetch} = useQuery(GET_GOAL, {
     variables: {id},
     fetchPolicy: 'network-only', // 항상 네트워크에서 최신 데이터 가져오기
@@ -68,6 +67,10 @@ const GoalDetailScreen: React.FC = () => {
   const [giveStickerCount, setGiveStickerCount] = useState('1');
   const [joinMessage, setJoinMessage] = useState('참가 요청해요!');
   const [joinModalVisible, setJoinModalVisible] = useState(false);
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+  const [selectedGoalImage, setSelectedGoalImage] = useState<string | null>(
+    null,
+  );
   const [createJoinRequest, {loading: joinLoading}] = useMutation(
     CREATE_GOAL_JOIN_REQUEST,
     {
@@ -241,7 +244,7 @@ const GoalDetailScreen: React.FC = () => {
     }
   };
 
-  // 내가 만든 목표일 때 바로 참여하는 함수
+  // 나의 목표일 때 바로 참여하는 함수
   const handleDirectJoin = async () => {
     try {
       await createJoinRequest({
@@ -268,7 +271,7 @@ const GoalDetailScreen: React.FC = () => {
     }
   };
 
-  // 내가 만든 목표인지 확인
+  // 나의 목표인지 확인
   const isMyGoal =
     goal.createdBy && currentUserId && goal.createdBy === currentUserId;
 
@@ -346,7 +349,7 @@ const GoalDetailScreen: React.FC = () => {
     );
 
     if (!currentParticipant) {
-      Alert.alert('오류', '참여자 정보를 찾을 수 없어요.');
+      Alert.alert('😣', '참여자 정보를 찾을 수 없어요.');
       return;
     }
 
@@ -403,6 +406,22 @@ const GoalDetailScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}>
         {/* 제목/설명 */}
         <View style={styles.headerSection}>
+          {/* 목표 이미지 */}
+          {goal.goalImage && (
+            <TouchableOpacity
+              style={styles.goalImageContainer}
+              onPress={() => {
+                // 큰 화면 보기 모달 표시
+                setSelectedGoalImage(goal.goalImage);
+                setImageModalVisible(true);
+              }}>
+              <Image
+                source={{uri: goal.goalImage}}
+                style={styles.goalImage}
+                resizeMode="cover"
+              />
+            </TouchableOpacity>
+          )}
           <Text style={styles.title}>🥇 {goal.title}</Text>
           <Text style={styles.description}>
             {goal.description || '설명이 없어요 😊'}
@@ -424,7 +443,31 @@ const GoalDetailScreen: React.FC = () => {
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>👑 만든 사람</Text>
-            <Text style={styles.infoValue}>{goal.creatorNickname || '-'}</Text>
+            <TouchableOpacity
+              onPress={() => {
+                if (goal.createdBy && goal.creatorNickname) {
+                  // 본인의 프로필인지 확인
+                  if (goal.createdBy === currentUserId) {
+                    // 본인이면 Main 탭의 Profile로 이동
+                    navigation.navigate('Main', {screen: 'Profile'});
+                  } else {
+                    // 타인이면 UserProfile로 이동
+                    navigation.navigate('UserProfile', {
+                      user: {
+                        id: goal.createdBy,
+                        userId: goal.createdBy,
+                        nickname: goal.creatorNickname,
+                        email: '',
+                        profileImage: undefined,
+                      },
+                    });
+                  }
+                }
+              }}>
+              <Text style={[styles.infoValue, styles.clickableText]}>
+                {goal.creatorNickname || '-'}
+              </Text>
+            </TouchableOpacity>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>🤝 참가자 수</Text>
@@ -451,7 +494,7 @@ const GoalDetailScreen: React.FC = () => {
                     source={
                       p.profileImage
                         ? {uri: p.profileImage}
-                        : require('../../assets/default-profile.jpg')
+                        : require('../../../assets/default-profile.jpg')
                     }
                     style={styles.participantImage}
                   />
@@ -464,6 +507,21 @@ const GoalDetailScreen: React.FC = () => {
           ) : (
             <Text style={styles.emptyText}>아직 참가자가 없어요 😊</Text>
           )}
+
+          {/* 목표 생성자일 때만 수정 버튼 표시 */}
+          {goal.createdBy &&
+            currentUserId &&
+            goal.createdBy === currentUserId && (
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() =>
+                  navigation.navigate('EditGoal', {
+                    goalId: goal.id,
+                  })
+                }>
+                <Text style={styles.editButtonText}>✏️ 목표 수정</Text>
+              </TouchableOpacity>
+            )}
         </View>
         {/* 참가자 현황 모달 */}
         <Modal
@@ -503,7 +561,7 @@ const GoalDetailScreen: React.FC = () => {
                         source={
                           selectedParticipant.profileImage
                             ? {uri: selectedParticipant.profileImage}
-                            : require('../../assets/default-profile.jpg')
+                            : require('../../../assets/default-profile.jpg')
                         }
                         style={styles.avatarImage}
                       />
@@ -694,8 +752,8 @@ const GoalDetailScreen: React.FC = () => {
           </View>
         </Modal>
       </ScrollView>
-      {/* 목표 참여/나가기 플로팅 버튼 - personal 모드가 아닐 때만 표시 */}
-      {goal.mode !== 'personal' && (
+      {/* 목표 참여/나가기 플로팅 버튼 - personal 모드가 아니고 완료되지 않은 경우만 표시 */}
+      {goal.mode !== 'personal' && goal.status !== 'completed' && (
         <>
           {/* 참여하기 버튼 - 참여하지 않은 경우 */}
           {!goal.isParticipant && (
@@ -775,6 +833,13 @@ const GoalDetailScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
+
+      {/* 목표 이미지 큰 화면 보기 모달 */}
+      <ImageModal
+        visible={imageModalVisible}
+        imageUri={selectedGoalImage}
+        onClose={() => setImageModalVisible(false)}
+      />
     </View>
   );
 };
@@ -783,6 +848,44 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.components.goalDetail.background,
+  },
+  safeArea: {
+    flex: 1,
+  },
+  statusBarArea: {
+    backgroundColor: colors.components.goalDetail.background,
+  },
+  customHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.primary,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
+    borderBottomWidth: 3,
+    borderBottomColor: colors.primaryLight,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  backButton: {
+    padding: 8,
+  },
+  backButtonText: {
+    fontSize: 24,
+    color: colors.white,
+    fontWeight: 'bold',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: colors.white,
+  },
+  headerSpacer: {
+    width: 40,
   },
   scrollView: {
     flex: 1,
@@ -1267,6 +1370,49 @@ const styles = StyleSheet.create({
     color: '#FFFFFF', // 흰색 텍스트
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  editButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  editButtonText: {
+    color: colors.white,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  clickableText: {
+    textDecorationLine: 'underline',
+    color: colors.primary,
+  },
+  goalImageContainer: {
+    width: 73,
+    height: 73,
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 16,
+    backgroundColor: colors.components.goalDetail.card.background,
+    borderWidth: 2,
+    borderColor: colors.components.goalDetail.card.border,
+    shadowColor: colors.components.goalDetail.card.shadow,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  goalImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
   },
 });
 

@@ -7,6 +7,7 @@ export const API_CONFIG = {
     BASE_URL: 'http://localhost:3000', // iOS 시뮬레이터용 local
     GRAPHQL_ENDPOINT: '/graphql',
     UPLOAD_PROFILE_IMAGE_ENDPOINT: '/upload/profile-image',
+    UPLOAD_GOAL_IMAGE_ENDPOINT: '/upload/goal-image',
   },
 
   // 프로덕션 환경
@@ -15,6 +16,7 @@ export const API_CONFIG = {
       'https://hamhibokka-backend-gnbgh2gxabbea0fy.koreacentral-01.azurewebsites.net',
     GRAPHQL_ENDPOINT: '/graphql',
     UPLOAD_PROFILE_IMAGE_ENDPOINT: '/upload/profile-image',
+    UPLOAD_GOAL_IMAGE_ENDPOINT: '/upload/goal-image',
   },
 };
 
@@ -36,4 +38,9 @@ export const getGraphQLUri = () => {
 export const getUploadProfileImageUrl = () => {
   const config = getCurrentApiConfig();
   return `${config.BASE_URL}${config.UPLOAD_PROFILE_IMAGE_ENDPOINT}`;
+};
+
+export const getUploadGoalImageUrl = () => {
+  const config = getCurrentApiConfig();
+  return `${config.BASE_URL}${config.UPLOAD_GOAL_IMAGE_ENDPOINT}`;
 };

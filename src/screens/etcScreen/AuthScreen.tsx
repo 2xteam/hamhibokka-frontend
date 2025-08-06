@@ -12,7 +12,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {LOGIN_USER, REGISTER_USER} from '../queries/user';
+import {ALERT_EMOJIS} from '../../constants/alerts';
+import {LOGIN_USER, REGISTER_USER} from '../../queries/user';
 
 // 비밀번호 강도 검증 함수
 const validatePassword = (password: string) => {
@@ -82,7 +83,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
     });
 
     if (!email || !password || (!isLogin && !nickname)) {
-      Alert.alert('오류', '모든 필드를 입력해주세요.');
+      Alert.alert(ALERT_EMOJIS.ERROR, '모든 필드를 입력해주세요.');
       return;
     }
 
@@ -101,14 +102,14 @@ const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
     } else {
       // 로그인 시에는 기본 길이만 확인
       if (password.length < 6) {
-        Alert.alert('오류', '비밀번호는 6자 이상이어야 합니다.');
+        Alert.alert(ALERT_EMOJIS.ERROR, '비밀번호는 6자 이상이어야 합니다.');
         return;
       }
     }
 
     // 회원가입 시 비밀번호 확인 검증
     if (!isLogin && password !== confirmPassword) {
-      Alert.alert('오류', '비밀번호가 일치하지 않습니다.');
+      Alert.alert(ALERT_EMOJIS.ERROR, '비밀번호가 일치하지 않습니다.');
       return;
     }
 
@@ -147,14 +148,12 @@ const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
     } catch (error: any) {
       // 개발 환경에서만 에러 로그 출력
       if (__DEV__) {
-        console.error('Auth error:', error);
+        // console.error('Auth error:', error);
       }
 
-      let errorMessage = isLogin
-        ? '로그인에 실패했습니다.'
-        : '회원가입에 실패했습니다.';
+      let errorMessage = '';
 
-      // GraphQL 에러 메시지 추출
+      // GraphQL 에러 메시지 우선 사용
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         const graphQLError = error.graphQLErrors[0];
 
@@ -163,38 +162,21 @@ const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
           console.log('GraphQL Error:', graphQLError);
         }
 
-        // 특정 에러 메시지 처리
-        if (
-          graphQLError.message &&
-          graphQLError.message.includes('이미 존재하는 이메일')
-        ) {
-          errorMessage = '이미 가입된 이메일입니다.';
-        } else if (
-          graphQLError.message &&
-          graphQLError.message.includes('이미 사용 중인 닉네임')
-        ) {
-          errorMessage = '이미 사용 중인 닉네임입니다.';
-        } else if (
-          graphQLError.message &&
-          graphQLError.message.includes('잘못된 이메일')
-        ) {
-          errorMessage = '올바른 이메일 형식을 입력해주세요.';
-        } else if (
-          graphQLError.message &&
-          graphQLError.message.includes('잘못된 비밀번호')
-        ) {
-          errorMessage = '비밀번호를 다시 확인해주세요.';
-        } else {
-          // 기본적으로 GraphQL 에러 메시지 사용
-          errorMessage = graphQLError.message || errorMessage;
-        }
+        // GraphQL 에러 메시지를 그대로 사용
+        errorMessage =
+          graphQLError.message || '알 수 없는 오류가 발생했습니다.';
       } else if (error.networkError) {
         errorMessage = '네트워크 연결을 확인해주세요.';
       } else if (error.message) {
         errorMessage = error.message;
+      } else {
+        // 기본 에러 메시지
+        errorMessage = isLogin
+          ? '로그인에 실패했습니다.'
+          : '회원가입에 실패했습니다.';
       }
 
-      Alert.alert('오류', errorMessage);
+      Alert.alert(ALERT_EMOJIS.ERROR, errorMessage);
     } finally {
       setIsLoading(false);
     }

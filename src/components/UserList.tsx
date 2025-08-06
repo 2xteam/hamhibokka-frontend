@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {FOLLOW_STATUS, FOLLOW_STATUS_TEXT} from '../constants/followStatus';
 
 export interface User {
   id: string;
@@ -44,7 +45,7 @@ const UserList: React.FC<UserListProps> = ({
         source={
           item.profileImage
             ? {uri: item.profileImage}
-            : require('../../../assets/default-profile.jpg')
+            : require('../../assets/default-profile.jpg')
         }
         style={styles.userAvatar}
       />
@@ -52,23 +53,36 @@ const UserList: React.FC<UserListProps> = ({
         <Text style={styles.userNickname}>{item.nickname}</Text>
         <Text style={styles.userEmail}>{item.email}</Text>
         {showFollowStatus && item.followStatus && (
-          <Text style={styles.followedText}>팔로우 중</Text>
+          <Text style={styles.followedText}>
+            {FOLLOW_STATUS_TEXT[
+              item.followStatus as keyof typeof FOLLOW_STATUS_TEXT
+            ] || '팔로우 중'}
+          </Text>
         )}
         {/* 친구 관리 모달용 상태 표시 */}
         {showApproveButton && (item as any).showPendingStatus && (
-          <Text style={styles.pendingText}>대기중</Text>
+          <Text style={styles.pendingText}>
+            {FOLLOW_STATUS_TEXT[FOLLOW_STATUS.PENDING]}
+          </Text>
         )}
         {showApproveButton &&
-          (item as any).status === 'pending' &&
+          (item as any).status === FOLLOW_STATUS.PENDING &&
           !(item as any).showPendingStatus && (
             <Text style={styles.requestText}>요청받음</Text>
           )}
-        {showApproveButton && (item as any).status === 'approved' && (
-          <Text style={styles.mutualFollowText}>맞팔중</Text>
-        )}
+        {showApproveButton &&
+          (item as any).status === FOLLOW_STATUS.APPROVED && (
+            <Text style={styles.mutualFollowText}>
+              {FOLLOW_STATUS_TEXT[FOLLOW_STATUS.APPROVED]}
+            </Text>
+          )}
         {/* 일반 팔로우 상태 표시 (친구 관리 모달이 아닌 경우) */}
         {!showApproveButton && showFollowStatus && item.followStatus && (
-          <Text style={styles.followedText}>팔로우 중</Text>
+          <Text style={styles.followedText}>
+            {FOLLOW_STATUS_TEXT[
+              item.followStatus as keyof typeof FOLLOW_STATUS_TEXT
+            ] || '팔로우 중'}
+          </Text>
         )}
       </View>
       {showApproveButton &&

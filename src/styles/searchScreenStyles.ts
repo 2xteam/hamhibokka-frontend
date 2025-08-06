@@ -211,4 +211,16 @@ export const searchScreenStyles = StyleSheet.create({
   goalList: {
     marginTop: 16,
   },
+  // 목표 찾기 전용 원형 welcomeIcon
+  goalWelcomeIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 16,
+    backgroundColor: colors.primaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    borderWidth: 3,
+    borderColor: colors.primary,
+  },
 });
