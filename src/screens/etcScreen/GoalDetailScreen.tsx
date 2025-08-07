@@ -1069,7 +1069,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     padding: 32,
     width: 340,
-    height: '95%',
+    minHeight: '65%',
     alignItems: 'center',
     shadowColor: colors.components.goalDetail.modal.shadow,
     shadowOffset: {width: 0, height: 8},
