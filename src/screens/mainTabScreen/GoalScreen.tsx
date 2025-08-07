@@ -57,11 +57,10 @@ const GoalScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F0F2F5', // 연한 회색 배경으로 구분
-    padding: 20,
+    backgroundColor: '#F0F2F5',
   },
   title: {
-    fontSize: 26, // 24에서 26으로 증가
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#2C3E50',
     marginBottom: 24,
@@ -69,6 +68,9 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 40,
+    paddingTop: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   goalItem: {
     backgroundColor: '#fff',
@@ -82,18 +84,18 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   goalTitle: {
-    fontSize: 20, // 18에서 20으로 증가
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#2C3E50',
     marginBottom: 8,
   },
   goalDesc: {
-    fontSize: 16, // 14에서 16으로 증가
+    fontSize: 16,
     color: '#7F8C8D',
     marginBottom: 8,
   },
   stickerCount: {
-    fontSize: 14, // 13에서 14로 증가
+    fontSize: 14,
     color: '#F39C12',
     fontWeight: 'bold',
   },

@@ -532,162 +532,146 @@ const GoalDetailScreen: React.FC = () => {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContentChild}>
               <Text style={styles.modalTitle}>👬 참가자 현황</Text>
-              {selectedParticipant ? (
-                <>
-                  <TouchableOpacity
-                    style={styles.profileClickable}
-                    onPress={() => {
-                      setModalVisible(false);
-                      // 나의 계정인지 확인
-                      if (selectedParticipant.userId === currentUserId) {
-                        // 나의 계정이면 Main 탭의 Profile로 이동
-                        navigation.navigate('Main', {screen: 'Profile'});
-                      } else {
-                        // 타인의 계정이면 UserProfile 스크린으로 이동
-                        navigation.navigate('UserProfile', {
-                          user: {
-                            id: selectedParticipant.userId,
-                            userId: selectedParticipant.userId,
-                            nickname:
-                              selectedParticipant.nickname || '알 수 없음',
-                            email: selectedParticipant.email || '',
-                            profileImage: selectedParticipant.profileImage,
-                          },
-                        });
-                      }
-                    }}>
-                    <View style={styles.avatarRow}>
-                      <Image
-                        source={
-                          selectedParticipant.profileImage
-                            ? {uri: selectedParticipant.profileImage}
-                            : require('../../../assets/default-profile.jpg')
+              <ScrollView
+                style={styles.modalScrollView}
+                showsVerticalScrollIndicator={true}
+                contentContainerStyle={styles.modalScrollContent}>
+                {selectedParticipant ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.profileClickable}
+                      onPress={() => {
+                        setModalVisible(false);
+                        // 나의 계정인지 확인
+                        if (selectedParticipant.userId === currentUserId) {
+                          // 나의 계정이면 Main 탭의 Profile로 이동
+                          navigation.navigate('Main', {screen: 'Profile'});
+                        } else {
+                          // 타인의 계정이면 UserProfile 스크린으로 이동
+                          navigation.navigate('UserProfile', {
+                            user: {
+                              id: selectedParticipant.userId,
+                              userId: selectedParticipant.userId,
+                              nickname:
+                                selectedParticipant.nickname || '알 수 없음',
+                              email: selectedParticipant.email || '',
+                              profileImage: selectedParticipant.profileImage,
+                            },
+                          });
                         }
-                        style={styles.avatarImage}
-                      />
-                    </View>
-                    <Text style={styles.modalLabel}>
-                      닉네임:{' '}
-                      <Text style={{color: colors.primary, fontWeight: 'bold'}}>
-                        {selectedParticipant.nickname || '-'}
-                      </Text>
-                    </Text>
-                  </TouchableOpacity>
-
-                  {/* 스티커 부여 현황(한 줄에 최대 5개씩, 3줄이 넘으면 스크롤) */}
-                  <View style={styles.stickerContainer}>
-                    <Text style={styles.stickerTitle}>스티커 현황</Text>
-                    <View style={styles.stickerScrollContainer}>
-                      <ScrollView
-                        style={styles.stickerScrollView}
-                        showsVerticalScrollIndicator={true}
-                        nestedScrollEnabled={true}
-                        indicatorStyle="white">
-                        <View style={styles.stickerGrid}>
-                          {Array.from({length: goal.stickerCount}).map(
-                            (_, idx) => (
-                              <View key={idx} style={styles.stickerItem}>
-                                <Text
-                                  style={[
-                                    styles.stickerIcon,
-                                    {
-                                      opacity:
-                                        idx <
-                                        (selectedParticipant.currentStickerCount ??
-                                          0)
-                                          ? 1
-                                          : 0.3,
-                                    },
-                                  ]}>
-                                  {idx <
-                                  (selectedParticipant.currentStickerCount ?? 0)
-                                    ? '🌟'
-                                    : '⭐️'}
-                                </Text>
-                              </View>
-                            ),
-                          )}
-                        </View>
-                      </ScrollView>
-                    </View>
-                  </View>
-                  {/* goal 생성자일 때만 스티커 부여 UI 노출, 단 목표 달성 시에는 노출 X */}
-                  {goal.createdBy &&
-                    currentUserId &&
-                    goal.createdBy === currentUserId &&
-                    selectedParticipant.currentStickerCount !== undefined &&
-                    selectedParticipant.currentStickerCount <
-                      goal.stickerCount && (
-                      <View style={styles.giveStickerBox}>
-                        <Text style={styles.giveStickerLabel}>
-                          ⭐ 스티커 관리
+                      }}>
+                      <View style={styles.avatarRow}>
+                        <Image
+                          source={
+                            selectedParticipant.profileImage
+                              ? {uri: selectedParticipant.profileImage}
+                              : require('../../../assets/default-profile.jpg')
+                          }
+                          style={styles.avatarImage}
+                        />
+                      </View>
+                      <Text style={styles.modalLabel}>
+                        닉네임:{' '}
+                        <Text
+                          style={{color: colors.primary, fontWeight: 'bold'}}>
+                          {selectedParticipant.nickname || '-'}
                         </Text>
-                        <View style={styles.giveStickerRow}>
-                          <TextInput
-                            style={styles.giveStickerInput}
-                            value={giveStickerCount}
-                            onChangeText={setGiveStickerCount}
-                            keyboardType="numeric"
-                            maxLength={2}
-                          />
-                          <TouchableOpacity
-                            style={styles.giveStickerBtn}
-                            onPress={async () => {
-                              const current =
-                                selectedParticipant.currentStickerCount ?? 0;
-                              const give = Number(giveStickerCount) || 1;
-                              if (current + give > goal.stickerCount) {
-                                Alert.alert(
-                                  '스티커 목표 초과',
-                                  '스티커 목표 개수를 초과할 수 없어요!',
-                                );
-                                return;
-                              }
-                              try {
-                                await receiveSticker({
-                                  variables: {
-                                    input: {
-                                      goalId: goal.goalId,
-                                      toUserId:
-                                        selectedParticipant.userId ||
-                                        selectedParticipant.id,
-                                      stickerCount: give,
-                                    },
-                                  },
-                                });
-                                Alert.alert(
-                                  '🎉',
-                                  `${giveStickerCount}개 스티커를 붙였어요!`,
-                                );
-                                setGiveStickerCount('1');
-                                setModalVisible(false);
-                                if (typeof refetch === 'function')
-                                  await refetch();
-                              } catch (e: any) {
-                                let msg = '스티커 붙이기에 실패했어요.';
-                                if (e?.graphQLErrors?.[0]?.message)
-                                  msg = e.graphQLErrors[0].message;
-                                else if (e?.message) msg = e.message;
-                                Alert.alert('실패', msg);
-                              }
-                            }}
-                            disabled={giveStickerLoading}>
-                            <Text style={styles.giveStickerBtnText}>
-                              {giveStickerLoading ? '⭐️...' : '🌟'}
-                            </Text>
-                          </TouchableOpacity>
-                          {/* 스티커 빼기 버튼 - 참여자의 스티커가 0보다 클 때만 표시 */}
-                          {selectedParticipant.currentStickerCount > 0 && (
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* 스티커 부여 현황(한 줄에 최대 5개씩, 3줄이 넘으면 스크롤) */}
+                    <View style={styles.stickerContainer}>
+                      <Text style={styles.stickerTitle}>✨모은 스티커</Text>
+                      <View style={styles.stickerScrollContainer}>
+                        <ScrollView
+                          style={styles.stickerScrollView}
+                          showsVerticalScrollIndicator={true}
+                          nestedScrollEnabled={true}
+                          indicatorStyle="white">
+                          <View style={styles.stickerGrid}>
+                            {Array.from({length: goal.stickerCount}).map(
+                              (_, idx) => (
+                                <View key={idx} style={styles.stickerItem}>
+                                  <Text
+                                    style={[
+                                      styles.stickerIcon,
+                                      {
+                                        opacity:
+                                          idx <
+                                          (selectedParticipant.currentStickerCount ??
+                                            0)
+                                            ? 1
+                                            : 0.3,
+                                      },
+                                    ]}>
+                                    {idx <
+                                    (selectedParticipant.currentStickerCount ??
+                                      0)
+                                      ? '🌟'
+                                      : '⭐️'}
+                                  </Text>
+                                </View>
+                              ),
+                            )}
+                          </View>
+                        </ScrollView>
+                      </View>
+                    </View>
+                    {/* goal 생성자일 때만 스티커 부여 UI 노출, 단 목표 달성 시에는 노출 X */}
+                    {goal.createdBy &&
+                      currentUserId &&
+                      goal.createdBy === currentUserId &&
+                      selectedParticipant.currentStickerCount !== undefined &&
+                      selectedParticipant.currentStickerCount <
+                        goal.stickerCount && (
+                        <View style={styles.giveStickerBox}>
+                          <Text style={styles.giveStickerLabel}>
+                            🌟 스티커 붙이기
+                          </Text>
+
+                          {/* 스티커 카운트 조절 UI */}
+                          <View style={styles.stickerControlContainer}>
+                            <View style={styles.stickerControl}>
+                              <TouchableOpacity
+                                style={styles.stickerButton}
+                                onPress={() => {
+                                  const current =
+                                    parseInt(giveStickerCount) || 1;
+                                  if (current > 1) {
+                                    setGiveStickerCount(
+                                      (current - 1).toString(),
+                                    );
+                                  }
+                                }}>
+                                <Text style={styles.stickerButtonText}>-</Text>
+                              </TouchableOpacity>
+                              <Text style={styles.stickerCount}>
+                                {giveStickerCount}
+                              </Text>
+                              <TouchableOpacity
+                                style={styles.stickerButton}
+                                onPress={() => {
+                                  const current =
+                                    parseInt(giveStickerCount) || 1;
+                                  setGiveStickerCount((current + 1).toString());
+                                }}>
+                                <Text style={styles.stickerButtonText}>+</Text>
+                              </TouchableOpacity>
+                            </View>
+                          </View>
+
+                          {/* 스티커 부여/뺏기 버튼들 */}
+                          <View style={styles.stickerActionRow}>
                             <TouchableOpacity
-                              style={styles.removeStickerBtn}
+                              style={styles.giveStickerBtn}
                               onPress={async () => {
                                 const current =
                                   selectedParticipant.currentStickerCount ?? 0;
-                                const remove = Number(giveStickerCount) || 1;
-                                if (remove > current) {
+                                const give = Number(giveStickerCount) || 1;
+                                if (current + give > goal.stickerCount) {
                                   Alert.alert(
-                                    '스티커 부족',
-                                    '가지고 있는 스티커보다 많이 뺄 수 없어요!',
+                                    '스티커 목표 초과',
+                                    '스티커 목표 개수를 초과할 수 없어요!',
                                   );
                                   return;
                                 }
@@ -699,20 +683,20 @@ const GoalDetailScreen: React.FC = () => {
                                         toUserId:
                                           selectedParticipant.userId ||
                                           selectedParticipant.id,
-                                        stickerCount: -remove, // 음수 값으로 스티커 빼기
+                                        stickerCount: give,
                                       },
                                     },
                                   });
                                   Alert.alert(
-                                    '🗑️',
-                                    `${giveStickerCount}개 스티커를 뺐어요!`,
+                                    '🎉',
+                                    `${giveStickerCount}개 스티커를 붙였어요!`,
                                   );
                                   setGiveStickerCount('1');
                                   setModalVisible(false);
                                   if (typeof refetch === 'function')
                                     await refetch();
                                 } catch (e: any) {
-                                  let msg = '스티커 빼기에 실패했어요.';
+                                  let msg = '스티커 붙이기에 실패했어요.';
                                   if (e?.graphQLErrors?.[0]?.message)
                                     msg = e.graphQLErrors[0].message;
                                   else if (e?.message) msg = e.message;
@@ -720,29 +704,80 @@ const GoalDetailScreen: React.FC = () => {
                                 }
                               }}
                               disabled={giveStickerLoading}>
-                              <Text style={styles.removeStickerBtnText}>
-                                {giveStickerLoading ? '🗑️...' : '🗑️'}
+                              <Text style={styles.giveStickerBtnText}>
+                                {giveStickerLoading ? '⭐️...' : '🌟'}
                               </Text>
                             </TouchableOpacity>
-                          )}
-                        </View>
-                      </View>
-                    )}
 
-                  {/* 참여자가 본인이고 목표 달성 시 축하 UI 노출 */}
-                  {selectedParticipant.userId === currentUserId &&
-                    selectedParticipant.currentStickerCount ===
-                      goal.stickerCount && (
-                      <View style={styles.celebrateBox}>
-                        <Text style={styles.celebrateEmoji}>🎉🎊</Text>
-                        <Text style={styles.celebrateTitle}>목표 달성!</Text>
-                        <Text style={styles.celebrateText}>
-                          축하해요! 모든 스티커를 모았어요! 🥳
-                        </Text>
-                      </View>
-                    )}
-                </>
-              ) : null}
+                            {/* 스티커 빼기 버튼 - 참여자의 스티커가 0보다 클 때만 표시 */}
+                            {selectedParticipant.currentStickerCount > 0 && (
+                              <TouchableOpacity
+                                style={styles.removeStickerBtn}
+                                onPress={async () => {
+                                  const current =
+                                    selectedParticipant.currentStickerCount ??
+                                    0;
+                                  const remove = Number(giveStickerCount) || 1;
+                                  if (remove > current) {
+                                    Alert.alert(
+                                      '스티커 부족',
+                                      '가지고 있는 스티커보다 많이 뺄 수 없어요!',
+                                    );
+                                    return;
+                                  }
+                                  try {
+                                    await receiveSticker({
+                                      variables: {
+                                        input: {
+                                          goalId: goal.goalId,
+                                          toUserId:
+                                            selectedParticipant.userId ||
+                                            selectedParticipant.id,
+                                          stickerCount: -remove, // 음수 값으로 스티커 빼기
+                                        },
+                                      },
+                                    });
+                                    Alert.alert(
+                                      '🗑️',
+                                      `${giveStickerCount}개 스티커를 뺐어요!`,
+                                    );
+                                    setGiveStickerCount('1');
+                                    setModalVisible(false);
+                                    if (typeof refetch === 'function')
+                                      await refetch();
+                                  } catch (e: any) {
+                                    let msg = '스티커 빼기에 실패했어요.';
+                                    if (e?.graphQLErrors?.[0]?.message)
+                                      msg = e.graphQLErrors[0].message;
+                                    else if (e?.message) msg = e.message;
+                                    Alert.alert('실패', msg);
+                                  }
+                                }}
+                                disabled={giveStickerLoading}>
+                                <Text style={styles.removeStickerBtnText}>
+                                  🗑️
+                                </Text>
+                              </TouchableOpacity>
+                            )}
+                          </View>
+                        </View>
+                      )}
+
+                    {/* 참여자가 본인이고 목표 달성 시 축하 UI 노출 */}
+                    {selectedParticipant.userId === currentUserId &&
+                      selectedParticipant.currentStickerCount ===
+                        goal.stickerCount && (
+                        <View style={styles.celebrateBox}>
+                          <Text style={styles.celebrateEmoji}>🎉🎊</Text>
+                          <Text style={styles.celebrateTitle}>목표 달성!</Text>
+                          <Text style={styles.celebrateText}>
+                            축하해요! 모든 스티커를 모았어요! 🥳
+                          </Text>
+                        </View>
+                      )}
+                  </>
+                ) : null}
+              </ScrollView>
               <TouchableOpacity
                 style={styles.modalCloseBtn}
                 onPress={() => setModalVisible(false)}>
@@ -848,6 +883,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.components.goalDetail.background,
+    paddingBottom: 60,
   },
   safeArea: {
     flex: 1,
@@ -1033,6 +1069,7 @@ const styles = StyleSheet.create({
     borderRadius: 28,
     padding: 32,
     width: 340,
+    height: '95%',
     alignItems: 'center',
     shadowColor: colors.components.goalDetail.modal.shadow,
     shadowOffset: {width: 0, height: 8},
@@ -1157,7 +1194,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stickerCountText: {
-    fontSize: 18, // 16에서 18로 증가
+    fontSize: 18,
     color: colors.components.goalDetail.info.label,
     fontWeight: '600',
   },
@@ -1170,7 +1207,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   giveStickerLabel: {
-    fontSize: 20, // 18에서 20으로 증가
+    fontSize: 20,
     color: colors.components.goalDetail.sticker.title,
     fontWeight: 'bold',
     marginBottom: 8,
@@ -1187,7 +1224,7 @@ const styles = StyleSheet.create({
     borderColor: colors.components.goalDetail.input.border,
     borderRadius: 12,
     padding: 8,
-    fontSize: 20, // 18에서 20으로 증가
+    fontSize: 20,
     marginRight: 12,
     textAlign: 'center',
     backgroundColor: '#FFFFFF',
@@ -1205,12 +1242,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 6,
-    marginRight: 12, // 버튼 사이 간격 추가
+    marginRight: 12,
   },
   giveStickerBtnText: {
     color: colors.components.goalDetail.sticker.button.text,
     fontWeight: 'bold',
-    fontSize: 18, // 16에서 18로 증가
+    fontSize: 18,
   },
   stickerIconRow: {
     marginTop: 10,
@@ -1230,7 +1267,7 @@ const styles = StyleSheet.create({
     borderColor: colors.components.goalDetail.sticker.border,
   },
   stickerTitle: {
-    fontSize: 18, // 16에서 18로 증가
+    fontSize: 20,
     color: colors.components.goalDetail.sticker.title,
     fontWeight: 'bold',
     marginBottom: 12,
@@ -1413,6 +1450,75 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 12,
+  },
+  // 스티커 카운트 조절 UI 스타일
+  stickerControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  stickerButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  stickerButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.white,
+  },
+  stickerCount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.primary,
+    marginHorizontal: 12,
+    minWidth: 30,
+    textAlign: 'center',
+  },
+  stickerActionRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    gap: 8,
+  },
+  stickerControlContainer: {
+    marginBottom: 10,
+    marginTop: 10,
+  },
+  stickerCountLabel: {
+    fontSize: 14,
+    color: colors.medium,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalScrollContainer: {
+    flex: 1,
+    width: '100%',
+    minHeight: 300,
+    maxHeight: 500,
+  },
+  modalScrollView: {
+    flex: 1,
+    width: '100%',
+  },
+  modalScrollContent: {
+    paddingBottom: 20,
+    alignItems: 'center',
   },
 });
 

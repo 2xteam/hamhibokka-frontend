@@ -27,7 +27,7 @@ const screens = [
 
 const tabBarOptions = {
   tabBarLabelStyle: {
-    fontSize: 24, // 22에서 24로 증가
+    fontSize: 22,
     fontWeight: 'bold',
     textShadowColor: colors.primaryDark,
     textShadowOffset: {width: 1, height: 1},
@@ -49,10 +49,10 @@ const tabBarOptions = {
     shadowRadius: 0,
     borderBottomWidth: 3,
     borderBottomColor: colors.primaryLight,
-    marginTop: -10,
+    marginTop: -21,
   },
   tabBarItemStyle: {
-    paddingVertical: 14, // 12에서 16으로 증가
+    paddingVertical: 14,
   },
 };
 

@@ -74,7 +74,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F0F2F5', // 연한 회색 배경으로 구분
-    padding: 20,
   },
   centered: {
     flex: 1,
@@ -84,6 +83,9 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     paddingBottom: 40,
+    paddingTop: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
 });
 

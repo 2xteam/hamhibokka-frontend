@@ -19,9 +19,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 12,
-    // paddingVertical: 8,
-    // borderRadius: 20,
-    // backgroundColor: colors.primaryLight,
     minWidth: 40,
     minHeight: 40,
   },
@@ -29,6 +26,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: colors.white,
     fontWeight: 'bold',
+    height: 40,
   },
 });
 

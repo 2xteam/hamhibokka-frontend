@@ -30,7 +30,7 @@ const screens = [
 
 const tabBarOptions = {
   tabBarLabelStyle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: 'bold',
     textShadowColor: colors.primaryDark,
     textShadowOffset: {width: 1, height: 1},
@@ -52,7 +52,7 @@ const tabBarOptions = {
     shadowRadius: 0,
     borderBottomWidth: 3,
     borderBottomColor: colors.primaryLight,
-    marginTop: -10,
+    marginTop: -21,
   },
   tabBarItemStyle: {
     paddingVertical: 14,

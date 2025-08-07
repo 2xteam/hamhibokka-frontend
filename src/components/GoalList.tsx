@@ -210,7 +210,9 @@ const GoalList: React.FC<GoalListProps> = ({
         </View>
 
         {item.description && (
-          <Text style={styles.goalDesc}>{item.description}</Text>
+          <Text style={styles.goalDesc} numberOfLines={2}>
+            {item.description}
+          </Text>
         )}
 
         <View style={styles.goalInfoRow}>
@@ -397,7 +399,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   goalTitle: {
-    fontSize: 20, // 18에서 20으로 증가
+    fontSize: 20,
     fontWeight: 'bold',
     color: colors.components.goalList.header.title,
     marginBottom: 8,
@@ -453,10 +455,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   goalDesc: {
-    fontSize: 16, // 15에서 16으로 증가
+    fontSize: 16,
     color: colors.components.goalList.header.mode,
     marginBottom: 16,
-    lineHeight: 24, // 22에서 24로 증가
+    lineHeight: 24,
   },
   goalInfoRow: {
     flexDirection: 'row',
@@ -477,7 +479,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   stickerCount: {
-    fontSize: 16, // 15에서 16으로 증가
+    fontSize: 16,
     color: colors.components.goalList.info.sticker,
     fontWeight: 'bold',
   },
@@ -512,7 +514,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   participantsTitle: {
-    fontSize: 16, // 15에서 16으로 증가
+    fontSize: 16,
     fontWeight: 'bold',
     color: colors.components.goalList.participants.title,
   },
@@ -537,12 +539,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryLight,
   },
   participantName: {
-    fontSize: 15, // 14에서 15로 증가
+    fontSize: 15,
     color: colors.components.goalList.participants.name,
     fontWeight: '600',
   },
   participantStickers: {
-    fontSize: 14, // 13에서 14로 증가
+    fontSize: 14,
     color: colors.components.goalList.participants.sticker,
     fontWeight: 'bold',
   },
@@ -584,19 +586,19 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   emptyTitle: {
-    fontSize: 26, // 24에서 26으로 증가
+    fontSize: 26,
     fontWeight: 'bold',
     color: colors.components.goalList.empty.title,
     marginBottom: 4,
   },
   emptyText: {
-    fontSize: 18, // 16에서 18로 증가
+    fontSize: 18,
     color: colors.components.goalList.empty.text,
     textAlign: 'center',
     marginBottom: 4,
   },
   emptySubtext: {
-    fontSize: 15, // 13에서 15로 증가
+    fontSize: 15,
     color: colors.components.goalList.empty.subtext,
     textAlign: 'center',
   },

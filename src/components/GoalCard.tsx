@@ -147,7 +147,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
           </View>
         )}
       </View>
-      <Text style={styles.feedGoalTitle} numberOfLines={2}>
+      <Text style={styles.feedGoalTitle} numberOfLines={3}>
         {goal.description || '설명이 없습니다.'}
       </Text>
 

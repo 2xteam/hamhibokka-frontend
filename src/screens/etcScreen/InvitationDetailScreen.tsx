@@ -92,14 +92,14 @@ const InvitationDetailScreen: React.FC = () => {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>상세 정보를 불러오는 중...</Text>
+        <Text style={styles.loadingText}>정보를 불러오는 중...</Text>
       </View>
     );
   }
   if (error || !data?.getInvitation) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>📄 상세 정보를 불러올 수 없습니다.</Text>
+        <Text style={styles.errorText}>📄 정보를 불러올 수 없습니다.</Text>
       </View>
     );
   }

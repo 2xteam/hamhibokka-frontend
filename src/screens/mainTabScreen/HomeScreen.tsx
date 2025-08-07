@@ -165,7 +165,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginTop: -2,
+    marginTop: -15,
     paddingBottom: 4,
     backgroundColor: colors.primary,
     borderBottomWidth: 3,
@@ -177,12 +177,12 @@ export const styles = StyleSheet.create({
     elevation: 8,
   },
   greeting: {
-    fontSize: 18, // 16에서 18로 증가
+    fontSize: 18,
     color: colors.white,
     fontWeight: '600',
   },
   userName: {
-    fontSize: 28, // 24에서 28로 증가
+    fontSize: 28,
     fontWeight: 'bold',
     color: colors.white,
     marginTop: 2,
@@ -236,13 +236,13 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 22, // 20에서 22로 증가
+    fontSize: 22,
     marginBottom: 10,
     fontWeight: 'bold',
     color: '#FF6B9D',
   },
   seeAllText: {
-    fontSize: 16, // 14에서 16으로 증가
+    fontSize: 16,
     color: '#FF6B9D',
     fontWeight: '600',
   },

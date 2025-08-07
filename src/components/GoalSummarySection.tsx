@@ -226,7 +226,7 @@ const MyCreatedGoalsSection: React.FC<MyCreatedGoalsSectionProps> = ({
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 10,
+    marginTop: 20,
     marginBottom: 24,
     paddingHorizontal: 20,
   },
