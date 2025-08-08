@@ -11,6 +11,8 @@
     "test": "jest",
     "codegen": "graphql-codegen --config codegen.yml",
     "codegen:watch": "graphql-codegen --config codegen.yml --watch",
+    "clean": "./clean.sh",
+    "install:all": "./install.sh",
     "clean-install": "./clean-install.sh"
   },
   "dependencies": {
