@@ -8,9 +8,6 @@ if [ ! -f "package.json" ]; then
   exit 1
 fi
 
-echo "📦 node_modules 삭제"
-rm -rf node_modules
-
 echo "📄 lock 파일 삭제 (package-lock.json, yarn.lock)"
 rm -f package-lock.json
 rm -f yarn.lock
@@ -34,6 +31,7 @@ watchman watch-del-all >/dev/null 2>&1 || true
 rm -rf "$TMPDIR"/metro-* 2>/dev/null || true
 rm -rf "$TMPDIR"/haste-* 2>/dev/null || true
 rm -rf node_modules/.cache/metro 2>/dev/null || true
+
 
 echo "📦 npm 캐시 정리"
 npm cache clean --force

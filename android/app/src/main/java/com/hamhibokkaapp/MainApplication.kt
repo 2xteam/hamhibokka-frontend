@@ -1,4 +1,4 @@
-package com.HamhibokkaApp
+package com.hamhibokkaapp
 
 import android.app.Application
 import com.facebook.react.PackageList
