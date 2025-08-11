@@ -568,10 +568,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: colors.primary,
-    paddingHorizontal: 20,
-    paddingTop: 2,
-    paddingBottom: 10,
-    borderBottomWidth: 3,
+    paddingHorizontal: 10,
+    // paddingTop: 2,
+    paddingBottom: 4,
+    borderBottomWidth: 2,
     borderBottomColor: colors.primaryLight,
     shadowColor: colors.primary,
     shadowOffset: {width: 0, height: 4},
@@ -580,18 +580,20 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   headerSpacer: {
-    width: 60,
+    width: 90,
+    height: 38,
   },
   headerTitle: {
-    fontSize: 24, // 22에서 24로 증가
+    fontSize: 22,
     fontWeight: 'bold',
     color: colors.white,
     textShadowColor: colors.primaryDark,
     textShadowOffset: {width: 1, height: 1},
     textShadowRadius: 2,
+    marginTop: -14,
   },
   logoutButton: {
-    paddingVertical: 10,
+    paddingVertical: 8,
     paddingHorizontal: 16,
     backgroundColor: colors.white,
     borderRadius: 20,
@@ -602,9 +604,10 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderWidth: 2,
     borderColor: colors.primaryLight,
+    marginTop: -14,
   },
   logoutButtonText: {
-    fontSize: 18, // 16에서 18로 증가
+    fontSize: 18,
     color: colors.primary,
     fontWeight: 'bold',
   },
@@ -650,14 +653,14 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
   },
   nickname: {
-    fontSize: 26, // 24에서 26으로 증가
+    fontSize: 26,
     fontWeight: 'bold',
     color: colors.primary,
     marginBottom: 8,
     textAlign: 'center',
   },
   email: {
-    fontSize: 18, // 16에서 18로 증가
+    fontSize: 18,
     color: colors.medium,
     fontWeight: '600',
     marginBottom: 20,
@@ -673,7 +676,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   friendsSectionTitle: {
-    fontSize: 24, // 22에서 24로 증가
+    fontSize: 24,
     fontWeight: 'bold',
     color: colors.primary,
     marginRight: 12,
@@ -688,7 +691,7 @@ const styles = StyleSheet.create({
   },
 
   friendsSectionSubtitle: {
-    fontSize: 16, // 14에서 16으로 증가
+    fontSize: 16,
     color: colors.medium,
     marginBottom: 20,
     fontWeight: '600',
@@ -706,7 +709,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 18, // 16에서 18로 증가
+    fontSize: 18,
     color: colors.primary,
     fontWeight: '600',
   },

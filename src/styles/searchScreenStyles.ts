@@ -10,7 +10,6 @@ export const searchScreenStyles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
   },
   searchInput: {
     flex: 1,
@@ -205,11 +204,11 @@ export const searchScreenStyles = StyleSheet.create({
     overflow: 'hidden',
   },
   userList: {
-    marginTop: 16,
+    paddingTop: 16,
   },
   // GoalSearchScreen 전용 스타일
   goalList: {
-    marginTop: 16,
+    paddingTop: 16,
   },
   // 목표 찾기 전용 원형 welcomeIcon
   goalWelcomeIcon: {
