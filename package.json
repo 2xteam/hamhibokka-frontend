@@ -3,17 +3,21 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
+    "android": "react-native run-android --port 8081",
+    "ios": "react-native run-ios --port 8081",
     "lint": "eslint .",
     "start": "react-native start",
-    "start:cache": "react-native start --reset-cache",
+    "start:cache": "react-native start --port 8081 --reset-cache",
     "test": "jest",
     "codegen": "graphql-codegen --config codegen.yml",
     "codegen:watch": "graphql-codegen --config codegen.yml --watch",
     "clean": "./clean.sh",
     "install:all": "./install.sh",
-    "clean-install": "./clean-install.sh"
+    "clean-install": "./clean-install.sh",
+    "android:clean": "cd android 2>/dev/null && ./gradlew clean || (cd .. && cd android && ./gradlew clean)",
+    "ios:clean": "cd ios 2>/dev/null && pod cache clean --all || (cd .. && cd ios && pod cache clean --all)",
+    "build:apk": "cd android 2>/dev/null && ./gradlew assembleRelease || (cd .. && cd android && ./gradlew assembleRelease)",
+    "build:apk:debug": "cd android 2>/dev/null && ./gradlew assembleDebug || (cd .. && cd android && ./gradlew assembleDebug)"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",

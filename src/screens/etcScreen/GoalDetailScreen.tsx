@@ -65,6 +65,7 @@ const GoalDetailScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [giveStickerCount, setGiveStickerCount] = useState('1');
+  const [showAllStickerDates, setShowAllStickerDates] = useState(false);
   const [joinMessage, setJoinMessage] = useState('참가 요청해요!');
   const [joinModalVisible, setJoinModalVisible] = useState(false);
   const [imageModalVisible, setImageModalVisible] = useState(false);
@@ -165,6 +166,7 @@ const GoalDetailScreen: React.FC = () => {
 
   const handleParticipantPress = (participant: any) => {
     setSelectedParticipant(participant);
+    setShowAllStickerDates(false);
     setModalVisible(true);
   };
 
@@ -616,6 +618,47 @@ const GoalDetailScreen: React.FC = () => {
                           </View>
                         </ScrollView>
                       </View>
+
+                      {/* 받은 스티커 날짜 히스토리 (간단 표시) */}
+                      {Array.isArray(selectedParticipant.stickerReceivedLogs) &&
+                        selectedParticipant.stickerReceivedLogs.length > 0 && (
+                          <View style={styles.stickerHistoryBox}>
+                            <Text style={styles.stickerHistoryTitle}>
+                              📚 언제 받았지?
+                            </Text>
+                            {(showAllStickerDates
+                              ? selectedParticipant.stickerReceivedLogs
+                              : selectedParticipant.stickerReceivedLogs.slice(
+                                  0,
+                                  3,
+                                )
+                            ).map((log: any, idx: number) => (
+                              <View
+                                key={`sticker-log-${idx}`}
+                                style={styles.stickerHistoryRow}>
+                                <Text style={styles.stickerHistoryDate}>
+                                  {formatDate(log.date, 'MM월 dd일')}
+                                </Text>
+                                <Text style={styles.stickerHistoryCount}>
+                                  {log.count > 0 ? `+${log.count}` : log.count}
+                                  개
+                                </Text>
+                              </View>
+                            ))}
+                            {selectedParticipant.stickerReceivedLogs.length >
+                              3 && (
+                              <TouchableOpacity
+                                style={styles.stickerHistoryToggle}
+                                onPress={() =>
+                                  setShowAllStickerDates(prev => !prev)
+                                }>
+                                <Text style={styles.stickerHistoryToggleText}>
+                                  {showAllStickerDates ? '접기' : '더보기'}
+                                </Text>
+                              </TouchableOpacity>
+                            )}
+                          </View>
+                        )}
                     </View>
                     {/* goal 생성자일 때만 스티커 부여 UI 노출, 단 목표 달성 시에는 노출 X */}
                     {goal.createdBy &&
@@ -1294,6 +1337,52 @@ const styles = StyleSheet.create({
   },
   stickerScrollContainer: {
     position: 'relative',
+  },
+
+  // 간단한 스티커 히스토리 영역
+  stickerHistoryBox: {
+    marginTop: 12,
+    backgroundColor: colors.components.goalDetail.input.background,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: colors.components.goalDetail.input.border,
+  },
+  stickerHistoryTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: colors.components.goalDetail.info.label,
+    marginBottom: 8,
+  },
+  stickerHistoryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  stickerHistoryDate: {
+    fontSize: 14,
+    color: colors.components.goalDetail.info.value,
+  },
+  stickerHistoryCount: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  stickerHistoryToggle: {
+    marginTop: 8,
+    alignSelf: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: colors.primary + '20',
+    borderWidth: 1,
+    borderColor: colors.primary,
+  },
+  stickerHistoryToggleText: {
+    fontSize: 12,
+    color: colors.primary,
+    fontWeight: '600',
   },
 
   celebrateBox: {
