@@ -39,14 +39,12 @@ const commonHeaderStyle = {
   elevation: 0,
   shadowOpacity: 0,
   borderBottomWidth: 0,
-  marginBottom: 10,
 };
 
 const commonHeaderTitleStyle = {
   fontWeight: 'bold' as const,
   fontSize: 20,
   color: colors.white,
-  marginBottom: 10,
 };
 
 // 헤더가 있는 화면을 위한 공통 옵션 생성 함수

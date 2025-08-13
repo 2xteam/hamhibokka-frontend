@@ -209,7 +209,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
 
   const [updateNickname] = useMutation(UPDATE_NICKNAME, {
     onCompleted: async data => {
-      console.log('Nickname updated successfully:', data);
       const newNickname = data.updateNickname.nickname;
       setLocalNickname(newNickname);
 
@@ -469,10 +468,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
   };
 
   const users = convertFollowsToUsers();
-
-  // 헤더 컴포넌트 렌더링
-  // 디버깅용: 사용자 정보 로그 출력
-  console.log('ProfileScreen user data:', user);
 
   const renderHeader = () => (
     <View style={styles.contentContainer}>

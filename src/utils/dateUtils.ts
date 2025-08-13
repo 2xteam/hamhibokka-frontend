@@ -3,7 +3,7 @@
  * @param dateStr - ISO 문자열 형태의 날짜
  * @returns 포맷팅된 날짜 문자열
  */
-export function formatDate(dateStr?: string): string {
+export function formatDate(dateStr?: string, p0?: string): string {
   if (!dateStr) return '-';
 
   const date = new Date(dateStr);

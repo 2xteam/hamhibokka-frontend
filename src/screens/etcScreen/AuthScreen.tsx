@@ -75,13 +75,6 @@ const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
   const [register] = useMutation(REGISTER_USER);
 
   const handleAuth = async () => {
-    console.log('handleAuth called with:', {
-      isLogin,
-      email,
-      password,
-      nickname,
-    });
-
     if (!email || !password || (!isLogin && !nickname)) {
       Alert.alert(ALERT_EMOJIS.ERROR, '모든 필드를 입력해주세요.');
       return;
@@ -119,15 +112,11 @@ const AuthScreen: React.FC<AuthScreenProps> = ({onAuthSuccess}) => {
       let result;
 
       if (isLogin) {
-        console.log('Attempting login with:', {email, password}); // 요청 데이터 로그
-
         result = await login({
           variables: {
             loginInput: {email, password},
           },
         });
-
-        console.log('Login result:', result); // 디버깅용
 
         if (result.data?.login) {
           const {accessToken, user} = result.data.login;

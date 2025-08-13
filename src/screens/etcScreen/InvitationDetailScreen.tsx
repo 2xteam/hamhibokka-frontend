@@ -107,7 +107,7 @@ const InvitationDetailScreen: React.FC = () => {
   const goal = inv.goal || {};
   const canApprove =
     goal.createdBy && currentUserId && goal.createdBy === currentUserId;
-  console.log(goal.createdBy, currentUserId);
+
   const isApproved = inv.status === 'accepted';
   const getModeEmoji = (mode?: string) => {
     switch (mode) {
