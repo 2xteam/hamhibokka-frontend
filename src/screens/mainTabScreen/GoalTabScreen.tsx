@@ -52,7 +52,7 @@ const tabBarOptions = {
     shadowRadius: 0,
     borderBottomWidth: 3,
     borderBottomColor: colors.primaryLight,
-    marginTop: -21,
+    marginTop: Platform.OS === 'android' ? -1 : -21,
   },
   tabBarItemStyle: {
     paddingVertical: 14,
