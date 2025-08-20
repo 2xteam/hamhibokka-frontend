@@ -1,4 +1,4 @@
-package com.hamhibokkaapp
+package com.HamhibokkaApp
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
