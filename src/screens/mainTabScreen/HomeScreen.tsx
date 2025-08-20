@@ -165,7 +165,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginTop: -15,
+    marginTop: Platform.OS === 'android' ? -6 : -15,
     paddingBottom: 4,
     backgroundColor: colors.primary,
     borderBottomWidth: 3,

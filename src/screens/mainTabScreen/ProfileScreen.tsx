@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
     textShadowColor: colors.primaryDark,
     textShadowOffset: {width: 1, height: 1},
     textShadowRadius: 2,
-    marginTop: -14,
+    marginTop: Platform.OS === 'android' ? 18 : -14,
   },
   logoutButton: {
     paddingVertical: 8,
@@ -599,7 +599,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     borderWidth: 2,
     borderColor: colors.primaryLight,
-    marginTop: -14,
+    marginTop: Platform.OS === 'android' ? 18 : -14,
   },
   logoutButtonText: {
     fontSize: 18,
