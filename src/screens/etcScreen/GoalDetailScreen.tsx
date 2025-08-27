@@ -467,7 +467,7 @@ const GoalDetailScreen: React.FC = () => {
                 }
               }}>
               <Text style={[styles.infoValue, styles.clickableText]}>
-                {goal.creatorNickname || '-'}
+                {goal.creatorNickname || '탈퇴한 회원'}
               </Text>
             </TouchableOpacity>
           </View>
