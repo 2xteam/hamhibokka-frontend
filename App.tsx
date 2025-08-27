@@ -7,6 +7,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import Reactotron from 'reactotron-react-native';
 import CustomBackButton from './src/components/CustomBackButton';
 import MainTabNavigator from './src/navigation/MainTabNavigator';
+import AccountManagementScreen from './src/screens/etcScreen/AccountManagementScreen';
 import AuthScreen from './src/screens/etcScreen/AuthScreen';
 import CreateGoalScreen from './src/screens/etcScreen/CreateGoalScreen';
 import EditGoalScreen from './src/screens/etcScreen/EditGoalScreen';
@@ -178,6 +179,17 @@ const App: React.FC = () => {
                   component={UserProfileScreen}
                   options={createHeaderOptions('🤖 프로필')}
                 />
+                <Stack.Screen
+                  name="AccountManagement"
+                  options={createHeaderOptions('⚙️ 계정 관리')}>
+                  {() => (
+                    <AccountManagementScreen
+                      user={user as any}
+                      onUpdateUser={updateUserInfo as any}
+                      onLogout={logout}
+                    />
+                  )}
+                </Stack.Screen>
               </>
             ) : (
               <Stack.Screen name="Auth">

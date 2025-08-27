@@ -472,16 +472,22 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const renderHeader = () => (
     <View style={styles.contentContainer}>
       {/* 프로필 정보 */}
+      {/* 프로필 정보 - 보기 전용 */}
       <ProfileHeader
         nickname={localNickname}
         email={user?.email || ''}
         profileImage={localProfileImage}
-        showCameraButton={true}
-        onCameraPress={handleImageUpload}
-        uploading={uploading}
-        isOwnProfile={true}
-        onNicknameUpdate={handleNicknameUpdate}
+        showCameraButton={false}
+        uploading={false}
+        isOwnProfile={false}
       />
+
+      {/* 계정 관리 이동 버튼 */}
+      <TouchableOpacity
+        style={styles.manageButton}
+        onPress={() => navigation.navigate('AccountManagement')}>
+        <Text style={styles.manageButtonText}>계정 관리</Text>
+      </TouchableOpacity>
 
       {/* 친구 관리 섹션 */}
       <View style={styles.friendsSection}>
@@ -710,6 +716,20 @@ const styles = StyleSheet.create({
   },
   friendsList: {
     paddingHorizontal: 0,
+  },
+  manageButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 16,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: colors.primaryLight,
+  },
+  manageButtonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   flatListContent: {
     flexGrow: 1,

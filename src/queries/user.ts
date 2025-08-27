@@ -161,3 +161,10 @@ export const UPDATE_NICKNAME = gql`
     }
   }
 `;
+
+// 계정 삭제 뮤테이션
+export const DELETE_USER = gql`
+  mutation DeleteUser($id: String!) {
+    deleteUser(id: $id)
+  }
+`;

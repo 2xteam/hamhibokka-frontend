@@ -111,6 +111,7 @@
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
+				A1B2C3D4E5F60708090A0B0C /* Generate Hermes dSYM */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -200,6 +201,22 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-HamhibokkaApp/Pods-HamhibokkaApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+/* Begin Custom PBXShellScriptBuildPhase for Hermes dSYM */
+		A1B2C3D4E5F60708090A0B0C /* Generate Hermes dSYM */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate Hermes dSYM";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${CONFIGURATION}\" = \"Release\" ]; then\n  HERMES_BIN=\"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework/hermes\"\n  if [ -f \"$HERMES_BIN\" ]; then\n    echo \"Generating dSYM for Hermes at $HERMES_BIN\";\n    dsymutil \"$HERMES_BIN\" -o \"${DWARF_DSYM_FOLDER_PATH}/hermes.framework.dSYM\";\n  else\n    echo \"Hermes binary not found at $HERMES_BIN.\";\n  fi\nfi\n";
+		};
+/* End Custom PBXShellScriptBuildPhase */
 		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

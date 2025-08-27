@@ -45,8 +45,6 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -79,5 +77,11 @@
 		<string>Octicons.ttf</string>
 		<string>Zocial.ttf</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>프로필/목표 이미지를 업로드하기 위해 사진에 접근이 필요합니다.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>앱에서 저장한 이미지를 사진 보관함에 저장하기 위해 권한이 필요합니다.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>프로필/목표 사진을 촬영하여 업로드하기 위해 카메라 접근이 필요합니다.</string>
 </dict>
 </plist>
