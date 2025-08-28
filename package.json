@@ -17,7 +17,8 @@
     "android:clean": "cd android 2>/dev/null && ./gradlew clean || (cd .. && cd android && ./gradlew clean)",
     "ios:clean": "cd ios 2>/dev/null && pod cache clean --all || (cd .. && cd ios && pod cache clean --all)",
     "build:apk": "cd android 2>/dev/null && ./gradlew assembleRelease || (cd .. && cd android && ./gradlew assembleRelease)",
-    "build:apk:debug": "cd android 2>/dev/null && ./gradlew assembleDebug || (cd .. && cd android && ./gradlew assembleDebug)"
+    "build:apk:debug": "cd android 2>/dev/null && ./gradlew assembleDebug || (cd .. && cd android && ./gradlew assembleDebug)",
+    "build:aab": "bash ./build-aab.sh"
   },
   "dependencies": {
     "@apollo/client": "^3.13.8",

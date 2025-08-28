@@ -18,6 +18,7 @@ import ChallengeSection from '../../components/ChallengeSection';
 import FloatingAddGoalButton from '../../components/FloatingAddGoalButton';
 import FollowFeedSection from '../../components/FollowFeedSection';
 import MyCreatedGoalsSection from '../../components/GoalSummarySection';
+import HowToModal from '../../components/HowToModal';
 import NotificationViewer from '../../components/NotificationViewer';
 import {GET_INVITATIONS} from '../../queries/goal';
 import {colors} from '../../styles/colors';
@@ -38,6 +39,39 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [notificationViewerVisible, setNotificationViewerVisible] =
     useState(false);
+  const [howToVisible, setHowToVisible] = useState(false);
+  const [howToPersonal] = useState<string[]>([
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/1.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/2.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/3.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/4.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/5.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/6.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/7.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/8.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/9.png',
+  ]);
+  const [howToFriendSearch] = useState<string[]>([
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-friend/1.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-friend/2.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-friend/3.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-friend/4.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-friend/5.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-friend/6.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-friend/7.png',
+  ]);
+  const [howToParticipation] = useState<string[]>([
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/1.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/2.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/3.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/4.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/5.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/6.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/7.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/8.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/9.png',
+    'https://hamhibokkastorage.blob.core.windows.net/hamhibokka-images/description-participate/10.png',
+  ]);
   const navigation = useNavigation<any>();
   const insets = useSafeAreaInsets();
 
@@ -139,10 +173,26 @@ const HomeScreen: React.FC<HomeScreenProps> = ({user}) => {
         {/* 플로팅 액션 버튼 */}
         <FloatingAddGoalButton />
 
+        {/* HOW? 버튼 */}
+        <TouchableOpacity
+          style={styles.howButton}
+          onPress={() => setHowToVisible(true)}>
+          <Text style={styles.howButtonText}>HOW?</Text>
+        </TouchableOpacity>
+
         {/* 알림 뷰어 */}
         <NotificationViewer
           visible={notificationViewerVisible}
           onClose={() => setNotificationViewerVisible(false)}
+        />
+
+        {/* HOW? 모달 */}
+        <HowToModal
+          visible={howToVisible}
+          imagesPersonal={howToPersonal}
+          imagesFriendSearch={howToFriendSearch}
+          imagesParticipation={howToParticipation}
+          onClose={() => setHowToVisible(false)}
         />
       </SafeAreaView>
     </View>
@@ -264,6 +314,29 @@ export const styles = StyleSheet.create({
     elevation: 6,
     borderWidth: 2,
     borderColor: '#FFE5F0',
+  },
+  howButton: {
+    position: 'absolute',
+    right: 24,
+    bottom: 100,
+    backgroundColor: colors.primary,
+    borderRadius: 18,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderWidth: 3,
+    borderColor: colors.components.fab.border,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 3},
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 6,
+    zIndex: 10,
+  },
+  howButtonText: {
+    color: colors.white,
+    fontSize: 13,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
 });
 
