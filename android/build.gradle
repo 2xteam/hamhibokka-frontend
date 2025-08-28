@@ -19,3 +19,19 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+// Ensure PATH includes common Node install locations for Exec tasks (Android Studio may have limited PATH)
+gradle.projectsEvaluated {
+    tasks.withType(Exec) { Exec t ->
+        def currentPath = t.environment["PATH"] ?: System.getenv("PATH")
+        def extraPaths = [
+            "/usr/local/bin",
+            "/opt/homebrew/bin"
+        ]
+        def newPath = (currentPath ? currentPath.split(":").toList() : [])
+            .plus(extraPaths)
+            .unique()
+            .join(":")
+        t.environment "PATH", newPath
+    }
+}
